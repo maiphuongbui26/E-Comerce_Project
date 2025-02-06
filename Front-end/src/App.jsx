@@ -8,7 +8,6 @@ function App() {
   const handleClickCount = ()=>{
     setCount((prevCount) => prevCount + 1)
   }
-
   return (
     <>
       <h1>Count state</h1>
@@ -17,5 +16,4 @@ function App() {
     </>
   )
 }
-
 export default App
