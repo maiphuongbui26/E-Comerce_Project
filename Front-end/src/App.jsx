@@ -1,18 +1,16 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route} from 'react-router-dom'
+import Home from './page/users/home/Home'
+import Header from './component/header/Header'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const handleClickCount = ()=>{
-    setCount((prevCount) => prevCount + 1)
-  }
+  
   return (
     <>
-      <h1>Count state</h1>
-      <p>{count}</p>
-      <button onClick={handleClickCount}>Tăng</button>
+      <Header/>
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
     </>
   )
 }
