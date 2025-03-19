@@ -4,7 +4,6 @@ import Home from './page/users/home/Home'
 import Header from './component/header/Header'
 
 function App() {
-  
   return (
     <>
       <Header/>

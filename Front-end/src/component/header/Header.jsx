@@ -13,7 +13,16 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 
-const pages = ["Products", "Pricing", "Blog"];
+const pages = [
+  "GIẢM GIÁ",
+  "ĐẦM",
+  "ÁO",
+  "QUẦN",
+  "CHÂN VÁY",
+  "ÁO KHOÁC",
+  "LOOKBOOK",
+  "BLAZER SS 2025",
+];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const Header = () => {
@@ -39,25 +48,13 @@ const Header = () => {
     <AppBar position="static" sx={{ backgroundColor: "#fff", color: "#000" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon
-            sx={{ display: { xs: "none", md: "flex" }, mr: 1, color: "#000" }}
+          <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
+          <img
+            src="../../../public/image/20240805_KnfT1Dl0.png"
+            width={77}
+            height={44}
           />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              textDecoration: "none",
-            }}
-          >
-            LOGO
-          </Typography>
+          </Box>
           {/* Menu app */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
@@ -88,14 +85,23 @@ const Header = () => {
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: "center", color: "#000" }}>
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      color: "#000",
+                      whiteSpace: "nowrap",
+                      fontSize: "0.875rem",
+                      px: 2,
+                    }}
+                  >
                     {page}
                   </Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+         
+         
           <Typography
             variant="h5"
             noWrap
@@ -111,14 +117,31 @@ const Header = () => {
               textDecoration: "none",
             }}
           >
-            LOGO
+          <img
+            src="../../../public/image/20240805_KnfT1Dl0.png"
+            width={77}
+            height={44}
+          />
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" },justifyContent:'center' }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: "none", md: "flex" },
+              justifyContent: "center",
+            }}
+          >
             {pages.map((page) => (
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: "#000", display: "block" }}
+                sx={{
+                  my: 2,
+                  color: "#000",
+                  display: "block",
+                  whiteSpace: "nowrap", // Prevent text wrapping
+                  fontSize: "0.875rem", // Adjust font size for better fit
+                  px: 2, // Add horizontal padding
+                }}
               >
                 {page}
               </Button>
