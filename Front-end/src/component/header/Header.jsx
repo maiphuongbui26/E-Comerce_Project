@@ -17,7 +17,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Drawer } from "@mui/material";
 
 const menuItems = [
-  { label: "GIẢM GIÁ", path: "/sales" },
+  { label: "GIẢM GIÁ", path: "/" },
   { label: "ĐẦM", path: "/dresses" },
   { label: "ÁO", path: "/shirts" },
   { label: "QUẦN", path: "/pants" },
