@@ -1,10 +1,14 @@
+import { Box } from "@mui/material";
+import SearchForm from "../../../component/header/SearchForm";
 
 const Cart = () => {
   return (
-    <div>
-      <h1>Cart</h1>
-    </div>
-  )
-}
-
-export default Cart
+    <>
+      <SearchForm />
+      <Box sx={{ flexGrow: 1,maxWidth: "1240px",margin: "0 auto" }}>
+         <span>Cart</span>
+      </Box>
+    </>
+  );
+};
+export default Cart;

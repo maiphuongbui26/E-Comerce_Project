@@ -10,11 +10,11 @@ function App() {
     <Routes>
       {/* User Routes */}
       <Route path="/" element={<UserLayout />}>
-        <Route path="dresses" element={<Home />} />
-        <Route path="cart" element={<Cart />} />
+        <Route path="/" element={<Home />} /> 
+        <Route path="dresses" element={<Cart />} />
         <Route path="checkout" element={<Checkout />} />
       </Route>
-    </Routes>
+    </Routes>   
   );
 }
 

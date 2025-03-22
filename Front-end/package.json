@@ -13,6 +13,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.8",
+    "@mui/joy": "^5.0.0-beta.52",
     "@mui/material": "^6.4.8",
     "@tailwindcss/vite": "^4.0.3",
     "axios": "^1.7.9",
@@ -20,6 +21,8 @@
     "react-dom": "^19.0.0",
     "react-navigation": "^5.0.0",
     "react-router-dom": "^7.1.5",
+    "react-slick": "^0.30.3",
+    "slick-carousel": "^1.8.1",
     "tailwindcss": "^4.0.3"
   },
   "devDependencies": {

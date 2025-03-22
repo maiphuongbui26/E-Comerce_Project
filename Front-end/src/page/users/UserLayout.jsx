@@ -2,15 +2,15 @@ import { Box, Container } from '@mui/material';
 import Header from '../../component/header/Header';
 import Footer from '../../component/footer/Footer';
 import { Outlet } from 'react-router-dom';
+import PolicyLinks from '../../component/header/PolicyLinks';
 const UserLayout = () => {
   return (
     <>
     <Header/>
-    <Container sx={{ maxWidth: "1240px" }}>
-      <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
+      <Box sx={{ flexGrow: 1, }}>
+      <PolicyLinks />
        <Outlet/>
       </Box>
-    </Container>  
     <Footer/>
     </>
   );
