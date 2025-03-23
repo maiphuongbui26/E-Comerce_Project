@@ -13,6 +13,7 @@ import MenuItem from "@mui/material/MenuItem";
 import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from "@mui/icons-material/Close";
 import { Drawer } from "@mui/material";
 
@@ -215,9 +216,15 @@ const Header = () => {
             {/* Personal */}
             <IconButton
               onClick={handleOpenUserMenu}
-              sx={{ color: "#000", p: 0 }}
+              sx={{display:{xs: "none", md: "inline-flex"}, color: "#000", p: 0 }}
             >
               <PersonOutlineOutlinedIcon />
+            </IconButton>
+            {/* Search */}
+            <IconButton
+              sx={{display:{xs: "inline-flex",md: "none"}, color: "#000", p: 0 }}
+            >
+              <SearchIcon />
             </IconButton>
             <Menu
               sx={{ mt: "45px" }}
