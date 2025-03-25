@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
-  const categoryProduct = [];
   var settings = {
     dots: false,
     infinite: true,
@@ -24,15 +23,9 @@ const Home = () => {
     autoplay: true,
     autoplaySpeed: 3000,
   };
-  var settingProduct = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  };
   return (
     <>
+    {/* Start Banner */}
       <Box className="relative" sx={{ margin: "0 auto" }}>
         <Slider {...settings}>
           <div>
@@ -94,7 +87,10 @@ const Home = () => {
           </Button>
         </Box>
       </Box>
+      {/*End Banner */}
+      {/* Start container */}
       <Box sx={{ maxWidth: "1240px", margin: "0 auto" }}>
+        {/*Start Category */}
         <Box
           sx={{
             padding: "60px 0 70px",
@@ -160,6 +156,8 @@ const Home = () => {
             </Box>
           ))}
         </Box>
+        {/*End Category */}
+        {/* Start product style  */}
         <Grid2
           sx={{ display: { xs: "none", md: "flex" } }}
           container
@@ -198,6 +196,8 @@ const Home = () => {
             </Grid2>
           ))}
         </Grid2>
+        {/* End product style   */}
+        {/* Start Best saler */}
         <Box>
           <Box>
             <Typography
@@ -224,7 +224,11 @@ const Home = () => {
                   size={{ xs: 6, md: 2 }}
                   key={index}
                 >
-                  <Box>
+                  <Box sx={{ "&:hover ": {
+                    transform: "translateY(-10px) scale(1.02)",
+                    transition: "transform 0.3s ease-in-out",
+                    cursor: "pointer",
+                  }}}>
                     <img
                       src="../../../../public/image/image_product_1.jpeg"
                       alt=""
@@ -331,7 +335,9 @@ const Home = () => {
             </Grid2>
           </Box>
         </Box>
+      {/* End Best saler */}
       </Box>
+      {/* End container */}
     </>
   );
 };
