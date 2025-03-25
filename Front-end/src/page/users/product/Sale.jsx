@@ -28,10 +28,27 @@ const Sales =()=>{
                     transition: "transform 0.3s ease-in-out",
                     cursor: "pointer",
                   }}}>
+                    <Box sx={{position: "relative"}}>
                     <img
                       src="../../../../public/image/image_product_1.jpeg"
                       alt=""
                     />
+                    <Box sx={{
+                      fontSize: "12px",
+                      lineHeight: "12px",
+                      color: "#fff",
+                      background: "#D40404",
+                      display: "inline-block",
+                      borderRadius: "8px 0px 8px 0",
+                      padding: "4px 9px",
+                      position: "absolute",
+                      top: "8px",
+                      left: "12px",
+                    }}
+                    >
+                      -30%
+                    </Box>
+                    </Box>
                     <Typography
                       sx={{
                         fontSize: "16px",
