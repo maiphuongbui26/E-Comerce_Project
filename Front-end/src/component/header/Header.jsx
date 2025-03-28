@@ -18,25 +18,28 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Drawer } from "@mui/material";
 
 const menuItems = [
-  { label: "Trang chủ", path: "/home", hidden: true },
-  { label: "GIẢM GIÁ", path: "/sale" },
-  { label: "ĐẦM", path: "/dresses" },
-  { label: "ÁO", path: "/shirts" },
-  { label: "QUẦN", path: "/pants" },
-  { label: "CHÂN VÁY", path: "/skirts" },
-  { label: "ÁO KHOÁC", path: "/jackets" },
-  { label: "BLAZER SS 2025", path: "/blazer-ss-2025" },
+  { label: "Trang chủ", path: "/user", hidden: true },
+  { label: "GIẢM GIÁ", path: "/user/sale" },
+  { label: "ĐẦM", path: "/user/dresses" },
+  { label: "ÁO", path: "/user/shirts" },
+  { label: "QUẦN", path: "/user/pants" },
+  { label: "CHÂN VÁY", path: "/user/skirts" },
+  { label: "ÁO KHOÁC", path: "/user/jackets" },
+  { label: "BLAZER SS 2025", path: "/user/blazer-ss-2025" },
 ];
 const settings = [
   {
     label: "Tài khoản của tôi",
-    path: "/account",
+    path: "/user/account",
   },
   {
     label: "Đăng xuất",
     path: "/login", 
   }
 ];
+
+// Update the home navigation in the logo click handler
+
 const Header = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -47,9 +50,8 @@ const Header = () => {
   };
   const handleMenuClick = (path) => {
     handleCloseNavMenu();
-    navigate(path);
+    navigate(path === "/" ? "/user" : path);
   };
-
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -205,7 +207,7 @@ const Header = () => {
           {/* Setting */}
           <Box sx={{ flexGrow: 0 }}>
             {/* Favorite */}
-            <IconButton sx={{ color: "#000", p: 0 }} onClick={()=>handleMenuClick('/favorite')}>
+            <IconButton sx={{ color: "#000", p: 0 }} onClick={()=>handleMenuClick('/user/favorite')}>
               <FavoriteBorderOutlinedIcon />
             </IconButton>
             {/* Cart */}

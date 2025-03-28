@@ -3,7 +3,7 @@ import { useState } from "react";
 
 const Profile = () => {
   const [profileData, setProfileData] = useState({
-    name: "Cường Nguyễn",
+    name: "Cương Nguyễn",
     phone: "",
     email: "cuonghc2k2abc@gmail.com"
   });
@@ -31,11 +31,13 @@ const Profile = () => {
               }}
             />
             <Box>
-              <Typography sx={{ fontWeight: 500, mb: 1 }}>{profileData.name}</Typography>
+              <Typography sx={{ fontWeight: 600, mb: 1 }}>{profileData.name}</Typography>
               <Button 
                 sx={{ 
                   color: "#dc0606", 
                   p: 0,
+                  fontSize: 12,
+                  fontWeight: 600,
                   textDecoration: "underline",
                   "&:hover": {
                     bgcolor: "transparent",
@@ -98,21 +100,10 @@ const Profile = () => {
         </Box>
         {/* Right Side - Orders */}
         <Box sx={{ flex: 1, bgcolor: "#fff", p: 3, borderRadius: 1 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
             <Typography variant="h6">Đơn hàng của tôi</Typography>
-            <Button 
-              sx={{ 
-                color: "#dc0606",
-                textDecoration: "underline",
-                "&:hover": {
-                  bgcolor: "transparent",
-                  opacity: 0.8
-                }
-              }}
-            >
-              tại đây
-            </Button>
-          </Box>
+            <Typography sx={{fontSize: "14px", color: "#666", mt: 2,fontWeight: 600, textAlign: 'center' }}>
+            Tra cứu đơn hàng của tôi <a style={{color: "#D40404" }} href="/order">tại đây</a>
+            </Typography>
         </Box>
       </Box>
     </Box>
