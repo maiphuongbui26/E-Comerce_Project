@@ -1,28 +1,11 @@
 import {
     Box,
     Grid2,
-    Pagination,
-    Slider,
-    Typography,
   } from "@mui/material";
   import SearchForm from "../../../component/header/SearchForm";
   import ProductItem from "../../../component/main_component/productItem";
-  import { useState } from "react";
   
   const Blazer = () => {
-    const [isExpanded, setIsExpanded] = useState(true);
-    const [value, setValue] = useState([0, 5000000]);
-    const [isShowPrice, setIsShowPrice] = useState(true);
-    // Update the initial state value
-    
-    // Format number with commas
-    const formatPrice = (price) => {
-      return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    };
-  
-    const handleChange = (event, newValue) => {
-      setValue(newValue);
-    };
     return (
       <>
         <Box sx={{ maxWidth: "1240px", margin: "0 auto" }}>

@@ -11,6 +11,7 @@ import Skirts from './page/users/product/Skirts';
 import Jackets from './page/users/product/Jackets';
 import Blazer from './page/users/product/Blazer';
 import ProductDetail from './page/users/product_details/ProductDetail';
+import Profile from './page/users/profile/Profile';
 
 // Import other user pages as needed
 
@@ -28,6 +29,8 @@ function App() {
         <Route path="/jackets" element={<Jackets />} />
         <Route path="/blazer-ss-2025" element={<Blazer />} />
         <Route path="/product-details" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
     </Routes>   
   );
