@@ -1,12 +1,14 @@
 import { Box, Typography, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Paper, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const PromotionManagement = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const navigate = useNavigate();
 
   const mockData = [
     { id: 1, code: "SUMMER23", name: "Khuyến mãi hè 2023", discount: "20%", startDate: "01.06.2023", endDate: "31.08.2023", status: "Active" },
@@ -50,6 +52,7 @@ const PromotionManagement = () => {
             <Button 
               variant="contained" 
               color="primary"
+              onClick={() => navigate('/admin/promotions/add')}
               sx={{
                 borderRadius: '20px',
                 textTransform: 'none',
@@ -110,11 +113,15 @@ const PromotionManagement = () => {
                     </Box>
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton size="small" sx={{ mr: 1 }}>
-                      <VisibilityIcon fontSize="small" />
+                    <IconButton 
+                      size="small"
+                      onClick={() => navigate(`/admin/promotions/edit/${row.id}`)}
+                      sx={{ mr: 1 }}
+                    >
+                      <EditIcon fontSize="small" sx={{ color: '#66bb6a' }} />
                     </IconButton>
-                    <IconButton size="small">
-                      <EditIcon fontSize="small" />
+                    <IconButton size="small" sx={{ mr: 1 }}>
+                    <DeleteIcon fontSize="small" sx={{ color: '#f44336' }} />
                     </IconButton>
                   </TableCell>
                 </TableRow>

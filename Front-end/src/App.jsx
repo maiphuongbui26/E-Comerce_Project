@@ -2,6 +2,10 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import UserLayout from './page/users/UserLayout';
 // Add admin layout import
 import AdminLayout from './page/admin/AdminLayout';
+import AddPromotion from './page/admin/promotion_management/AddPromotion';
+import EditPromotion from './page/admin/promotion_management/EditPromotion';
+import AddSupplier from './page/admin/supplier_management/AddSupplier';
+import EditSupplier from './page/admin/supplier_management/EditSupplier';
 
 import Home from './page/users/home/Home';
 import Cart from './page/users/cart/Cart';
@@ -24,8 +28,12 @@ import SupplierManagement from './page/admin/supplier_management/SupplierManagem
 import UserManagement from './page/admin/user_management/UserManagement';
 import AddCategory from './page/admin/categories_management/AddCategory';
 import EditCategory from './page/admin/categories_management/EditCategory';
+import AddProduct from './page/admin/product_management/AddProduct';
+import EditProduct from './page/admin/product_management/EditProduct';
 
-// Import other user pages as needed
+// Add these imports at the top
+import AddUser from './page/admin/user_management/AddUser';
+import EditUser from './page/admin/user_management/EditUser';
 
 function App() {
   return (
@@ -53,9 +61,17 @@ function App() {
         <Route path="categories/edit/:id" element={<EditCategory />} />
         <Route path="orders" element={<OrderManagement />} />
         <Route path="products" element={<ProductManagement />} />
+        <Route path="products/add" element={<AddProduct />} />
+        <Route path="products/edit/:id" element={<EditProduct />} />
         <Route path="promotions" element={<PromotionManagement />} />
+        <Route path="promotions/add" element={<AddPromotion />} />
+        <Route path="promotions/edit/:id" element={<EditPromotion />} />
         <Route path="suppliers" element={<SupplierManagement />} />
+        <Route path="suppliers/add" element={<AddSupplier />} />
+        <Route path="suppliers/edit/:id" element={<EditSupplier />} />
         <Route path="users" element={<UserManagement />} />
+        <Route path="users/add" element={<AddUser />} />
+        <Route path="users/edit/:id" element={<EditUser />} />
 
       </Route>
       {/* Redirect from root to user home */}
