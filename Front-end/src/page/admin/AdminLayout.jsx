@@ -30,7 +30,6 @@ const AdminLayout = () => {
   return (
     <Box sx={{ display: 'flex' }}>
       <NavbarAdmin />
-      
       {/* Main Content */}
       <Box sx={{ flexGrow: 1, ml: '280px' }}>
         {/* Header */}
@@ -44,19 +43,6 @@ const AdminLayout = () => {
           borderBottom: '1px solid #e0e0e0'
         }}>
           {/* Search Bar */}
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            bgcolor: '#f5f5f5',
-            borderRadius: 1,
-            px: 2
-          }}>
-            <SearchIcon sx={{ color: '#666' }} />
-            <InputBase
-              placeholder="Search..."
-              sx={{ ml: 1, flex: 1 }}
-            />
-          </Box>
 
           {/* Right Icons */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
