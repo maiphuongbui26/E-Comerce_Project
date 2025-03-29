@@ -57,7 +57,7 @@ const UserManagement = () => {
         borderBottom: '1px solid #e0e0e0',
         mb: 2
       }}>
-        <Typography variant="h5">Danh sách khách hàng</Typography>
+        <Typography variant="h5">Danh sách người dùng</Typography>
       </Box>
 
       <Box sx={{ p: 3, bgcolor: '#fff', borderRadius: 1 }}>
@@ -95,8 +95,8 @@ const UserManagement = () => {
           <Table>
             <TableHead sx={{ bgcolor: '#f8f9fa' }}>
               <TableRow>
-                <TableCell>Mã KH</TableCell>
-                <TableCell>Tên khách hàng</TableCell>
+                <TableCell>Mã ND</TableCell>
+                <TableCell>Tên người dùng</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Số điện thoại</TableCell>
                 <TableCell>Địa chỉ</TableCell>
