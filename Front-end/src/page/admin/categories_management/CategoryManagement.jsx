@@ -10,6 +10,9 @@ import { useNavigate } from 'react-router-dom';
 // Thêm import
 import CategoryDetailModal from './CategoryDetailModal';
 
+// Add import
+import { categoryService } from '../../../services/categoryService';
+
 const CategoryManagement = () => {
   const navigate = useNavigate();
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -112,7 +115,11 @@ const CategoryManagement = () => {
                     >
                       <VisibilityIcon fontSize="small" sx={{ color: '#1976d2' }} />
                     </IconButton>
-                    <IconButton size="small" sx={{ mr: 1 }}>
+                    <IconButton 
+                      size="small" 
+                      sx={{ mr: 1 }}
+                      onClick={() => handleDelete(row.MaMuc)}
+                    >
                       <DeleteIcon fontSize="small" sx={{ color: '#d32f2f' }} />
                     </IconButton>
                     <IconButton 

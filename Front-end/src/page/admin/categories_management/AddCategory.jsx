@@ -5,6 +5,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import CategoryIcon from '@mui/icons-material/Category';
 
+// Add import
+import { categoryService } from '../../../services/categoryService';
+
 const AddCategory = () => {
   const navigate = useNavigate();
   const [category, setCategory] = useState({
@@ -12,6 +15,24 @@ const AddCategory = () => {
     location: '',
     status: 'Active'
   });
+
+  const handleSubmit = async () => {
+    try {
+      if (!category.name.trim()) {
+        alert('Vui lòng nhập tên danh mục');
+        return;
+      }
+      
+      await categoryService.create({
+        TenMuc: category.name,
+        TrangThai: category.status
+      });
+      navigate('/admin/categories');
+    } catch (error) {
+      console.error('Error creating category:', error);
+      alert('Có lỗi xảy ra khi tạo danh mục');
+    }
+  };
 
   return (
     <>
@@ -83,6 +104,7 @@ const AddCategory = () => {
             <Button
               variant="contained"
               startIcon={<SaveIcon />}
+              onClick={handleSubmit}
               sx={{ px: 3 }}
             >
               Lưu danh mục

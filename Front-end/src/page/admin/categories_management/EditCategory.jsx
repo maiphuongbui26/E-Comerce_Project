@@ -5,25 +5,55 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import CategoryIcon from '@mui/icons-material/Category';
 import EditIcon from '@mui/icons-material/Edit';
+import { categoryService } from '../../../services/categoryService';
 
 const EditCategory = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [category, setCategory] = useState({
-    name: '',
-    location: '',
-    status: 'Active'
+    MaMuc: '',
+    TenMuc: '',
+    TrangThai: 'Active'
   });
 
   useEffect(() => {
-    // Mock data - replace with API call
-    setCategory({
-      id: 1,
-      name: "Áo",
-      location: "Women's Fashion",
-      status: "Active"
-    });
+    const loadCategory = async () => {
+      try {
+        const data = await categoryService.getById(id);
+        if (data) {
+          setCategory({
+            MaMuc: data.MaMuc,
+            TenMuc: data.TenMuc || '',
+            TrangThai: data.TrangThai || 'Active'
+          });
+        }
+      } catch (error) {
+        console.error('Error loading category:', error);
+      }
+    };
+    if (id) {
+      loadCategory();
+    }
   }, [id]);
+
+  const handleUpdate = async () => {
+    try {
+      if (!category.TenMuc.trim()) {
+        alert('Vui lòng nhập tên danh mục');
+        return;
+      }
+
+      await categoryService.update(id, {
+        MaMuc: category.MaMuc,
+        TenMuc: category.TenMuc,
+        TrangThai: category.TrangThai
+      });
+      navigate('/admin/categories');
+    } catch (error) {
+      console.error('Error updating category:', error);
+      alert('Có lỗi xảy ra khi cập nhật danh mục');
+    }
+  };
 
   return (
     <>
@@ -46,7 +76,7 @@ const EditCategory = () => {
               Chỉnh sửa danh mục
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              ID: {id} - Cập nhật thông tin danh mục
+              ID: {category.MaMuc} - Cập nhật thông tin danh mục
             </Typography>
           </Box>
         </Box>
@@ -66,16 +96,8 @@ const EditCategory = () => {
                 fullWidth
                 label="Tên danh mục"
                 placeholder="Nhập tên danh mục"
-                value={category.name}
-                onChange={(e) => setCategory({ ...category, name: e.target.value })}
-              />
-
-              <TextField
-                fullWidth
-                label="Vị trí hiển thị"
-                placeholder="Ví dụ: Women's Fashion"
-                value={category.location}
-                onChange={(e) => setCategory({ ...category, location: e.target.value })}
+                value={category.TenMuc}
+                onChange={(e) => setCategory({ ...category, TenMuc: e.target.value })}
               />
 
               <FormControl fullWidth>
@@ -83,8 +105,8 @@ const EditCategory = () => {
                   Trạng thái
                 </Typography>
                 <Select
-                  value={category.status}
-                  onChange={(e) => setCategory({ ...category, status: e.target.value })}
+                  value={category.TrangThai}
+                  onChange={(e) => setCategory({ ...category, TrangThai: e.target.value })}
                   sx={{ bgcolor: '#fff' }}
                 >
                   <MenuItem value="Active">Hoạt động</MenuItem>
@@ -106,6 +128,7 @@ const EditCategory = () => {
             <Button
               variant="contained"
               startIcon={<SaveIcon />}
+              onClick={handleUpdate}
               sx={{ px: 3 }}
             >
               Cập nhật
