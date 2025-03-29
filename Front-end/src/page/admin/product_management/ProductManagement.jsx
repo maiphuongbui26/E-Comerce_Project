@@ -75,7 +75,7 @@ const ProductManagement = () => {
                 <TableCell>Tên sản phẩm</TableCell>
                 <TableCell>Danh mục</TableCell>
                 <TableCell>Giá bán</TableCell>
-                <TableCell>Tồn kho</TableCell>
+                <TableCell>Số lượng</TableCell>
                 <TableCell>Trạng thái</TableCell>
                 <TableCell align="center">Thao tác</TableCell>
               </TableRow>

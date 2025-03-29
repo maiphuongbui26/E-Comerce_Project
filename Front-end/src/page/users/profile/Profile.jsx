@@ -3,9 +3,9 @@ import { useState } from "react";
 
 const Profile = () => {
   const [profileData, setProfileData] = useState({
-    name: "Cương Nguyễn",
+    name: "Phương Mia",
     phone: "",
-    email: "cuonghc2k2abc@gmail.com"
+    email: "phuongmai18@gmail.com"
   });
   const handleChange = (e) => {
     const { name, value } = e.target;
