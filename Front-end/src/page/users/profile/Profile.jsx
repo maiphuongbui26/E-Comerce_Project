@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography, Avatar } from "@mui/material";
+import { Box, Button, TextField, Typography, Avatar, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { useState } from "react";
 
 const Profile = () => {
@@ -15,6 +15,39 @@ const Profile = () => {
     }));
   };
 
+  // Add new states
+  const [openPasswordModal, setOpenPasswordModal] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  // Add handlers
+  const handlePasswordModalOpen = () => setOpenPasswordModal(true);
+  const handlePasswordModalClose = () => {
+    setOpenPasswordModal(false);
+    setPasswordData({
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePasswordSubmit = () => {
+    // Add your password change logic here
+    console.log(passwordData);
+    handlePasswordModalClose();
+  };
+
   return (
     <Box sx={{ maxWidth: "1240px", margin: "0 auto", padding: "40px 20px" }}>
       <Box sx={{ display: "flex", gap: 4 }}>
@@ -26,13 +59,14 @@ const Profile = () => {
             <Avatar 
               sx={{ 
                 width: 80, 
-                height: 80, 
+                height: 80,
                 mr: 2 
               }}
             />
             <Box>
               <Typography sx={{ fontWeight: 600, mb: 1 }}>{profileData.name}</Typography>
               <Button 
+              onClick={handlePasswordModalOpen}
                 sx={{ 
                   color: "#dc0606", 
                   p: 0,
@@ -106,6 +140,74 @@ const Profile = () => {
             </Typography>
         </Box>
       </Box>
+      <Dialog 
+      open={openPasswordModal} 
+      onClose={handlePasswordModalClose}
+      maxWidth="xs"
+      fullWidth
+    >
+      <DialogTitle sx={{ 
+        borderBottom: '1px solid #e0e0e0',
+        p: 2
+      }}>
+        Đổi mật khẩu
+      </DialogTitle>
+      <DialogContent sx={{ mt: 2 }}>
+        <Typography sx={{ fontSize: '14px', color: '#666', mb: 3 }}>
+          Để bảo mật tài khoản, vui lòng không chia sẻ mật khẩu cho người khác
+        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <TextField
+            fullWidth
+            name="oldPassword"
+            label="Mật khẩu cũ"
+            type="password"
+            value={passwordData.oldPassword}
+            onChange={handlePasswordChange}
+            size="small"
+          />
+          <TextField
+            fullWidth
+            name="newPassword"
+            label="Mật khẩu mới"
+            type="password"
+            value={passwordData.newPassword}
+            onChange={handlePasswordChange}
+            size="small"
+          />
+          <TextField
+            fullWidth
+            name="confirmPassword"
+            label="Xác nhận Mật khẩu"
+            type="password"
+            value={passwordData.confirmPassword}
+            onChange={handlePasswordChange}
+            size="small"
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ p: 2, borderTop: '1px solid #e0e0e0' }}>
+        <Button 
+          onClick={handlePasswordModalClose}
+          sx={{ 
+            color: '#666',
+            '&:hover': { bgcolor: 'transparent', opacity: 0.8 }
+          }}
+        >
+          HỦY
+        </Button>
+        <Button
+          onClick={handlePasswordSubmit}
+          variant="contained"
+          sx={{
+            bgcolor: '#303030',
+            '&:hover': { bgcolor: '#1a1a1a' }
+          }}
+        >
+          XÁC NHẬN
+        </Button>
+      </DialogActions>
+    </Dialog>
     </Box>
   );
 };
