@@ -2,7 +2,6 @@ import {
   Box,
   Grid2,
   Pagination,
-  Slider,
   Typography,
 } from "@mui/material";
 import SearchForm from "../../../component/header/SearchForm";
@@ -11,25 +10,25 @@ import { useState } from "react";
 
 const Dresses = () => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [value, setValue] = useState([0, 5000000]);
   const [isShowPrice, setIsShowPrice] = useState(true);
-  // Update the initial state value
-  
-  // Format number with commas
-  const formatPrice = (price) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
+  const priceRanges = [
+    { value: 'under350', label: 'Dưới 350.000đ' },
+    { value: '350to750', label: 'Từ 350.000đ - 750.000đ' },
+    { value: 'above750', label: 'Trên 750.000đ' }
+  ];
+  const handlePriceRangeToggle = (range) => {
+    setSelectedPriceRanges(prev => 
+      prev.includes(range) 
+        ? prev.filter(r => r !== range)
+        : [...prev, range]
+    );
   };
   return (
     <>
       <Box sx={{ maxWidth: "1240px", margin: "0 auto" }}>
         <SearchForm />
-        {/* Start Breadcrumbs */}
         <Box></Box>
-        {/* End Breadcrumbs */}
         <Typography
           variant="h4"
           sx={{
@@ -41,10 +40,7 @@ const Dresses = () => {
         >
           <span>175</span> sản phẩm <span>Đầm</span>
         </Typography>
-        <Box
-          sx={{ borderBottom: "1px solid #E1E1E1", paddingBottom: "38px" }}
-        ></Box>
-        {/* Start Product Sale */}
+        <Box sx={{ borderBottom: "1px solid #E1E1E1", paddingBottom: "38px" }} />
         <Grid2
           container
           sx={{ padding: { xs: "0 14px", md: "0" }, marginTop: "65px" }}
@@ -54,6 +50,7 @@ const Dresses = () => {
         >
           <Grid2 size={{ xs: 6, md: 3 }}>
             <Box sx={{ padding: "20px", bgcolor: "#fff", width: "300px" }}>
+              {/* Product Line Filter */}
               <Box>
                 <Typography
                   onClick={() => setIsExpanded(!isExpanded)}
@@ -100,39 +97,28 @@ const Dresses = () => {
                     },
                   }}
                 >
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      width: "100%",
-                      transform: isExpanded
-                        ? "translateY(0)"
-                        : "translateY(-100%)",
-                      transition: "transform 0.5s ease-in-out",
-                    }}
-                  >
-                    <Box>
-                      {[...Array(8)].map((_, index) => (
-                        <Box
-                          key={index}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            mb: 1,
-                            "&:last-child": {
-                              mb: 0,
-                            },
-                          }}
-                        >
-                          <input type="checkbox" />
-                          <Typography sx={{ ml: 1, fontSize: "14px" }}>
-                            Đầm {index + 1}
-                          </Typography>
-                        </Box>
-                      ))}
-                    </Box>
+                  <Box>
+                    {[...Array(8)].map((_, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          mb: 1,
+                          "&:last-child": { mb: 0 },
+                        }}
+                      >
+                        <input type="checkbox" />
+                        <Typography sx={{ ml: 1, fontSize: "14px" }}>
+                          Đầm {index + 1}
+                        </Typography>
+                      </Box>
+                    ))}
                   </Box>
                 </Box>
               </Box>
+
+              {/* Price Filter */}
               <Box sx={{ marginTop: "20px" }}>
                 <Typography
                   onClick={() => setIsShowPrice(!isShowPrice)}
@@ -146,7 +132,7 @@ const Dresses = () => {
                     cursor: "pointer",
                   }}
                 >
-                  Giá
+                  Theo giá
                   <span
                     style={{
                       transform: isShowPrice ? "rotate(45deg)" : "none",
@@ -160,86 +146,40 @@ const Dresses = () => {
                 <Box
                   sx={{
                     mt: 2,
-                    height: "110px",
-                    maxHeight: isShowPrice ? "110px" : "0",
-                    overflow: isShowPrice ? "auto" : "hidden",
+                    maxHeight: isShowPrice ? "250px" : "0",
+                    overflow: isShowPrice ? "visible" : "hidden",
                     transition: "all 0.3s ease-in-out",
                     opacity: isShowPrice ? 1 : 0,
-                    position: "relative",
                   }}
                 >
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      width: "100%",
-                      transform: isShowPrice
-                        ? "translateY(0)"
-                        : "translateY(-100%)",
-                      transition: "transform 0.5s ease-in-out",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignContent: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Typography
-                        sx={{ fontSize: "12px", mb: 1, fontWeight: 600 }}
-                      >
-                        Kéo chọn Khoảng giá
-                      </Typography>
-                      <Typography
+                  <Box>
+                    {priceRanges.map((range) => (
+                      <Box
+                        key={range.value}
                         sx={{
-                          fontSize: "12px",
-                          color: "#666",
-                          fontWeight: "600",
+                          display: "flex",
+                          alignItems: "center",
+                          mb: 1,
+                          "&:last-child": { mb: 0 },
                         }}
                       >
-                        Đơn vị: <span style={{ color: "#dc0606" }}>vnd</span>
-                      </Typography>
-                    </Box>
-                    <Box sx={{ px: 2 }}>
-                      <Slider
-                        value={value}
-                        onChange={handleChange}
-                        min={0}
-                        max={5000000}
-                        valueLabelDisplay="off"
-                        sx={{
-                          color: "#dc0606",
-                          '& .MuiSlider-thumb': {
-                            backgroundColor: '#fff',
-                            border: '2px solid #dc0606',
-                          },
-                          '& .MuiSlider-track': {
-                            padding: '2px 0',
-                          },
-                          width: "90%"
-                        }}
-                      />
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mt: 2,
-                      }}
-                    >
-                      <Typography sx={{ fontSize: "14px", fontWeight: 600 }}>
-                        {formatPrice(value[0])}
-                      </Typography>
-                      <Typography sx={{ fontSize: "14px", fontWeight: 600 }}>
-                        {formatPrice(value[1])}
-                      </Typography>
-                    </Box>
+                        <input
+                          type="checkbox"
+                          checked={selectedPriceRanges.includes(range.value)}
+                          onChange={() => handlePriceRangeToggle(range.value)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <Typography sx={{ ml: 1, fontSize: "14px" }}>
+                          {range.label}
+                        </Typography>
+                      </Box>
+                    ))}
                   </Box>
                 </Box>
               </Box>
             </Box>
           </Grid2>
+          {/* Product Grid */}
           <Grid2 size={{ xs: 6, md: 9 }}>
             <Box sx={{ 
               display: 'flex', 
@@ -266,9 +206,10 @@ const Dresses = () => {
                 </select>
               </Box>
               <Typography sx={{fontWeight: 600, fontSize: '14px', color: '#303030' }}>
-                Hiển thị <span style={{ color: '#D40404',fontSize: "18px" }}>1 - 24 / 175</span> sản phẩm
+                Hiển thị <span style={{ color: '#D40404', fontSize: "18px" }}>1 - 24 / 175</span> sản phẩm
               </Typography>
             </Box>
+
             <Grid2
               container
               spacing={{ xs: 1, md: 1 }}
@@ -283,14 +224,13 @@ const Dresses = () => {
             </Grid2>
           </Grid2>
         </Grid2>
-        {/* End Product Sale */}
-        <Box
-          sx={{ display: "flex", justifyContent: "center", margin: "40px 0" }}
-        >
+
+        <Box sx={{ display: "flex", justifyContent: "center", margin: "40px 0" }}>
           <Pagination size="large" count={10} color="secondary" />
         </Box>
       </Box>
     </>
   );
 };
+
 export default Dresses;

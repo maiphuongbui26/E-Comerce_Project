@@ -102,7 +102,7 @@ const Profile = () => {
         <Box sx={{ flex: 1, bgcolor: "#fff", p: 3, borderRadius: 1 }}>
             <Typography variant="h6">Đơn hàng của tôi</Typography>
             <Typography sx={{fontSize: "14px", color: "#666", mt: 2,fontWeight: 600, textAlign: 'center' }}>
-            Tra cứu đơn hàng của tôi <a style={{color: "#D40404" }} href="/order">tại đây</a>
+            Tra cứu đơn hàng của tôi <a style={{color: "#D40404" }} href="/user/order">tại đây</a>
             </Typography>
         </Box>
       </Box>

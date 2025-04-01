@@ -13,9 +13,10 @@ import MenuItem from "@mui/material/MenuItem";
 import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from "@mui/icons-material/Close";
-import { Drawer } from "@mui/material";
+import { Drawer, Popper, Paper, Fade } from "@mui/material";
 
 const menuItems = [
   { label: "Trang chủ", path: "/user", hidden: true },
@@ -40,9 +41,12 @@ const settings = [
 
 // Update the home navigation in the logo click handler
 
+
+
 const Header = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const [anchorElCart, setAnchorElCart] = useState(null); // State for cart dropdown
   const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
@@ -64,15 +68,20 @@ const Header = () => {
     setAnchorElUser(null);
   };
 
+  const handleCartOpen = (event) => {
+    setAnchorElCart(anchorElCart ? null : event.currentTarget);
+  };
+
+  const handleCartClose = () => {
+    setAnchorElCart(null);
+  };
+
   return (
-    <AppBar
-      position="static"
-      sx={{ backgroundColor: "#fff", color: "#000" }}
-    >
-      <Container sx={{ maxWidth: "1240px", px: "12px" }}>
-        <Toolbar disableGutters>
-          <Box
-            sx={{ display: { xs: "none", md: "block" }, mr: 1,":hover":{cursor:"pointer"}}}
+    <>
+      <AppBar position="static" sx={{ backgroundColor: "#fff", color: "#000" }}>
+        <Container sx={{ maxWidth: "1240px", px: "12px" }}>
+          <Toolbar disableGutters>
+            <Box sx={{ display: { xs: "none", md: "block" }, mr: 1,":hover":{cursor:"pointer"}}}
             onClick={() => {
               handleMenuClick("/");
             }}
@@ -207,23 +216,26 @@ const Header = () => {
           {/* Setting */}
           <Box sx={{ flexGrow: 0 }}>
             {/* Favorite */}
-            <IconButton sx={{ color: "#000", p: 0 }} onClick={()=>handleMenuClick('/user/favorite')}>
+            <IconButton sx={{ color: "#000", p: 0 }} onClick={() => handleMenuClick('/user/favorite')}>
               <FavoriteBorderOutlinedIcon />
             </IconButton>
             {/* Cart */}
-            <IconButton sx={{ color: "#000", p: 0 }}>
+            <IconButton 
+              sx={{ color: "#000", p: 0 }} 
+              onClick={handleCartOpen}
+            >
               <LocalMallOutlinedIcon sx={{ margin: "0 10px" }} />
             </IconButton>
             {/* Personal */}
             <IconButton
               onClick={handleOpenUserMenu}
-              sx={{display:{xs: "none", md: "inline-flex"}, color: "#000", p: 0 }}
+              sx={{ display: { xs: "none", md: "inline-flex" }, color: "#000", p: 0 }}
             >
               <PersonOutlineOutlinedIcon />
             </IconButton>
             {/* Search */}
             <IconButton
-              sx={{display:{xs: "inline-flex",md: "none"}, color: "#000", p: 0 }}
+              sx={{ display: { xs: "inline-flex", md: "none" }, color: "#000", p: 0 }}
             >
               <SearchIcon />
             </IconButton>
@@ -243,10 +255,10 @@ const Header = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting,index) => (
+              {settings.map((setting, index) => (
                 <MenuItem key={index} onClick={handleCloseUserMenu}>
                   <Typography
-                  onClick={() => handleMenuClick(setting.path)}
+                    onClick={() => handleMenuClick(setting.path)}
                     sx={{
                       textAlign: "center",
                       fontSize: "13px",
@@ -262,6 +274,67 @@ const Header = () => {
         </Toolbar>
       </Container>
     </AppBar>
+
+      {/* Cart Dropdown */}
+      <Popper
+        open={Boolean(anchorElCart)}
+        anchorEl={anchorElCart}
+        transition
+        placement="bottom-end"
+        sx={{ zIndex: 1301 }}
+      >
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <Paper
+              sx={{
+                width: { xs: '90vw', sm: 400 },
+                mt: 1,
+                borderRadius: 2,
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+              }}
+            >
+              <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0', display: 'flex', justifyContent: 'flex-end' }}>
+                <IconButton size="small" onClick={handleCartClose}>
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+              
+              <Box sx={{ 
+                p: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                minHeight: 300
+              }}>
+                <ShoppingCartOutlinedIcon sx={{ fontSize: 50, color: 'text.secondary', mb: 2 }} />
+                <Typography variant="h6" color="text.secondary" mb={2}>
+                  Giỏ hàng trống
+                </Typography>
+                <Button 
+                  variant="contained"
+                  onClick={() => {
+                    handleCartClose();
+                    handleMenuClick('/user/cart');
+                  }}
+                  sx={{
+                    bgcolor: '#cc0f0f',
+                    color: 'white',
+                    px: 4,
+                    py: 1,
+                    '&:hover': {
+                      bgcolor: '#a30c0c'
+                    }
+                  }}
+                >
+                  ĐẾN GIỎ HÀNG
+                </Button>
+              </Box>
+            </Paper>
+          </Fade>
+        )}
+      </Popper>
+    </>
   );
 };
+
 export default Header;

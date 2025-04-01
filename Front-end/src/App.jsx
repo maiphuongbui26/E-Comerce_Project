@@ -6,10 +6,8 @@ import AddPromotion from './page/admin/promotion_management/AddPromotion';
 import EditPromotion from './page/admin/promotion_management/EditPromotion';
 import AddSupplier from './page/admin/supplier_management/AddSupplier';
 import EditSupplier from './page/admin/supplier_management/EditSupplier';
-
 import Home from './page/users/home/Home';
 import Cart from './page/users/cart/Cart';
-import Checkout from './page/users/checkout/Checkout';
 import Sales from './page/users/product/Sale';
 import Dresses from './page/users/product/Dresses';
 import Shirts from './page/users/product/shirts';
