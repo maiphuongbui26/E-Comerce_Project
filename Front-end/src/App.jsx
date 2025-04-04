@@ -28,14 +28,20 @@ import AddCategory from './page/admin/categories_management/AddCategory';
 import EditCategory from './page/admin/categories_management/EditCategory';
 import AddProduct from './page/admin/product_management/AddProduct';
 import EditProduct from './page/admin/product_management/EditProduct';
-
-// Add these imports at the top
+import Login from './page/users/auth_user/Login';
+import Register from './page/users/auth_user/Register';
 import AddUser from './page/admin/user_management/AddUser';
 import EditUser from './page/admin/user_management/EditUser';
 
 function App() {
   return (
     <Routes>
+      {/* Auth Routes */}
+      <Route path="/auth">
+        <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
+      </Route>
+
       {/* User Routes */}
       <Route path="/user" element={<UserLayout />}>
         <Route path="/user" element={<Home />} /> 
