@@ -45,7 +45,7 @@ const NavbarAdmin = () => {
       icon: <BusinessIcon />,
     },
     {
-      title: "Quản lý người dùng",
+      title: "Quản lý tài khoản",
       path: "/admin/users",
       icon: <PeopleIcon />,
     },

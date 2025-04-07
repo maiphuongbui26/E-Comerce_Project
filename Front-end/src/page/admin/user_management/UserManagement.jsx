@@ -57,7 +57,7 @@ const UserManagement = () => {
         borderBottom: '1px solid #e0e0e0',
         mb: 2
       }}>
-        <Typography variant="h5">Danh sách người dùng</Typography>
+        <Typography variant="h5">Danh sách tài khoản</Typography>
       </Box>
 
       <Box sx={{ p: 3, bgcolor: '#fff', borderRadius: 1 }}>
@@ -65,7 +65,7 @@ const UserManagement = () => {
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             <TextField 
               size="small"
-              placeholder="Tìm kiếm khách hàng"
+              placeholder="Tìm kiếm...."
               InputProps={{
                 startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />,
               }}
@@ -87,7 +87,7 @@ const UserManagement = () => {
             startIcon={<AddIcon />}
             onClick={() => navigate('/admin/users/add')}
           >
-            Thêm người dùng
+            Thêm tài khoản
           </Button>
         </Box>
 

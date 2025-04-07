@@ -31,7 +31,7 @@ const AddUser = () => {
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <PersonAddIcon />
-          <Typography variant="h5">Thêm khách hàng mới</Typography>
+          <Typography variant="h5">Thêm tài khoản mới</Typography>
         </Box>
       </Box>
 
@@ -40,13 +40,13 @@ const AddUser = () => {
           <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: 'repeat(2, 1fr)' }}>
             <TextField
               fullWidth
-              label="Mã khách hàng"
+              label="Mã người dùng"
               value={formData.code}
               onChange={(e) => setFormData({ ...formData, code: e.target.value })}
             />
             <TextField
               fullWidth
-              label="Tên khách hàng"
+              label="Tên người dùng"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
