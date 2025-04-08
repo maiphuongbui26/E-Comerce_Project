@@ -1,7 +1,9 @@
 require('dotenv').config();
 const express = require('express');
-const connectDB = require('./src/config/database.config');
-const userRoutes = require('./src/routes/user.routes');
+const connectDB = require('./config/database.config');
+const userRoutes = require('./routes/user.routes');
+const logger = require('./logs/logger');
+
 
 const app = express();
 
@@ -22,5 +24,9 @@ app.get('/', (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  logger.info({
+    message: 'Server is running on port',
+    PORT: PORT,
+    timestamp: new Date().toISOString()
+  });
 });

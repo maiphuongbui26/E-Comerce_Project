@@ -42,11 +42,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    trim: true
+    trim: true,
+    index: true
   },
   SoDienThoai: {
     type: String,
     required: true,
+    index: true,
     trim: true
   },
   TrangThai: {
@@ -66,10 +68,6 @@ const userSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-// Add index for better query performance
-userSchema.index({ ThuDienTu: 1 });
-userSchema.index({ SoDienThoai: 1 });
 
 // Add pre-save middleware to handle password hashing if needed
 userSchema.pre('save', async function(next) {
