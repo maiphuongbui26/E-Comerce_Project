@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const connectDB = require('./src/config/database.config');
+const userRoutes = require('./src/routes/user.routes');
 
 const app = express();
 
@@ -10,6 +11,9 @@ connectDB();
 // Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use('/api/users', userRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {
