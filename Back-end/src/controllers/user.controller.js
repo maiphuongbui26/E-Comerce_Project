@@ -66,7 +66,6 @@ const userController = {
           { SoDienThoai: new RegExp(search, 'i') }
         ];
       }
-
       if (TrangThai) {
         query.TrangThai = TrangThai;
       }
