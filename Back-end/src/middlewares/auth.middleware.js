@@ -8,7 +8,6 @@ const authMiddleware = {
     if (!token) {
       return res.status(401).json({ message: 'Không tìm thấy token xác thực' });
     }
-
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded;
