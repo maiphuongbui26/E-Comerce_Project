@@ -23,7 +23,12 @@ const userController = {
         process.env.JWT_SECRET,
         { expiresIn: '24h' }
       );
-
+      res.cookie('token', token, {
+        httpOnly: true,          // Không thể truy cập bằng JavaScript
+        secure: true,            // Chỉ gửi qua HTTPS
+        sameSite: 'strict',      // Bảo vệ CSRF
+        maxAge: 24 * 60 * 60 * 1000  // Hết hạn sau 24h
+      });
       res.json({ token, user: { ...user._doc, MatKhau: undefined } });
     } catch (error) {
       res.status(500).json({ message: error.message });
