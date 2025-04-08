@@ -8,15 +8,12 @@ const axiosInstance = axios.create({
   }
 });
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-export default axiosInstance;
+export const fetchData = async (endpoint, config = {}) => {
+  try {
+    const response = await axiosInstance(endpoint, config);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+};
