@@ -5,22 +5,25 @@ require('dotenv').config();
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('Connected to MongoDB');
+    const password = 'admin@123';
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(hashedPassword);
     try {
       const testUser = new User({
         id: 'USER001',
-        HoVaTen: 'Nguyễn Văn Test',
+        HoVaTen: 'Admin',
         NgaySinh: new Date('1990-01-01'),
         DiaChi: {
-          TinhThanh: 'Hồ Chí Minh',
-          HuyenQuan: 'Quận 1',
-          XaPhuong: 'Phường Bến Nghé'
+          TinhThanh: 'Hà Nội',
+          HuyenQuan: 'Bắc Từ Liêm',
+          XaPhuong: 'Cầu Diễn'
         },
-        DanhBaLienLac: '0987654321',
-        ThuDienTu: 'test.user@example.com',
-        SoDienThoai: '0987654321',
+        DanhBaLienLac: '0978853470',
+        ThuDienTu: 'adminHN1234@gmail.com',
+        SoDienThoai: '0978853470',
         TrangThai: 'active',
-        MatKhau: 'password123',
-        VaiTro: 'user'
+        MatKhau: hashedPassword,
+        VaiTro: 'admin'
       });
 
       await testUser.save();

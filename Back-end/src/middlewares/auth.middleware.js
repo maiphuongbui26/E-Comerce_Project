@@ -4,7 +4,6 @@ const authMiddleware = {
   verifyToken: (req, res, next) => {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
-
     if (!token) {
       return res.status(401).json({ message: 'Không tìm thấy token xác thực' });
     }
