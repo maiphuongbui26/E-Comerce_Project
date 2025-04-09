@@ -14,10 +14,12 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import BusinessIcon from "@mui/icons-material/Business";
 import PeopleIcon from "@mui/icons-material/People";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useAuthAdmin } from "../../hooks/useAuthAdmin";
 
 const NavbarAdmin = () => {
   const navigate = useNavigate();
-
+  const { getAdmin,admin } = useAuthAdmin();
   const menuItems = [
     {
       title: "Quản lý danh mục",
@@ -51,6 +53,9 @@ const NavbarAdmin = () => {
     },
   ];
 
+  useEffect(() => {
+      getAdmin()
+  }, [admin]);
   return (
     <Box
       sx={{

@@ -12,25 +12,25 @@ function generateUserId() {
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('Connected to MongoDB');
-    const password = 'cuonghc2k2';
+    const password = 'maiphuong18';
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log(hashedPassword);
     try {
       const testUser = new User({
         id: generateUserId(),
-        HoVaTen: 'Nguyễn Đức Cương',
-        NgaySinh: new Date('2002-01-01'),
+        HoVaTen: 'Admin',
+        NgaySinh: new Date('2003-01-01'),
         DiaChi: {
-          TinhThanh: 'Phú Thọ',
-          HuyenQuan: 'Thanh Ba',
-          XaPhuong: 'Hoàng Cương'
+          TinhThanh: 'Hà Nội',
+          HuyenQuan: 'Bắc Từ Liêm',
+          XaPhuong: 'Cầu Diễn'
         },
         DanhBaLienLac: '0978853470',
-        ThuDienTu: 'cuonghc@gmail.com',
+        ThuDienTu: 'maind18@gmail.com',
         SoDienThoai: '0978853470',
         TrangThai: 'active',
         MatKhau: hashedPassword,
-        VaiTro: 'khachhang'
+        VaiTro: 'admin'
       });
 
       await testUser.save();

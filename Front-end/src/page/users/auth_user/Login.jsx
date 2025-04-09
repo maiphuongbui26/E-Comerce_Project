@@ -1,5 +1,5 @@
 import { Box, TextField, Button, Typography, Grid, Backdrop } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { CircularProgress, Alert } from '@mui/material';
 
 const Login = () => {
-  const { handleLogin, error, isLoading } = useAuth();
+  const { handleLogin, error, isLoading,isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
   const [credentials, setCredentials] = useState({
@@ -27,18 +27,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
       await handleLogin(credentials);
-      if(error){
-        return;
-      }else{
-          navigate('/'); 
-      }
     } catch (error) {
       console.error('Login failed:', error);
     }
   };
-
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated]);
   return (
     <>
       <Backdrop
@@ -80,7 +78,6 @@ const Login = () => {
                 {error.message || error} {/* Sửa chỗ này */}
               </Alert>
             )}
-
             <form onSubmit={handleSubmit}>
               <Typography variant="body1" sx={{ color: '#555' }}>
                 Nhập SDT hoặc Địa chỉ email:

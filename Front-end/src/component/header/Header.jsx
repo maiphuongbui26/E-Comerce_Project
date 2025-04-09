@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -42,7 +42,7 @@ const settings = [
 
 
 const Header = () => {
-  const { handleLogout,user } = useAuth();
+  const { handleLogout,user,getUser } = useAuth();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElCart, setAnchorElCart] = useState(null); // State for cart dropdown
@@ -83,7 +83,9 @@ const Header = () => {
   const handleCartClose = () => {
     setAnchorElCart(null);
   };
-
+  useEffect(() => {
+    getUser();
+  },[])
   return (
     <>
       <AppBar position="static" sx={{ backgroundColor: "#fff", color: "#000" }}>
@@ -239,7 +241,7 @@ const Header = () => {
               onClick={handleOpenUserMenu}
               sx={{ display: { xs: "none", md: "inline-flex" }, color: "#000", p: 0 }}
             >
-              {user ? <Avatar sx={{ width: 34, height: 34 }}  alt="avatar" src="/static/images/avatar/1.jpg" /> : (<PersonOutlineOutlinedIcon />)}
+              {user ? <Avatar sx={{ width: 34, height: 34 }}  alt="avatar" src="/static/images/avatar/1.jpg" /> : (<PersonOutlineOutlinedIcon  onClick={()=>navigate('/auth/user/login')}/>)}
             </IconButton>
             {/* Search */}
             <IconButton
@@ -247,7 +249,7 @@ const Header = () => {
             >
               <SearchIcon />
             </IconButton>
-            <Menu
+            {user ? (  <Menu
               sx={{ mt: "45px" }}
               id="menu-appbar"
               anchorEl={anchorElUser}
@@ -276,7 +278,7 @@ const Header = () => {
                   </Typography>
                 </MenuItem>
               ))}
-            </Menu>
+            </Menu>):<Box></Box>}
           </Box>
         </Toolbar>
       </Container>

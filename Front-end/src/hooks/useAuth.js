@@ -3,12 +3,12 @@ import { login, logout,getCurrentUser,register } from '../redux/features/auth/au
 
 export const useAuth = () => {
   const dispatch = useDispatch();
-  const { user, isLoading, error } = useSelector(state => state.auth);
+  const { user, isLoading, error,isAuthenticated } = useSelector(state => state.auth);
   const handleLogin = async (credentials) => {
     try {
       await dispatch(login(credentials)).unwrap();
     } catch (error) {
-      // console.error(error);
+      console.error(error);
     }
   };
   const handleRegister = async (credentials) => {
@@ -31,5 +31,5 @@ export const useAuth = () => {
     return user; 
   }
 
-  return { user, isLoading, error, handleLogin, handleLogout,getUser,handleRegister };
+  return { user, isLoading, error,isAuthenticated, handleLogin, handleLogout,getUser,handleRegister };
 };

@@ -4,13 +4,13 @@ import { useAuth } from "../../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  const {user,getUser} = useAuth();
+  const {user} = useAuth();
   console.log(user);
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState({
-    name: "Phương Mia",
-    phone: "",
-    email: "phuongmai18@gmail.com"
+    name: user?.HoVaTen || '',
+    phone: user?.SoDienThoai || '',
+    email: user?.ThuDienTu || ''
   });
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,9 +51,15 @@ const Profile = () => {
     console.log(passwordData);
     handlePasswordModalClose();
   };
-useEffect(() => {
-  getUser();
-},[])
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        name: user.HoVaTen || '',
+        phone: user.SoDienThoai || '',
+        email: user.ThuDienTu || ''
+      });
+    }
+  }, [user]);
   return (
     <Box sx={{ maxWidth: "1240px", margin: "0 auto", padding: "40px 20px" }}>
       <Box sx={{ display: "flex", gap: 4 }}>
@@ -96,7 +102,7 @@ useEffect(() => {
               <TextField
                 fullWidth
                 name="name"
-                value={user?.HoVaTen}
+                value={profileData?.name}
                 onChange={handleChange}
                 placeholder="Họ và tên"
                 size="small"
@@ -107,7 +113,7 @@ useEffect(() => {
               <TextField
                 fullWidth
                 name="phone"
-                value={user?.SoDienThoai}
+                value={profileData?.phone}
                 onChange={handleChange}
                 placeholder="Điện thoại"
                 size="small"
@@ -118,7 +124,7 @@ useEffect(() => {
               <TextField
                 fullWidth
                 name="email"
-                value={user?.ThuDienTu}
+                value={profileData?.email}
                 onChange={handleChange}
                 placeholder="Email"
                 size="small"

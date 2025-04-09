@@ -1,23 +1,21 @@
 import { Box, IconButton, InputBase, Avatar, Menu, MenuItem, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import NavbarAdmin from "../../component/header/NavbarAdmin";
 import SearchIcon from '@mui/icons-material/Search';
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import FullscreenExitOutlinedIcon from '@mui/icons-material/FullscreenExitOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
+import { useAuthAdmin } from "../../hooks/useAuthAdmin";
 
 const AdminLayout = () => {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  // Add user info (you can replace this with actual user data from your auth system)
-  const user = {
-    name: "Nguyễn Văn A",
-    email: "nguyenvana@gmail.com"
-  };
+  const { admin,handleAdminLogout } = useAuthAdmin();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -26,7 +24,14 @@ const AdminLayout = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+  const handleLogoutClick = async() => {
+   const res = await handleAdminLogout();
+   if(res.status === 200){
+    navigate('/auth/admin/login');
+   }
+   console.log(res);
+  };
+  
   return (
     <Box sx={{ display: 'flex' }}>
       <NavbarAdmin />
@@ -85,10 +90,10 @@ const AdminLayout = () => {
               {/* User Info */}
               <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid #eee' }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                  {user.name}
+                  {admin?.user?.HoVaTen}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '13px' }}>
-                  {user.email}
+                  {admin?.user?.ThuDienTu}
                 </Typography>
               </Box>
               
@@ -115,7 +120,7 @@ const AdminLayout = () => {
                   02
                 </Box>
               </MenuItem>
-              <MenuItem>
+              <MenuItem onClick={handleLogoutClick}>
                 <ListItemIcon>
                   <LogoutIcon fontSize="small" />
                 </ListItemIcon>
