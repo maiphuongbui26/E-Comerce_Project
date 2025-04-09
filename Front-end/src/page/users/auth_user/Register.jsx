@@ -8,9 +8,10 @@ const Register = () => {
     SoDienThoai: '',
     ThuDienTu: '',
     HoVaTen: '',
-    MatKhau: ''
+    MatKhau: '',
+    VaiTro: 'khachhang',
   });
-  const { handleRegister } = useAuth();
+  const { handleRegister,error,isLoading } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,8 +24,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      await handleRegister(credentials);
+      await handleRegister(formData);
       if(error){
         return;
       }

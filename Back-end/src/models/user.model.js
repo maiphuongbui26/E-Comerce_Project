@@ -14,29 +14,20 @@ const userSchema = new mongoose.Schema({
   },
   NgaySinh: {
     type: Date,
-    required: true
   },
   DiaChi: {
     TinhThanh: {
       type: String,
-      required: true,
       trim: true
     },
     HuyenQuan: {
       type: String,
-      required: true,
       trim: true
     },
     XaPhuong: {
       type: String,
-      required: true,
       trim: true
     }
-  },
-  DanhBaLienLac: {
-    type: String,
-    required: true,
-    trim: true
   },
   ThuDienTu: {
     type: String,

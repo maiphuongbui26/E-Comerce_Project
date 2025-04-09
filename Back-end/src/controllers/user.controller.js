@@ -1,6 +1,7 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const generateUserId = require('../utils/generateId');
 
 const userController = {
   // Login
@@ -38,11 +39,12 @@ const userController = {
   // Create/Register user
   create: async (req, res) => {
     try {
-      const { MatKhau, ...userData } = req.body;
-      const hashedPassword = await bcrypt.hash(MatKhau, 10);
-      
+      const formData = req.body;
+      const hashedPassword = await bcrypt.hash(formData.MatKhau, 10);
+      console.log("req.body",req.body)
       const user = new User({
-        ...userData,
+        id: generateUserId('U'),
+        ...formData,
         MatKhau: hashedPassword
       });
 

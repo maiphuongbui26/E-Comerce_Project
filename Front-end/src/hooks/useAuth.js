@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { login, logout,getCurrentUser } from '../redux/features/auth/authThunks';
+import { login, logout,getCurrentUser,register } from '../redux/features/auth/authThunks';
 
 export const useAuth = () => {
   const dispatch = useDispatch();
