@@ -136,7 +136,37 @@ const userController = {
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  }
+  },
+
+  // Logout user
+  logout: async (req, res) => {
+    try {
+      res.cookie('token', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        expires: new Date(0) // Set cookie expiration to past date
+      });
+      res.json({ message: 'Đăng xuất thành công' });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Get current logged-in user
+  getCurrentUser: async (req, res) => {
+    console.log("reqreqreq",req.user); 
+    try {
+      const user = await User.findOne({id: req.user.id}).select('-MatKhau');
+    console.log("useruser",user); 
+      if (!user) {
+        return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 };
 
 module.exports = userController;

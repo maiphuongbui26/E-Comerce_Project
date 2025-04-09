@@ -33,11 +33,12 @@ import Register from './page/users/auth_user/Register';
 import AddUser from './page/admin/user_management/AddUser';
 import EditUser from './page/admin/user_management/EditUser';
 
+
 function App() {
   return (
     <Routes>
       {/* Auth Routes */}
-      <Route path="/auth">
+      <Route path="/auth/user">
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
       </Route>

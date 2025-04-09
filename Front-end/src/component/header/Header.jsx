@@ -16,7 +16,8 @@ import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from "@mui/icons-material/Close";
-import { Drawer, Popper, Paper, Fade } from "@mui/material";
+import { Drawer, Popper, Paper, Fade, Avatar } from "@mui/material";
+import { useAuth } from '../../hooks/useAuth'; 
 
 const menuItems = [
   { label: "Trang chủ", path: "/user", hidden: true },
@@ -35,15 +36,13 @@ const settings = [
   },
   {
     label: "Đăng xuất",
-    path: "/login", 
+    path: "/auth/user/login", 
   }
 ];
 
-// Update the home navigation in the logo click handler
-
-
 
 const Header = () => {
+  const { handleLogout,user } = useAuth();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElCart, setAnchorElCart] = useState(null); // State for cart dropdown
@@ -55,6 +54,15 @@ const Header = () => {
   const handleMenuClick = (path) => {
     handleCloseNavMenu();
     navigate(path === "/" ? "/user" : path);
+  };
+  const handleSettingClick = async (setting) => {
+    handleCloseUserMenu();
+    if (setting.label === 'Đăng xuất') {
+      await handleLogout();
+      navigate('/auth/user/login');
+    } else {
+      navigate(setting.path);
+    }
   };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -231,7 +239,7 @@ const Header = () => {
               onClick={handleOpenUserMenu}
               sx={{ display: { xs: "none", md: "inline-flex" }, color: "#000", p: 0 }}
             >
-              <PersonOutlineOutlinedIcon />
+              {user ? <Avatar sx={{ width: 34, height: 34 }}  alt="avatar" src="/static/images/avatar/1.jpg" /> : (<PersonOutlineOutlinedIcon />)}
             </IconButton>
             {/* Search */}
             <IconButton
@@ -256,9 +264,8 @@ const Header = () => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting, index) => (
-                <MenuItem key={index} onClick={handleCloseUserMenu}>
+                <MenuItem key={index} onClick={() => handleSettingClick(setting)}>
                   <Typography
-                    onClick={() => handleMenuClick(setting.path)}
                     sx={{
                       textAlign: "center",
                       fontSize: "13px",

@@ -9,7 +9,6 @@ const initialState = {
   error: null,
   role: null
 };
-
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -75,14 +74,14 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = true;
         state.user = action.payload;
-        state.role = action.payload.role;
+        // state.role = action.payload.role;
       })
       .addCase(getCurrentUser.rejected, (state) => {
         state.isLoading = false;
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
-        state.role = null;
+        // state.role = null;
       });
   },
 });

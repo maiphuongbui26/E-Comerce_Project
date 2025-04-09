@@ -14,8 +14,15 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 // Thêm vào sau các middleware cơ bản
 app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:5173', // Frontend URL
+  credentials: true, // Cho phép gửi cookies
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 // Routes
 app.use('/api/users', userRoutes);
 

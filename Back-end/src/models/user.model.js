@@ -62,7 +62,7 @@ const userSchema = new mongoose.Schema({
   },
   VaiTro: {
     type: String,
-    enum: ['admin', 'user'],
+    enum: ['admin', 'khachhang','nhanvien'],
     default: 'user'
   }
 }, {

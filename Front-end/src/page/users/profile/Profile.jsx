@@ -1,7 +1,12 @@
 import { Box, Button, TextField, Typography, Avatar, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+  const {user,getUser} = useAuth();
+  console.log(user);
+  const navigate = useNavigate();
   const [profileData, setProfileData] = useState({
     name: "Phương Mia",
     phone: "",
@@ -41,13 +46,14 @@ const Profile = () => {
       [name]: value
     }));
   };
-
   const handlePasswordSubmit = () => {
     // Add your password change logic here
     console.log(passwordData);
     handlePasswordModalClose();
   };
-
+useEffect(() => {
+  getUser();
+},[])
   return (
     <Box sx={{ maxWidth: "1240px", margin: "0 auto", padding: "40px 20px" }}>
       <Box sx={{ display: "flex", gap: 4 }}>
@@ -64,7 +70,7 @@ const Profile = () => {
               }}
             />
             <Box>
-              <Typography sx={{ fontWeight: 600, mb: 1 }}>{profileData.name}</Typography>
+              <Typography sx={{ fontWeight: 600, mb: 1 }}>{user?.HoVaTen}</Typography>
               <Button 
               onClick={handlePasswordModalOpen}
                 sx={{ 
@@ -90,7 +96,7 @@ const Profile = () => {
               <TextField
                 fullWidth
                 name="name"
-                value={profileData.name}
+                value={user?.HoVaTen}
                 onChange={handleChange}
                 placeholder="Họ và tên"
                 size="small"
@@ -101,7 +107,7 @@ const Profile = () => {
               <TextField
                 fullWidth
                 name="phone"
-                value={profileData.phone}
+                value={user?.SoDienThoai}
                 onChange={handleChange}
                 placeholder="Điện thoại"
                 size="small"
@@ -112,7 +118,7 @@ const Profile = () => {
               <TextField
                 fullWidth
                 name="email"
-                value={profileData.email}
+                value={user?.ThuDienTu}
                 onChange={handleChange}
                 placeholder="Email"
                 size="small"

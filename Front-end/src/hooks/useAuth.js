@@ -1,18 +1,35 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { login, register } from '../redux/features/auth/authThunks';
+import { login, logout,getCurrentUser } from '../redux/features/auth/authThunks';
 
 export const useAuth = () => {
   const dispatch = useDispatch();
-  const { user, loading, error } = useSelector(state => state.auth);
-
+  const { user, isLoading, error } = useSelector(state => state.auth);
   const handleLogin = async (credentials) => {
     try {
       await dispatch(login(credentials)).unwrap();
     } catch (error) {
-      // Handle error
+      // console.error(error);
+    }
+  };
+  const handleRegister = async (credentials) => {
+    try {
+      await dispatch(register(credentials)).unwrap();
+    } catch (error) {
       console.error(error);
     }
   };
 
-  return { user, loading, error, handleLogin };
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const getUser =async () => {
+    await dispatch(getCurrentUser()).unwrap();
+    return user; 
+  }
+
+  return { user, isLoading, error, handleLogin, handleLogout,getUser,handleRegister };
 };

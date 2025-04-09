@@ -4,12 +4,12 @@ import axios from 'axios';
 const BASE_URL = 'http://localhost:8080/api';
 
 export const login = createAsyncThunk(
-  'auth/login',
+  'users/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/auth/login`, credentials);
+      const response = await axios.post(`${BASE_URL}/users/login`, credentials);
       localStorage.setItem('token', response.data.token);
-      return response.data;
+        return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -20,7 +20,7 @@ export const register = createAsyncThunk(
   'auth/register',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/auth/register`, userData);
+      const response = await axios.post(`${BASE_URL}/users/register`, userData);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -46,13 +46,15 @@ export const getCurrentUser = createAsyncThunk(
     try {
       const token = localStorage.getItem('token');
       if (!token) return null;
-      
-      const response = await axios.get(`${BASE_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get(`${BASE_URL}/users/me`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || 'Failed to get user data');
     }
   }
 );
