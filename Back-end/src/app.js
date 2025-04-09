@@ -13,7 +13,9 @@ connectDB();
 // Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+const cookieParser = require('cookie-parser');
+// Thêm vào sau các middleware cơ bản
+app.use(cookieParser());
 // Routes
 app.use('/api/users', userRoutes);
 

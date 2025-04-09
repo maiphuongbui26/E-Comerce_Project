@@ -1,7 +1,14 @@
 const mongoose = require('mongoose');
 const User = require('../models/user.model');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
+function generateUserId() {
+  const prefix = 'U';
+  const timestamp = Date.now().toString().slice(-6);
+  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  return `${prefix}${timestamp}${random}`;
+}
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('Connected to MongoDB');
@@ -10,7 +17,7 @@ mongoose.connect(process.env.MONGO_URI)
     console.log(hashedPassword);
     try {
       const testUser = new User({
-        id: 'USER001',
+        id: generateUserId(),
         HoVaTen: 'Admin',
         NgaySinh: new Date('1990-01-01'),
         DiaChi: {

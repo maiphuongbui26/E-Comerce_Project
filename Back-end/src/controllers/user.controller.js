@@ -7,8 +7,8 @@ const userController = {
   login: async (req, res) => {
     try {
       const { ThuDienTu, MatKhau } = req.body;
+      console.log(ThuDienTu,MatKhau);
       const user = await User.findOne({ ThuDienTu });
-      
       if (!user) {
         return res.status(401).json({ message: 'Email không tồn tại' });
       }
