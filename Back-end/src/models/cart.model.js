@@ -7,28 +7,50 @@ const cartSchema = new mongoose.Schema({
     unique: true,
     trim: true
   },
-  HinhAnh: {
-    type: String,
+  NguoiDung: {
+    type: String,  
+    ref: 'User',
     required: true
   },
-  ThongTin: {
-    type: String,
-    required: true
-  },
-  SoLuong: {
-    type: Number,
-    required: true,
-    min: 0,
-    default: 0
-  },
-  GiaTien: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  DonHang: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Order'
+  DanhSachSanPham: [{
+    SanPham: {
+      idSanPham: {
+        type: String,
+        required: true
+      },
+      TenSanPham: String,
+      LoaiSanPham: {
+        id: String,
+        TenLoaiSanPham: String
+      },
+      DanhMuc: {
+        idDanhMuc: String,
+        TenDanhMuc: String,
+        MoTa: String,
+        HinhAnh: String
+      },
+      DonGia: {
+        id: String,
+        TenDonGia: String
+      },
+      HinhAnh: String
+    },
+    SoLuong: {
+      type: Number,
+      required: true,
+      min: 1,
+      default: 1
+    },
+    MauSac: String,
+    KichThuoc: String,
+    GiaTien: {
+      type: Number,
+      required: true
+    },
+    ThanhTien: {
+      type: Number,
+      default: 0
+    }
   }],
   TongTienHang: {
     type: Number,
@@ -45,30 +67,30 @@ const cartSchema = new mongoose.Schema({
   TongTien: {
     type: Number,
     default: 0
+  },
+  TrangThai: {
+    type: String,
+    enum: ['active', 'ordered', 'expired'],
+    default: 'active'
   }
 }, {
   timestamps: true
 });
 
-// Add indexes for better query performance
-cartSchema.index({ Id: 1 });
-
-// Pre-save middleware to calculate totals
+// Pre-save middleware remains the same
 cartSchema.pre('save', function(next) {
-  this.TongTienHang = this.SoLuong * this.GiaTien;
+  this.DanhSachSanPham.forEach(item => {
+    item.ThanhTien = item.SoLuong * item.GiaTien;
+  });
+  
+  this.TongTienHang = this.DanhSachSanPham.reduce((total, item) => {
+    return total + item.ThanhTien;
+  }, 0);
+  
   this.TamTinh = this.TongTienHang - this.GiamGia;
   this.TongTien = this.TamTinh;
   next();
 });
 
-// Virtual for formatted price
-cartSchema.virtual('GiaTienFormatted').get(function() {
-  return new Intl.NumberFormat('vi-VN', { 
-    style: 'currency', 
-    currency: 'VND' 
-  }).format(this.GiaTien);
-});
-
 const Cart = mongoose.model('Cart', cartSchema);
-
 module.exports = Cart;

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const supplierSchema = new mongoose.Schema({
-  IdNhaCungCap: {
+  idNhaCungCap: {
     type: String,
     required: true,
     unique: true,
@@ -9,46 +9,26 @@ const supplierSchema = new mongoose.Schema({
   },
   TenNhaCungCap: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
   Email: {
     type: String,
     required: true,
-    unique: true,
-    trim: true
+    unique: true
   },
   SoDienThoai: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
   DiaChi: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
-  MoTa: {
-    type: String,
-    trim: true
-  },
-  SanPhamCungCap: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product'
-  }],
-  TrangThai: {
-    type: String,
-    enum: ['active', 'inactive', 'pending'],
-    default: 'active'
-  },
-  NgayTao: {
-    type: Date,
-    default: Date.now
-  }
+  MoTa: String,
+  SanPhamCungCap: String
 }, {
   timestamps: true
 });
 
 const Supplier = mongoose.model('Supplier', supplierSchema);
-
 module.exports = Supplier;

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const productTypeSchema = new mongoose.Schema({
-  Id: {
+  id: {
     type: String,
     required: true,
     unique: true,
@@ -9,8 +9,7 @@ const productTypeSchema = new mongoose.Schema({
   },
   TenLoaiSanPham: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   }
 }, {
   timestamps: true

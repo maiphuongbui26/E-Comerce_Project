@@ -24,6 +24,9 @@ const CategoryManagement = () => {
     { MaMuc: "01", TenMuc: "C_NhaCungCap" },
     { MaMuc: "02", TenMuc: "C_DanhMucSanPham" },
     { MaMuc: "03", TenMuc: "C_KichThuoc" },
+    { MaMuc: "04", TenMuc: "C_LoaiSanPham" },
+    { MaMuc: "05", TenMuc: "C_DonGia" },
+    { MaMuc: "06", TenMuc: "C_Style" },
   ];
 
   // Handle modal actions
@@ -36,7 +39,6 @@ const CategoryManagement = () => {
     setSelectedCategory(null);
     setOpenModal(false);
   };
-
   return (
     <>
       {/* Title Section */}
@@ -70,19 +72,7 @@ const CategoryManagement = () => {
                 }
               }}
             />
-            <Button 
-              variant="contained" 
-              color="primary"
-              onClick={() => navigate('/admin/categories/add')}
-              sx={{
-                borderRadius: '20px',
-                textTransform: 'none',
-                px: 3,
-                height: '36px'
-              }}
-            >
-              Thêm danh mục
-            </Button>
+            
           </Box>
         </Box>
 
@@ -114,19 +104,6 @@ const CategoryManagement = () => {
                       onClick={() => handleOpenModal(row)}
                     >
                       <VisibilityIcon fontSize="small" sx={{ color: '#1976d2' }} />
-                    </IconButton>
-                    <IconButton 
-                      size="small" 
-                      sx={{ mr: 1 }}
-                      onClick={() => handleDelete(row.MaMuc)}
-                    >
-                      <DeleteIcon fontSize="small" sx={{ color: '#d32f2f' }} />
-                    </IconButton>
-                    <IconButton 
-                      size="small"
-                      onClick={() => navigate(`/admin/categories/edit/${row.id}`)}
-                    >
-                      <EditIcon fontSize="small" />
                     </IconButton>
                   </TableCell>
                 </TableRow>

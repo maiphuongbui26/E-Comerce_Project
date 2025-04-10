@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const wardSchema = new mongoose.Schema({
-  Id: {
+  id: {
     type: String,
     required: true,
     unique: true,

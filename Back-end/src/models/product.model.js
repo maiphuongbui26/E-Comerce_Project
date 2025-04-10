@@ -12,6 +12,39 @@ const productSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  LoaiSanPham: {
+    id: String,
+    TenLoaiSanPham: String
+  },
+  DanhMuc: {
+    idDanhMuc: String,
+    TenDanhMuc: String,
+    MoTa: String,
+    HinhAnh: String
+  },
+  DonGia: {
+    id: String,
+    TenDonGia: String
+  },
+  KichThuoc: {
+    id: String,
+    TenKichThuoc: String,
+    MoTa: String
+  },
+  Style: {
+    id: String,
+    TenStyle: String,
+    HinhAnh: String
+  },
+  NhaCungCap: {
+    idNhaCungCap: String,
+    TenNhaCungCap: String,
+    Email: String,
+    SoDienThoai: String,
+    DiaChi: String,
+    MoTa: String,
+    SanPhamCungCap: String
+  },
   GiaSanPham: {
     type: Number,
     required: true
@@ -21,49 +54,27 @@ const productSchema = new mongoose.Schema({
     required: true,
     default: 0
   },
-  MoTa: {
-    type: String,
-    trim: true
-  },
-  MauSac: {
-    type: String,
-    trim: true
-  },
+  MoTa: String,
+  MauSac: String,
   TrangThai: {
     type: String,
     enum: ['available', 'outOfStock', 'discontinued'],
     default: 'available'
   },
-  DanhGia: {
-    type: String,
-    trim: true
-  },
-  HinhAnh: [{
-    type: String,
-    trim: true
-  }],
-  KichThuoc: {
-    type: String,
-    trim: true
-  },
+  DanhGia: String,
+  HinhAnh: [String],
   YeuThich: {
     type: Boolean,
     default: false
-  },
-  NhaCungCap: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Supplier',
-    required: true
   }
 }, {
   timestamps: true
 });
 
-// Add indexes for better query performance
 productSchema.index({ TenSanPham: 1 });
 productSchema.index({ GiaSanPham: 1 });
-productSchema.index({ NhaCungCap: 1 });
+productSchema.index({ 'LoaiSanPham.id': 1 });
+productSchema.index({ 'DanhMuc.idDanhMuc': 1 });
 
 const Product = mongoose.model('Product', productSchema);
-
 module.exports = Product;

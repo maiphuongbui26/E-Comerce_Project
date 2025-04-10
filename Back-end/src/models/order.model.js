@@ -8,36 +8,44 @@ const orderSchema = new mongoose.Schema({
     trim: true
   },
   NguoiDung: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    id: String,
+    HoTen: String,
+    Email: String,
+    SoDienThoai: String
   },
-  DanhSachSanPham: [{
-    SanPham: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-      required: true
-    },
-    TenSanPham: {
-      type: String,
-      required: true
-    },
-    GiaSanPham: {
-      type: Number,
-      required: true
-    },
-    SoLuong: {
-      type: Number,
-      required: true,
-      min: 1
-    },
-    MauSac: {
-      type: String
-    },
-    KichThuoc: {
-      type: String
-    }
-  }],
+  GioHang: {
+    Id: String,
+    DanhSachSanPham: [{
+      SanPham: {
+        idSanPham: String,
+        TenSanPham: String,
+        LoaiSanPham: {
+          id: String,
+          TenLoaiSanPham: String
+        },
+        DanhMuc: {
+          idDanhMuc: String,
+          TenDanhMuc: String,
+          MoTa: String,
+          HinhAnh: String
+        },
+        DonGia: {
+          id: String,
+          TenDonGia: String
+        },
+        HinhAnh: String
+      },
+      SoLuong: Number,
+      MauSac: String,
+      KichThuoc: String,
+      GiaTien: Number,
+      ThanhTien: Number
+    }],
+    TongTienHang: Number,
+    GiamGia: Number,
+    TamTinh: Number,
+    TongTien: Number
+  },
   MaGiamGia: {
     type: String,
     trim: true
@@ -49,10 +57,6 @@ const orderSchema = new mongoose.Schema({
   TongTien: {
     type: Number,
     required: true
-  },
-  NgayDatHang: {
-    type: Date,
-    default: Date.now
   },
   DiaChiGiaoHang: {
     type: String,
@@ -68,11 +72,8 @@ const orderSchema = new mongoose.Schema({
     enum: ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'],
     default: 'pending'
   },
-  GhiChu: {
-    type: String,
-    trim: true
-  },
-  NgayCapNhat: {
+  GhiChu: String,
+  NgayDatHang: {
     type: Date,
     default: Date.now
   }
@@ -80,12 +81,40 @@ const orderSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Add indexes for better query performance
-orderSchema.index({ idDonHang: 1 });
-orderSchema.index({ NguoiDung: 1 });
-orderSchema.index({ NgayDatHang: -1 });
-orderSchema.index({ TrangThaiDonHang: 1 });
+orderSchema.pre('save', async function(next) {
+  if (this.isNew) {
+    const cart = await mongoose.model('Cart').findOne({ Id: this.GioHang.Id });
+    const user = await mongoose.model('User').findById(this.NguoiDung.id);
+    
+    if (cart && user) {
+      // Copy user information
+      this.NguoiDung = {
+        id: user._id,
+        HoTen: user.HoTen,
+        Email: user.Email,
+        SoDienThoai: user.SoDienThoai
+      };
+
+      // Copy cart information
+      this.GioHang = {
+        Id: cart.Id,
+        DanhSachSanPham: cart.DanhSachSanPham,
+        TongTienHang: cart.TongTienHang,
+        GiamGia: cart.GiamGia,
+        TamTinh: cart.TamTinh,
+        TongTien: cart.TongTien
+      };
+      
+      // Calculate final total
+      this.TongTien = cart.TongTien + this.PhiShip;
+      
+      // Update cart status
+      cart.TrangThai = 'ordered';
+      await cart.save();
+    }
+  }
+  next();
+});
 
 const Order = mongoose.model('Order', orderSchema);
-
 module.exports = Order;

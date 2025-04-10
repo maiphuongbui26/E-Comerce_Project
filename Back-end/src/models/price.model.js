@@ -1,19 +1,19 @@
 const mongoose = require('mongoose');
 
-const sortSchema = new mongoose.Schema({
-  Id: {
+const priceSchema = new mongoose.Schema({
+  id: {
     type: String,
     required: true,
     unique: true,
     trim: true
   },
-  ThuTuSapXep: {
-    type: Number,
+  TenDonGia: {
+    type: String,
     required: true
   }
 }, {
   timestamps: true
 });
 
-const Sort = mongoose.model('Sort', sortSchema);
-module.exports = Sort;
+const Price = mongoose.model('Price', priceSchema);
+module.exports = Price;
