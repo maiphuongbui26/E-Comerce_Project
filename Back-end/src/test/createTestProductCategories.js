@@ -8,13 +8,13 @@ mongoose.connect(process.env.MONGO_URI)
     try {
       const testCategories = [
         {
-          idDanhMuc: 'DM001',
+          id: 'DM001',
           TenDanhMuc: 'Áo Nam',
           MoTa: 'Các loại áo dành cho nam giới',
           HinhAnh: 'https://example.com/images/ao-nam.jpg'
         },
         {
-          idDanhMuc: 'DM002',
+          id: 'DM002',
           TenDanhMuc: 'Quần Nam',
           MoTa: 'Các loại quần dành cho nam giới',
           HinhAnh: 'https://example.com/images/quan-nam.jpg'

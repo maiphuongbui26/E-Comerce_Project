@@ -24,8 +24,7 @@ const supplierSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  MoTa: String,
-  SanPhamCungCap: String
+  MoTa: String
 }, {
   timestamps: true
 });

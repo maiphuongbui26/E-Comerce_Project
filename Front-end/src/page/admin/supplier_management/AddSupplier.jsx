@@ -1,24 +1,29 @@
-import { Box, Typography, TextField, Button, FormControl, Select, MenuItem, Paper, Divider } from '@mui/material';
+import { Box, Typography, TextField, Button, Paper, Divider } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import BusinessIcon from '@mui/icons-material/Business';
+import { useSupplier } from '../../../hooks/useSupplier';
 
 const AddSupplier = () => {
   const navigate = useNavigate();
+  const { handleCreateSupplier, isLoading, error } = useSupplier();
   const [formData, setFormData] = useState({
-    code: '',
-    name: '',
-    contact: '',
-    phone: '',
-    address: '',
-    status: 'Active'
+    TenNhaCungCap: '',
+    Email: '',
+    SoDienThoai: '',
+    DiaChi: '',
+    MoTa: '',
+    SanPhamCungCap: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    const success = await handleCreateSupplier(formData);
+    if (success) {
+      navigate('/admin/suppliers');
+    }
   };
 
   return (
@@ -40,44 +45,42 @@ const AddSupplier = () => {
           <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: 'repeat(2, 1fr)' }}>
             <TextField
               fullWidth
-              label="Mã nhà cung cấp"
-              value={formData.code}
-              onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-            />
-            <TextField
-              fullWidth
+              required
               label="Tên nhà cung cấp"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              value={formData.TenNhaCungCap}
+              onChange={(e) => setFormData({ ...formData, TenNhaCungCap: e.target.value })}
             />
             <TextField
               fullWidth
-              label="Người liên hệ"
-              value={formData.contact}
-              onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+              required
+              label="Email"
+              type="email"
+              value={formData.Email}
+              onChange={(e) => setFormData({ ...formData, Email: e.target.value })}
             />
             <TextField
               fullWidth
+              required
               label="Số điện thoại"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              value={formData.SoDienThoai}
+              onChange={(e) => setFormData({ ...formData, SoDienThoai: e.target.value })}
             />
             <TextField
               fullWidth
+              required
               label="Địa chỉ"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              value={formData.DiaChi}
+              onChange={(e) => setFormData({ ...formData, DiaChi: e.target.value })}
+            />
+            <TextField
+              fullWidth
+              label="Mô tả"
+              multiline
+              rows={3}
+              value={formData.MoTa}
+              onChange={(e) => setFormData({ ...formData, MoTa: e.target.value })}
               sx={{ gridColumn: 'span 2' }}
             />
-            <FormControl fullWidth>
-              <Select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              >
-                <MenuItem value="Active">Đang hợp tác</MenuItem>
-                <MenuItem value="Inactive">Ngừng hợp tác</MenuItem>
-              </Select>
-            </FormControl>
           </Box>
 
           <Divider sx={{ my: 3 }} />

@@ -24,8 +24,6 @@ import ProductManagement from "./page/admin/product_management/ProductManagement
 import PromotionManagement from "./page/admin/promotion_management/PromotionManagement";
 import SupplierManagement from "./page/admin/supplier_management/SupplierManagement";
 import UserManagement from "./page/admin/user_management/UserManagement";
-import AddCategory from "./page/admin/categories_management/AddCategory";
-import EditCategory from "./page/admin/categories_management/EditCategory";
 import AddProduct from "./page/admin/product_management/AddProduct";
 import EditProduct from "./page/admin/product_management/EditProduct";
 import Login from "./page/users/auth_user/Login";
@@ -66,8 +64,6 @@ function App() {
       {/* Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="categories" element={<CategoryManagement />} />
-        <Route path="categories/add" element={<AddCategory />} />
-        <Route path="categories/edit/:id" element={<EditCategory />} />
         <Route path="orders" element={<OrderManagement />} />
         <Route path="products" element={<ProductManagement />} />
         <Route path="products/add" element={<AddProduct />} />

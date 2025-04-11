@@ -1,13 +1,15 @@
-// Update imports
+
+
 import { 
   Box, Typography, TextField, IconButton, Table, 
   TableBody, TableCell, TableContainer, TableHead, 
-  TableRow, Checkbox, Paper, Button, Pagination 
+  TableRow, Paper, Pagination 
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect } from 'react';
-import CategoryDetailModal from './CategoryDetailModal';
+import { categoryFormConfigs } from '../../../constants/categoryFormConfigs';
+import CategoryDetailModal from './CategoryDetailModal';  // Fix import path
 
 const CategoryManagement = () => {
   const [page, setPage] = useState(1);
@@ -15,54 +17,46 @@ const CategoryManagement = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const mockData = [
-    { MaMuc: "01", TenMuc: "C_NhaCungCap", MoTa: "Quản lý nhà cung cấp" },
-    { MaMuc: "02", TenMuc: "C_DanhMucSanPham", MoTa: "Quản lý danh mục sản phẩm" },
-    { MaMuc: "03", TenMuc: "C_KichThuoc", MoTa: "Quản lý kích thước" },
-    { MaMuc: "04", TenMuc: "C_LoaiSanPham", MoTa: "Quản lý loại sản phẩm" },
-    { MaMuc: "05", TenMuc: "C_DonGia", MoTa: "Quản lý đơn giá" },
-    { MaMuc: "06", TenMuc: "C_Style", MoTa: "Quản lý style" },
-  ];
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
-  // Handle modal actions
-  const handleOpenModal = (category) => {
-    setSelectedCategory(category);
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedCategory(null);
-    setOpenModal(false);
-  };
-
-  // Handle checkbox selection
-  const handleSelectAll = (event) => {
-    if (event.target.checked) {
-      setSelectedItems(mockData.map(item => item.MaMuc));
-    } else {
-      setSelectedItems([]);
+  // Thay đổi fetchCategories để tạo dữ liệu từ categoryFormConfigs
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      // Include endpoint from API field in categoryFormConfigs
+      const categoriesList = Object.keys(categoryFormConfigs).map(key => {
+        const apiField = categoryFormConfigs[key].find(field => field.id === 'API');
+        return {
+          MaMuc: key,
+          TenMuc: key,
+          MoTa: `Danh mục ${key.replace('C_', '')}`,
+          endpoint: apiField?.endpoint || key.toLowerCase()
+        };
+      });
+      setCategories(categoriesList);
+    } catch (err) {
+      setError('Không thể tải danh sách danh mục');
+      console.error(err);
+      setCategories([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSelectItem = (maMuc) => {
-    setSelectedItems(prev => {
-      if (prev.includes(maMuc)) {
-        return prev.filter(id => id !== maMuc);
-      } else {
-        return [...prev, maMuc];
-      }
-    });
-  };
+  // Thêm kiểm tra trước khi filter
+  const filteredData = Array.isArray(categories) 
+    ? categories.filter(item =>
+        item.TenMuc.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.MoTa.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
-  // Filter data based on search term
-  const filteredData = mockData.filter(item =>
-    item.TenMuc.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.MoTa.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Calculate pagination
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const startIndex = (page - 1) * rowsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
@@ -92,58 +86,46 @@ const CategoryManagement = () => {
               }
             }}
           />
-          
-          {selectedItems.length > 0 && (
-            <Button 
-              variant="contained" 
-              color="error" 
-              size="small"
-              onClick={() => setSelectedItems([])}
-            >
-              Xóa đã chọn ({selectedItems.length})
-            </Button>
-          )}
         </Box>
-
         <TableContainer component={Paper} elevation={0}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox" align="center">
-                  <Checkbox 
-                    checked={selectedItems.length === mockData.length}
-                    indeterminate={selectedItems.length > 0 && selectedItems.length < mockData.length}
-                    onChange={handleSelectAll}
-                  />
-                </TableCell>
                 <TableCell align="center">Mã danh mục</TableCell>
                 <TableCell align="center">Tên danh mục</TableCell>
-                <TableCell align="center">Mô tả</TableCell>
+                <TableCell align="center">Số trường dữ liệu</TableCell>
                 <TableCell align="center">Thao tác</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedData.map((row) => (
-                <TableRow key={row.MaMuc}>
-                  <TableCell padding="checkbox" align="center">
-                    <Checkbox 
-                      checked={selectedItems.includes(row.MaMuc)}
-                      onChange={() => handleSelectItem(row.MaMuc)}
-                    />
-                  </TableCell>
-                  <TableCell align="center">{row.MaMuc}</TableCell>
-                  <TableCell align="center">{row.TenMuc}</TableCell>
-                  <TableCell align="center">{row.MoTa}</TableCell>
-                  <TableCell align="center">
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleOpenModal(row)}
-                    >
-                      <VisibilityIcon fontSize="small" sx={{ color: '#1976d2' }} />
-                    </IconButton>
-                  </TableCell>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">Đang tải...</TableCell>
                 </TableRow>
-              ))}
+              ) : paginatedData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">Không có dữ liệu</TableCell>
+                </TableRow>
+              ) : (
+                paginatedData.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell align="center">{row.MaMuc}</TableCell>
+                    <TableCell align="center">{row.MaMuc.replace('C_', '')}</TableCell>
+                    <TableCell align="center">{categoryFormConfigs[row.MaMuc].length} trường</TableCell>
+                    <TableCell align="center">
+                      <IconButton 
+                        size="small" 
+                        onClick={() => {
+                          setSelectedCategory(row);
+                          setOpenModal(true);
+                        }}
+                      >
+                        <VisibilityIcon fontSize="small" sx={{ color: '#1976d2' }} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -173,16 +155,19 @@ const CategoryManagement = () => {
             size="small"
           />
         </Box>
+
+        {error && (
+          <Typography color="error" sx={{ mt: 2 }}>
+            {error}
+          </Typography>
+        )}
       </Box>
 
       <CategoryDetailModal
         open={openModal}
-        onClose={handleCloseModal}
+        onClose={() => setOpenModal(false)}
         category={selectedCategory}
-        onUpdate={() => {
-          // Refresh data here
-          handleCloseModal();
-        }}
+        onUpdate={fetchCategories}
       />
     </>
   );

@@ -16,7 +16,7 @@ mongoose.connect(process.env.MONGO_URI)
 
       // Get references from all related collections
       const productType = await ProductType.findOne({ id: 'LSP001' });
-      const category = await ProductCategory.findOne({ idDanhMuc: 'DM001' });
+      const category = await ProductCategory.findOne({ id: 'DM001' });
       const price = await Price.findOne({ id: 'DG001' });
       const size = await Size.findOne({ id: 'KT001' });
       const style = await Style.findOne({ id: 'ST001' });
@@ -35,7 +35,7 @@ mongoose.connect(process.env.MONGO_URI)
             TenLoaiSanPham: productType.TenLoaiSanPham
           },
           DanhMuc: {
-            idDanhMuc: category.idDanhMuc,
+            id: category.id,
             TenDanhMuc: category.TenDanhMuc,
             MoTa: category.MoTa,
             HinhAnh: category.HinhAnh
@@ -79,7 +79,7 @@ mongoose.connect(process.env.MONGO_URI)
           idSanPham: 'SP002',
           TenSanPham: 'Quần Jean Nam Slim Fit',
           LoaiSanPham: productType.id,
-          DanhMuc: category.idDanhMuc,
+          DanhMuc: category.id,
           DonGia: price.id,
           KichThuoc: size.id,
           Style: style.id,

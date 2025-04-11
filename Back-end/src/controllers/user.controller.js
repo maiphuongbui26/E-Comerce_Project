@@ -111,8 +111,8 @@ const userController = {
         updateData.MatKhau = await bcrypt.hash(MatKhau, 10);
       }
 
-      const user = await User.findByIdAndUpdate(
-        req.params.id,
+      const user = await User.findOneAndUpdate(
+        { id: req.params.id }, // Tìm theo trường 'id' thay vì '_id'
         updateData,
         { new: true }
       ).select('-MatKhau');
@@ -130,7 +130,7 @@ const userController = {
   // Delete user
   delete: async (req, res) => {
     try {
-      const user = await User.findByIdAndDelete(req.params.id);
+      const user = await User.findOneAndDelete(req.params.id);
       if (!user) {
         return res.status(404).json({ message: 'Không tìm thấy người dùng' });
       }

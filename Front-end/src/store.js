@@ -5,6 +5,9 @@ import productReducer from './redux/features/product/productSlice';
 import cartReducer from './redux/features/cart/cartSlice';
 import categoryReducer from './redux/features/category/categorySlice';
 import orderReducer from './redux/features/order/orderSlice';
+import supplierReducer from './redux/features/supplier/supplierSlice';
+import userReducer from './redux/features/user/userslice';
+import discountReducer from './redux/features/discount/discountSlice';
 
 
 export const store = configureStore({
@@ -15,12 +18,10 @@ export const store = configureStore({
     cart: cartReducer,
     categories: categoryReducer,
     orders: orderReducer,
+    suppliers: supplierReducer,
+    users: userReducer,
+    discounts: discountReducer,
   },
-//   middleware: (getDefaultMiddleware) =>
-//     getDefaultMiddleware({
-//       serializableCheck: false,
-//     }),
-//   devTools: process.env.NODE_ENV !== 'production',
 });
 
 export default store;

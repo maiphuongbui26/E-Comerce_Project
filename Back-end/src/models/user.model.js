@@ -16,18 +16,8 @@ const userSchema = new mongoose.Schema({
     type: Date,
   },
   DiaChi: {
-    TinhThanh: {
-      type: String,
-      trim: true
-    },
-    HuyenQuan: {
-      type: String,
-      trim: true
-    },
-    XaPhuong: {
-      type: String,
-      trim: true
-    }
+    type: String,
+    trim: true
   },
   ThuDienTu: {
     type: String,

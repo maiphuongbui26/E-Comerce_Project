@@ -1,51 +1,48 @@
-import { Box, Typography, TextField, Button, FormControl, Select, MenuItem, Paper, Divider } from '@mui/material';
+import { Box, Typography, TextField, Button, Paper, Divider } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
+import { useDiscount } from '../../../hooks/useDiscount';
 
 const EditPromotion = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { discounts, handleUpdateDiscount, handleFetchDiscounts, isLoading } = useDiscount();
   const [formData, setFormData] = useState({
-    code: '',
-    name: '',
-    discount: '',
-    startDate: '',
-    endDate: '',
-    status: ''
+    TenChuongTrinh: '',
+    NgayBatDau: '',
+    NgayKetThuc: ''
   });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await handleUpdateDiscount(id, formData);
+    navigate('/admin/promotions');
+  };
+  useEffect(() => {
+    handleFetchDiscounts();
+  }, []);
 
   useEffect(() => {
-    // Mock data fetch
-    const mockPromotion = {
-      code: 'SUMMER23',
-      name: 'Khuyến mãi hè 2023',
-      discount: '20',
-      startDate: '2023-06-01',
-      endDate: '2023-08-31',
-      status: 'Active'
-    };
-    setFormData(mockPromotion);
-  }, [id]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-  };
+    if (discounts.length > 0) {
+      const discount = discounts.find(d => d.id === id);
+      if (discount) {
+        setFormData({
+          TenChuongTrinh: discount.TenChuongTrinh,
+          NgayBatDau: new Date(discount.NgayBatDau).toISOString().split('T')[0],
+          NgayKetThuc: new Date(discount.NgayKetThuc).toISOString().split('T')[0]
+        });
+      }
+    }
+  }, [discounts, id]);
 
   return (
     <>
-      <Box sx={{ 
-        p: 2, 
-        bgcolor: '#fff',
-        borderRadius: '4px 4px 0 0',
-        borderBottom: '1px solid #e0e0e0'
-      }}>
+      <Box sx={{ p: 2, bgcolor: '#fff', borderRadius: '4px 4px 0 0', borderBottom: '1px solid #e0e0e0' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <EditIcon />
-          <Typography variant="h5">Chỉnh sửa khuyến mãi {formData.code}</Typography>
+          <Typography variant="h5">Chỉnh sửa mã giảm giá</Typography>
         </Box>
       </Box>
 
@@ -53,49 +50,30 @@ const EditPromotion = () => {
         <form onSubmit={handleSubmit}>
           <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: 'repeat(2, 1fr)' }}>
             <TextField
+              required
               fullWidth
-              label="Mã khuyến mãi"
-              value={formData.code}
-              onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+              label="Tên chương trình"
+              value={formData.TenChuongTrinh}
+              onChange={(e) => setFormData({ ...formData, TenChuongTrinh: e.target.value })}
             />
             <TextField
-              fullWidth
-              label="Tên khuyến mãi"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-            <TextField
-              fullWidth
-              label="Giảm giá (%)"
-              type="number"
-              value={formData.discount}
-              onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
-            />
-            <FormControl fullWidth>
-              <Select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              >
-                <MenuItem value="Active">Đang áp dụng</MenuItem>
-                <MenuItem value="Pending">Chờ áp dụng</MenuItem>
-                <MenuItem value="Inactive">Ngừng áp dụng</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
+              required
               fullWidth
               label="Ngày bắt đầu"
               type="date"
-              value={formData.startDate}
-              onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+              value={formData.NgayBatDau}
+              onChange={(e) => setFormData({ ...formData, NgayBatDau: e.target.value })}
               InputLabelProps={{ shrink: true }}
             />
             <TextField
+              required
               fullWidth
               label="Ngày kết thúc"
               type="date"
-              value={formData.endDate}
-              onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+              value={formData.NgayKetThuc}
+              onChange={(e) => setFormData({ ...formData, NgayKetThuc: e.target.value })}
               InputLabelProps={{ shrink: true }}
+              sx={{ gridColumn: '2' }}
             />
           </Box>
 
@@ -113,8 +91,9 @@ const EditPromotion = () => {
               type="submit"
               variant="contained"
               startIcon={<SaveIcon />}
+              disabled={isLoading}
             >
-              Lưu
+              {isLoading ? 'Đang lưu...' : 'Lưu'}
             </Button>
           </Box>
         </form>

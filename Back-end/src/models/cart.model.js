@@ -25,7 +25,7 @@ const cartSchema = new mongoose.Schema(
           TenLoaiSanPham: String,
         },
         DanhMuc: {
-          idDanhMuc: String,
+          id: String,
           TenDanhMuc: String,
           MoTa: String,
           HinhAnh: String,
@@ -42,7 +42,14 @@ const cartSchema = new mongoose.Schema(
           default: 1,
         },
         MauSac: String,
-        KichThuoc: String,
+        KichThuoc: {
+          id: String,
+          TenKichThuoc: {
+            type: String,
+            enum: ['S', 'M', 'L'],
+            required: true
+          }
+        },
         GiaTien: {
           type: Number,
           required: true,

@@ -16,20 +16,14 @@ const productSchema = new mongoose.Schema({
     id: String,
     TenLoaiSanPham: String
   },
-  DanhMuc: {
-    idDanhMuc: String,
-    TenDanhMuc: String,
-    MoTa: String,
-    HinhAnh: String
-  },
   DonGia: {
     id: String,
     TenDonGia: String
   },
-  KichThuoc: {
-    id: String,
-    TenKichThuoc: String,
-    MoTa: String
+  SoLuong: {
+    type: Number,
+    required: true,
+    default: 0
   },
   Style: {
     id: String,
@@ -43,24 +37,13 @@ const productSchema = new mongoose.Schema({
     SoDienThoai: String,
     DiaChi: String,
     MoTa: String,
-    SanPhamCungCap: String
   },
   GiaSanPham: {
     type: Number,
     required: true
   },
-  SoLuong: {
-    type: Number,
-    required: true,
-    default: 0
-  },
   MoTa: String,
   MauSac: String,
-  TrangThai: {
-    type: String,
-    enum: ['available', 'outOfStock', 'discontinued'],
-    default: 'available'
-  },
   DanhGia: String,
   HinhAnh: [String],
   YeuThich: {
@@ -74,7 +57,7 @@ const productSchema = new mongoose.Schema({
 productSchema.index({ TenSanPham: 1 });
 productSchema.index({ GiaSanPham: 1 });
 productSchema.index({ 'LoaiSanPham.id': 1 });
-productSchema.index({ 'DanhMuc.idDanhMuc': 1 });
+productSchema.index({ 'DanhMuc.id': 1 });
 
 const Product = mongoose.model('Product', productSchema);
 module.exports = Product;

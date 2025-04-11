@@ -29,11 +29,9 @@ const AdminLayout = () => {
    if(res.status === 200){
     navigate('/auth/admin/login');
    }
-   console.log(res);
   };
   useEffect(() => {
     getAdmin()
-    console.log("adminadmin",admin)
 }, []);
   return (
     <Box sx={{ display: 'flex' }}>

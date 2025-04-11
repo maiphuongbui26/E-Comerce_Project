@@ -7,7 +7,7 @@ const productCategoryController = {
     try {
       const categoryData = req.body;
       const category = new ProductCategory({
-        idDanhMuc: generatePCId('DM'),
+        id: generatePCId('DM'),
         ...categoryData
       });
 
@@ -53,7 +53,7 @@ const productCategoryController = {
   // Get category by ID
   getById: async (req, res) => {
     try {
-      const category = await ProductCategory.findOne({ idDanhMuc: req.params.id });
+      const category = await ProductCategory.findOne({ id: req.params.id });
       if (!category) {
         return res.status(404).json({ message: 'Không tìm thấy danh mục' });
       }
@@ -67,7 +67,7 @@ const productCategoryController = {
   update: async (req, res) => {
     try {
       const category = await ProductCategory.findOneAndUpdate(
-        { idDanhMuc: req.params.id },
+        { id: req.params.id },
         req.body,
         { new: true }
       );
@@ -88,7 +88,7 @@ const productCategoryController = {
   // Delete category
   delete: async (req, res) => {
     try {
-      const category = await ProductCategory.findOneAndDelete({ idDanhMuc: req.params.id });
+      const category = await ProductCategory.findOneAndDelete({ id: req.params.id });
       if (!category) {
         return res.status(404).json({ message: 'Không tìm thấy danh mục' });
       }

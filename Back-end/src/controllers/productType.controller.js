@@ -38,7 +38,7 @@ const productTypeController = {
       const total = await ProductType.countDocuments(query);
 
       res.json({
-        productTypes,
+        'product-types': productTypes,
         totalPages: Math.ceil(total / limit),
         currentPage: page
       });

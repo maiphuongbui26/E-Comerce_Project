@@ -5,7 +5,8 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
-  updateProductStock
+  deleteProductImage,
+  toggleFavorite
 } from './productThunks';
 
 const initialState = {
@@ -15,13 +16,12 @@ const initialState = {
   error: null,
   filters: {
     search: '',
-    category: 'all',
-    priceRange: {
-      min: 0,
-      max: null
-    },
-    sortBy: 'newest',
-    status: 'all'
+    productType: '',
+    minPrice: '',
+    maxPrice: '',
+    status: '',
+    sortBy: 'createdAt',
+    order: 'desc'
   },
   pagination: {
     currentPage: 1,
@@ -38,17 +38,14 @@ const productSlice = createSlice({
     setFilters: (state, action) => {
       state.filters = { ...state.filters, ...action.payload };
     },
+    setPagination: (state, action) => {
+      state.pagination = { ...state.pagination, ...action.payload };
+    },
     clearSelectedProduct: (state) => {
       state.selectedProduct = null;
     },
     clearError: (state) => {
       state.error = null;
-    },
-    setPage: (state, action) => {
-      state.pagination.currentPage = action.payload;
-    },
-    setLimit: (state, action) => {
-      state.pagination.limit = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -56,116 +53,108 @@ const productSlice = createSlice({
       // Fetch Products
       .addCase(fetchProducts.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.isLoading = false;
         state.products = action.payload.products;
-        state.pagination = {
-          currentPage: action.payload.currentPage,
-          totalPages: action.payload.totalPages,
-          totalItems: action.payload.totalItems,
-          limit: action.payload.limit
-        };
+        state.pagination.totalPages = action.payload.totalPages;
+        state.pagination.totalItems = action.payload.total;
+        state.pagination.currentPage = action.payload.currentPage;
+        state.error = null;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || 'Failed to fetch products';
       })
 
       // Fetch Product By Id
       .addCase(fetchProductById.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
       })
       .addCase(fetchProductById.fulfilled, (state, action) => {
         state.isLoading = false;
         state.selectedProduct = action.payload;
+        state.error = null;
       })
       .addCase(fetchProductById.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || 'Failed to fetch product';
       })
 
       // Create Product
       .addCase(createProduct.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
       })
       .addCase(createProduct.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.products.unshift(action.payload);
+        state.products.unshift(action.payload.product);
+        state.error = null;
       })
       .addCase(createProduct.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || 'Failed to create product';
       })
 
       // Update Product
       .addCase(updateProduct.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.isLoading = false;
-        const index = state.products.findIndex(product => product.id === action.payload.id);
+        const index = state.products.findIndex(p => p.idSanPham === action.payload.product.idSanPham);
         if (index !== -1) {
-          state.products[index] = action.payload;
+          state.products[index] = action.payload.product;
         }
+        state.error = null;
       })
       .addCase(updateProduct.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || 'Failed to update product';
       })
 
       // Delete Product
       .addCase(deleteProduct.pending, (state) => {
         state.isLoading = true;
-        state.error = null;
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.products = state.products.filter(product => product.id !== action.payload);
+        state.products = state.products.filter(p => p.idSanPham !== action.payload);
+        state.error = null;
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || 'Failed to delete product';
       })
 
-      // Update Product Stock
-      .addCase(updateProductStock.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(updateProductStock.fulfilled, (state, action) => {
-        state.isLoading = false;
-        const index = state.products.findIndex(product => product.id === action.payload.id);
+      // Delete Product Image
+      .addCase(deleteProductImage.fulfilled, (state, action) => {
+        const index = state.products.findIndex(p => p.idSanPham === action.payload.product.idSanPham);
         if (index !== -1) {
-          state.products[index] = action.payload;
+          state.products[index] = action.payload.product;
+        }
+        if (state.selectedProduct?.idSanPham === action.payload.product.idSanPham) {
+          state.selectedProduct = action.payload.product;
         }
       })
-      .addCase(updateProductStock.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
+
+      // Toggle Favorite
+      .addCase(toggleFavorite.fulfilled, (state, action) => {
+        const index = state.products.findIndex(p => p.idSanPham === action.payload.product.idSanPham);
+        if (index !== -1) {
+          state.products[index] = action.payload.product;
+        }
+        if (state.selectedProduct?.idSanPham === action.payload.product.idSanPham) {
+          state.selectedProduct = action.payload.product;
+        }
       });
   }
 });
 
-// Actions
-export const { 
-  setFilters, 
-  clearSelectedProduct, 
-  clearError, 
-  setPage, 
-  setLimit 
+export const {
+  setFilters,
+  setPagination,
+  clearSelectedProduct,
+  clearError
 } = productSlice.actions;
-
-// Selectors
-export const selectAllProducts = (state) => state.products.products;
-export const selectSelectedProduct = (state) => state.products.selectedProduct;
-export const selectProductLoading = (state) => state.products.isLoading;
-export const selectProductError = (state) => state.products.error;
-export const selectProductFilters = (state) => state.products.filters;
-export const selectProductPagination = (state) => state.products.pagination;
 
 export default productSlice.reducer;

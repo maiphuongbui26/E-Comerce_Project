@@ -3,12 +3,12 @@ import axios from 'axios';
 
 const BASE_URL = 'http://localhost:8080/api';
 
-export const fetchUsers = createAsyncThunk(
-  'users/fetchAll',
+export const fetchDiscounts = createAsyncThunk(
+  'discounts/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await axios.get(`${BASE_URL}/users`, {
+      const response = await axios.get(`${BASE_URL}/discounts`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -21,12 +21,12 @@ export const fetchUsers = createAsyncThunk(
   }
 );
 
-export const createUser = createAsyncThunk(
-  'users/create',
-  async (userData, { rejectWithValue }) => {
+export const createDiscount = createAsyncThunk(
+  'discounts/create',
+  async (discountData, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await axios.post(`${BASE_URL}/users/register`, userData, {
+      const response = await axios.post(`${BASE_URL}/discounts/create`, discountData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -39,12 +39,12 @@ export const createUser = createAsyncThunk(
   }
 );
 
-export const updateUser = createAsyncThunk(
-  'users/update',
-  async ({ userId, userData }, { rejectWithValue }) => {
+export const updateDiscount = createAsyncThunk(
+  'discounts/update',
+  async ({ id, discountData }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await axios.put(`${BASE_URL}/users/${userId}`, userData, {
+      const response = await axios.put(`${BASE_URL}/discounts/update/${id}`, discountData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -57,36 +57,18 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-export const deleteUser = createAsyncThunk(
-  'users/delete',
-  async (userId, { rejectWithValue }) => {
+export const deleteDiscount = createAsyncThunk(
+  'discounts/delete',
+  async (id, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('adminToken');
-      await axios.delete(`${BASE_URL}/users/${userId}`, {
+      await axios.delete(`${BASE_URL}/discounts/delete/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-      return userId;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const updateUserProfile = createAsyncThunk(
-  'users/updateProfile',
-  async (userData, { rejectWithValue }) => {
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await axios.put(`${BASE_URL}/users/profile`, userData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      return response.data;
+      return id;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

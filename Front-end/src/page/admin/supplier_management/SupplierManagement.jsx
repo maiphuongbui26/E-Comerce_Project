@@ -1,38 +1,64 @@
-import { Box, Typography, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Select, MenuItem } from '@mui/material';
+import { 
+  Box, Typography, TextField, IconButton, Table, TableBody, 
+  TableCell, TableContainer, TableHead, TableRow, Paper, 
+  Button, Pagination // Add Pagination import
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSupplier } from '../../../hooks/useSupplier';
 
 const SupplierManagement = () => {
   const navigate = useNavigate();
-  const [statusFilter, setStatusFilter] = useState('all');
+  // Add pagination states
+  const [page, setPage] = useState(1);
+  const [rowsPerPage] = useState(5);
+  const { suppliers, isLoading, error, handleFetchSuppliers, handleDeleteSupplier } = useSupplier();
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const mockData = [
-    { id: 1, code: "NCC001", name: "Công ty TNHH May Mặc ABC", contact: "Nguyễn Văn A", phone: "0901234567", address: "123 Lê Lợi, Q.1, TP.HCM", status: "Active" },
-    { id: 2, code: "NCC002", name: "Xưởng May XYZ", contact: "Trần Thị B", phone: "0912345678", address: "456 Nguyễn Huệ, Q.1, TP.HCM", status: "Active" },
-    { id: 3, code: "NCC003", name: "Công ty CP Thời Trang DEF", contact: "Lê Văn C", phone: "0923456789", address: "789 Đồng Khởi, Q.1, TP.HCM", status: "Inactive" },
-  ];
+  // Fetch suppliers when component mounts
+  useEffect(() => {
+    handleFetchSuppliers();
+  }, []);
 
-  const getStatusColor = (status) => {
-    const colors = {
-      Active: '#66bb6a',
-      Inactive: '#ef5350'
-    };
-    return colors[status] || '#757575';
+  // Handle delete supplier
+  const onDeleteSupplier = async (id) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa nhà cung cấp này?')) {
+      const success = await handleDeleteSupplier(id);
+      if (success) {
+        handleFetchSuppliers(); // Refresh the list
+      }
+    }
+  };
+
+  // Filter suppliers based on search term and status
+  const filteredSuppliers = suppliers?.filter(supplier => {
+    const matchesSearch = searchTerm.trim() === '' || 
+      supplier.TenNhaCungCap.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.Email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.SoDienThoai.includes(searchTerm);
+
+    return matchesSearch;
+  });
+
+  // Calculate pagination
+  const totalPages = Math.ceil((filteredSuppliers?.length || 0) / rowsPerPage);
+  const paginatedSuppliers = filteredSuppliers?.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage
+  );
+
+  // Handle page change
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
   };
 
   return (
     <>
-      <Box sx={{ 
-        p: 2, 
-        bgcolor: '#fff', 
-        borderRadius: '4px 4px 0 0',
-        borderBottom: '1px solid #e0e0e0',
-        mb: 2
-      }}>
+      <Box sx={{ p: 2, bgcolor: '#fff', borderRadius: '4px 4px 0 0', borderBottom: '1px solid #e0e0e0', mb: 2 }}>
         <Typography variant="h5">Danh sách nhà cung cấp</Typography>
       </Box>
 
@@ -42,21 +68,13 @@ const SupplierManagement = () => {
             <TextField 
               size="small"
               placeholder="Tìm kiếm nhà cung cấp"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
                 startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />,
               }}
               sx={{ width: 250 }}
             />
-            <Select
-              size="small"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              sx={{ width: 150 }}
-            >
-              <MenuItem value="all">Tất cả</MenuItem>
-              <MenuItem value="Active">Đang hợp tác</MenuItem>
-              <MenuItem value="Inactive">Ngừng hợp tác</MenuItem>
-            </Select>
           </Box>
           <Button
             variant="contained"
@@ -73,53 +91,70 @@ const SupplierManagement = () => {
               <TableRow>
                 <TableCell>Mã NCC</TableCell>
                 <TableCell>Tên nhà cung cấp</TableCell>
-                <TableCell>Người liên hệ</TableCell>
+                <TableCell>Email</TableCell>
                 <TableCell>Số điện thoại</TableCell>
                 <TableCell>Địa chỉ</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell align="center">Thao tác</TableCell>
+                <TableCell>Thao tác</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockData.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>{row.code}</TableCell>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{row.contact}</TableCell>
-                  <TableCell>{row.phone}</TableCell>
-                  <TableCell>{row.address}</TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        bgcolor: `${getStatusColor(row.status)}20`,
-                        color: getStatusColor(row.status),
-                        py: 0.5,
-                        px: 1.5,
-                        borderRadius: 1,
-                        display: 'inline-block',
-                        fontSize: '0.875rem'
-                      }}
-                    >
-                      {row.status}
-                    </Box>
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton 
-                      size="small"
-                      onClick={() => navigate(`/admin/suppliers/edit/${row.id}`)}
-                      sx={{ mr: 1 }}
-                    >
-                      <EditIcon fontSize="small" sx={{ color: '#66bb6a' }} />
-                    </IconButton>
-                    <IconButton size="small">
-                      <DeleteIcon fontSize="small" sx={{ color: '#f44336' }} />
-                    </IconButton>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">Đang tải dữ liệu...</TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center" sx={{ color: 'error.main' }}>
+                    Có lỗi xảy ra khi tải dữ liệu
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : filteredSuppliers?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">Không có dữ liệu</TableCell>
+                </TableRow>
+              ) : (
+                paginatedSuppliers?.map((supplier) => (
+                  <TableRow key={supplier.idNhaCungCap}>
+                    <TableCell>{supplier.idNhaCungCap}</TableCell>
+                    <TableCell>{supplier.TenNhaCungCap}</TableCell>
+                    <TableCell>{supplier.Email}</TableCell>
+                    <TableCell>{supplier.SoDienThoai}</TableCell>
+                    <TableCell>{supplier.DiaChi}</TableCell>
+                    <TableCell>
+                      <IconButton 
+                        size="small"
+                        onClick={() => navigate(`/admin/suppliers/edit/${supplier.idNhaCungCap}`)}
+                        sx={{ mr: 1 }}
+                      >
+                        <EditIcon fontSize="small" sx={{ color: '#66bb6a' }} />
+                      </IconButton>
+                      <IconButton 
+                        size="small"
+                        onClick={() => onDeleteSupplier(supplier.idNhaCungCap)}
+                      >
+                        <DeleteIcon fontSize="small" sx={{ color: '#f44336' }} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
+
+        {/* Add pagination */}
+        {!isLoading && filteredSuppliers?.length > 0 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              showFirstButton
+              showLastButton
+            />
+          </Box>
+        )}
       </Box>
     </>
   );

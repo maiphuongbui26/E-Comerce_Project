@@ -1,93 +1,70 @@
-import { Box, Typography, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Select, MenuItem } from '@mui/material';
+import { Box, Typography, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../../hooks/useUser';
 
 const UserManagement = () => {
   const navigate = useNavigate();
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { users, isLoading, error, handleFetchUsers, handleDeleteUser } = useUser();
+  const rowsPerPage = 10;
 
-  const mockData = [
-    { 
-      id: 1, 
-      code: "KH001",
-      name: "Nguyễn Văn A", 
-      email: "nguyenvana@gmail.com",
-      phone: "0901234567",
-      address: "123 Lê Lợi, Q.1, TP.HCM",
-      status: "Active"
-    },
-    { 
-      id: 2, 
-      code: "KH002",
-      name: "Trần Thị B",
-      email: "tranthib@gmail.com", 
-      phone: "0912345678",
-      address: "456 Nguyễn Huệ, Q.1, TP.HCM",
-      status: "Active"
-    },
-    { 
-      id: 3, 
-      code: "KH003",
-      name: "Lê Văn C",
-      email: "levanc@gmail.com",
-      phone: "0923456789",
-      address: "789 Đồng Khởi, Q.1, TP.HCM",
-      status: "Inactive"
-    },
-  ];
+  useEffect(() => {
+    handleFetchUsers();
+  }, []);
 
-  const getStatusColor = (status) => {
-    const colors = {
-      Active: '#66bb6a',
-      Inactive: '#ef5350'
-    };
-    return colors[status] || '#757575';
+  // Filter users based on search term
+  const filteredUsers = users?.filter(user => 
+    user.HoVaTen?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.ThuDienTu?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.SoDienThoai?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.id?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Calculate pagination
+  const totalUsers = filteredUsers?.length || 0;
+  const totalPages = Math.ceil(totalUsers / rowsPerPage);
+  const startIndex = (page - 1) * rowsPerPage;
+  const paginatedUsers = filteredUsers?.slice(startIndex, startIndex + rowsPerPage);
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
+      const success = await handleDeleteUser(id);
+      if (success) {
+        handleFetchUsers();
+      }
+    }
   };
 
   return (
     <>
-      <Box sx={{ 
-        p: 2, 
-        bgcolor: '#fff', 
-        borderRadius: '4px 4px 0 0',
-        borderBottom: '1px solid #e0e0e0',
-        mb: 2
-      }}>
-        <Typography variant="h5">Danh sách tài khoản</Typography>
+      <Box sx={{ p: 2, bgcolor: '#fff', borderRadius: '4px 4px 0 0', borderBottom: '1px solid #e0e0e0', mb: 2 }}>
+        <Typography variant="h5">Danh sách người dùng</Typography>
       </Box>
 
       <Box sx={{ p: 3, bgcolor: '#fff', borderRadius: 1 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <TextField 
-              size="small"
-              placeholder="Tìm kiếm...."
-              InputProps={{
-                startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />,
-              }}
-              sx={{ width: 250 }}
-            />
-            <Select
-              size="small"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              sx={{ width: 150 }}
-            >
-              <MenuItem value="all">Tất cả</MenuItem>
-              <MenuItem value="Active">Đang hoạt động</MenuItem>
-              <MenuItem value="Inactive">Ngừng hoạt động</MenuItem>
-            </Select>
-          </Box>
+          <TextField 
+            size="small"
+            placeholder="Tìm kiếm người dùng"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />,
+            }}
+            sx={{ width: 300 }}
+          />
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => navigate('/admin/users/add')}
           >
-            Thêm tài khoản
+            Thêm người dùng
           </Button>
         </Box>
 
@@ -95,55 +72,86 @@ const UserManagement = () => {
           <Table>
             <TableHead sx={{ bgcolor: '#f8f9fa' }}>
               <TableRow>
-                <TableCell>Mã ND</TableCell>
-                <TableCell>Tên người dùng</TableCell>
+                <TableCell>Mã người dùng</TableCell>
+                <TableCell>Họ và tên</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Số điện thoại</TableCell>
-                <TableCell>Địa chỉ</TableCell>
+                <TableCell>Vai trò</TableCell>
                 <TableCell>Trạng thái</TableCell>
                 <TableCell align="center">Thao tác</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockData.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>{row.code}</TableCell>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>{row.phone}</TableCell>
-                  <TableCell>{row.address}</TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        bgcolor: `${getStatusColor(row.status)}20`,
-                        color: getStatusColor(row.status),
-                        py: 0.5,
-                        px: 1.5,
-                        borderRadius: 1,
-                        display: 'inline-block',
-                        fontSize: '0.875rem'
-                      }}
-                    >
-                      {row.status}
-                    </Box>
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton 
-                      size="small"
-                      onClick={() => navigate(`/admin/users/edit/${row.id}`)}
-                      sx={{ mr: 1 }}
-                    >
-                      <EditIcon fontSize="small" sx={{ color: '#66bb6a' }} />
-                    </IconButton>
-                    <IconButton size="small">
-                      <DeleteIcon fontSize="small" sx={{ color: '#f44336' }} />
-                    </IconButton>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">Đang tải dữ liệu...</TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center" sx={{ color: 'error.main' }}>
+                    {error}
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : paginatedUsers?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">Không có dữ liệu</TableCell>
+                </TableRow>
+              ) : (
+                paginatedUsers?.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>{user.id}</TableCell>
+                    <TableCell>{user.HoVaTen}</TableCell>
+                    <TableCell>{user.ThuDienTu}</TableCell>
+                    <TableCell>{user.SoDienThoai}</TableCell>
+                    <TableCell>{user.VaiTro}</TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          bgcolor: user.TrangThai === 'active' ? '#66bb6a20' : '#ef535020',
+                          color: user.TrangThai === 'active' ? '#66bb6a' : '#ef5350',
+                          py: 0.5,
+                          px: 1,
+                          borderRadius: 1,
+                          display: 'inline-block'
+                        }}
+                      >
+                        {user.TrangThai === 'active' ? 'Hoạt động' : 'Không hoạt động'}
+                      </Box>
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton 
+                        size="small"
+                        onClick={() => navigate(`/admin/users/edit/${user.id}`)}
+                        sx={{ mr: 1 }}
+                      >
+                        <EditIcon fontSize="small" sx={{ color: '#66bb6a' }} />
+                      </IconButton>
+                      <IconButton 
+                        size="small"
+                        onClick={() => handleDelete(user.id)}
+                      >
+                        <DeleteIcon fontSize="small" sx={{ color: '#f44336' }} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
+
+        {!isLoading && paginatedUsers?.length > 0 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={(e, newPage) => setPage(newPage)}
+              color="primary"
+              showFirstButton
+              showLastButton
+            />
+          </Box>
+        )}
       </Box>
     </>
   );

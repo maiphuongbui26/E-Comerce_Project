@@ -10,7 +10,8 @@ const productTypeRoutes = require('./routes/productType.routes');
 const sizeRoutes = require('./routes/size.routes');
 const cartRoutes = require('./routes/cart.routes');
 const orderRoutes = require('./routes/order.routes');
-const salesRoutes = require('./routes/sales.routes');
+const styleRoutes = require('./routes/style.routes');
+const discountRoutes = require('./routes/discount.routes');
 
 
 const app = express();
@@ -40,13 +41,16 @@ app.use('/api/product-types', productTypeRoutes);
 app.use('/api/sizes', sizeRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/sales', salesRoutes);
+app.use('/api/styles', styleRoutes); // Add this line
+app.use('/api/discounts', discountRoutes); // Add this line
 
 // Basic route for testing
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to E-Commerce API' });
 });
 
+// Add this after other middleware
+app.use('/uploads', express.static('public/uploads'));
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   logger.info({

@@ -1,38 +1,52 @@
-import { Box, Typography, TextField, Button, FormControl, Select, MenuItem, Paper, Divider } from '@mui/material';
+import { Box, Typography, TextField, Button, Paper, Divider } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
+import { useSupplier } from '../../../hooks/useSupplier';
 
 const EditSupplier = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { suppliers, handleUpdateSupplier, handleFetchSuppliers, isLoading } = useSupplier();
   const [formData, setFormData] = useState({
-    code: '',
-    name: '',
-    contact: '',
-    phone: '',
-    address: '',
-    status: ''
+    idNhaCungCap: '',
+    TenNhaCungCap: '',
+    Email: '',
+    SoDienThoai: '',
+    DiaChi: '',
+    MoTa: '',
+    SanPhamCungCap: ''
   });
 
   useEffect(() => {
-    // Mock data fetch
-    const mockSupplier = {
-      code: 'NCC001',
-      name: 'Công ty TNHH May Mặc ABC',
-      contact: 'Nguyễn Văn A',
-      phone: '0901234567',
-      address: '123 Lê Lợi, Q.1, TP.HCM',
-      status: 'Active'
-    };
-    setFormData(mockSupplier);
-  }, [id]);
+    handleFetchSuppliers();
+  }, []);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (suppliers.length > 0) {
+      const supplier = suppliers.find(s => s.idNhaCungCap === id);
+      if (supplier) {
+        setFormData({
+          idNhaCungCap: supplier.idNhaCungCap,
+          TenNhaCungCap: supplier.TenNhaCungCap,
+          Email: supplier.Email,
+          SoDienThoai: supplier.SoDienThoai,
+          DiaChi: supplier.DiaChi,
+          MoTa: supplier.MoTa || '',
+          SanPhamCungCap: supplier.SanPhamCungCap || ''
+        });
+      }
+    }
+  }, [suppliers, id]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    const success = await handleUpdateSupplier(id, formData);
+    if (success) {
+      navigate('/admin/suppliers');
+    }
   };
 
   return (
@@ -45,7 +59,7 @@ const EditSupplier = () => {
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <EditIcon />
-          <Typography variant="h5">Chỉnh sửa nhà cung cấp {formData.code}</Typography>
+          <Typography variant="h5">Chỉnh sửa nhà cung cấp {formData.idNhaCungCap}</Typography>
         </Box>
       </Box>
 
@@ -54,44 +68,50 @@ const EditSupplier = () => {
           <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: 'repeat(2, 1fr)' }}>
             <TextField
               fullWidth
+              required
               label="Mã nhà cung cấp"
-              value={formData.code}
-              onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+              value={formData.idNhaCungCap}
+              disabled
             />
             <TextField
               fullWidth
+              required
               label="Tên nhà cung cấp"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              value={formData.TenNhaCungCap}
+              onChange={(e) => setFormData({ ...formData, TenNhaCungCap: e.target.value })}
             />
             <TextField
               fullWidth
-              label="Người liên hệ"
-              value={formData.contact}
-              onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+              required
+              label="Email"
+              type="email"
+              value={formData.Email}
+              onChange={(e) => setFormData({ ...formData, Email: e.target.value })}
             />
             <TextField
               fullWidth
+              required
               label="Số điện thoại"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              value={formData.SoDienThoai}
+              onChange={(e) => setFormData({ ...formData, SoDienThoai: e.target.value })}
             />
             <TextField
               fullWidth
+              required
               label="Địa chỉ"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              value={formData.DiaChi}
+              onChange={(e) => setFormData({ ...formData, DiaChi: e.target.value })}
               sx={{ gridColumn: 'span 2' }}
             />
-            <FormControl fullWidth>
-              <Select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-              >
-                <MenuItem value="Active">Đang hợp tác</MenuItem>
-                <MenuItem value="Inactive">Ngừng hợp tác</MenuItem>
-              </Select>
-            </FormControl>
+            <TextField
+              fullWidth
+              label="Mô tả"
+              multiline
+              rows={3}
+              value={formData.MoTa}
+              onChange={(e) => setFormData({ ...formData, MoTa: e.target.value })}
+              sx={{ gridColumn: 'span 2' }}
+            />
           </Box>
 
           <Divider sx={{ my: 3 }} />
@@ -108,8 +128,9 @@ const EditSupplier = () => {
               type="submit"
               variant="contained"
               startIcon={<SaveIcon />}
+              disabled={isLoading}
             >
-              Lưu
+              {isLoading ? 'Đang lưu...' : 'Lưu'}
             </Button>
           </Box>
         </form>
