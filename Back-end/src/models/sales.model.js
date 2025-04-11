@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const priceSchema = new mongoose.Schema({
+const salesSchema = new mongoose.Schema({
   id: {
     type: String,
     required: true,
@@ -18,5 +18,5 @@ const priceSchema = new mongoose.Schema({
   timestamps: true
 });
 
-const Price = mongoose.model('Price', priceSchema);
-module.exports = Price;
+const Sales = mongoose.model('Sales', salesSchema);
+module.exports = Sales;

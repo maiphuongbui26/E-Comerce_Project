@@ -10,6 +10,7 @@ const productTypeRoutes = require('./routes/productType.routes');
 const sizeRoutes = require('./routes/size.routes');
 const cartRoutes = require('./routes/cart.routes');
 const orderRoutes = require('./routes/order.routes');
+const salesRoutes = require('./routes/sales.routes');
 
 
 const app = express();
@@ -39,6 +40,7 @@ app.use('/api/product-types', productTypeRoutes);
 app.use('/api/sizes', sizeRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/sales', salesRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {
