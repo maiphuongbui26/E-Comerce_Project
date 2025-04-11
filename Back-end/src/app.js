@@ -2,7 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/database.config');
 const userRoutes = require('./routes/user.routes');
+const supplierRoutes = require('./routes/supplier.routes');
+const priceRoutes = require('./routes/price.routes');
+const productCategoryRoutes = require('./routes/productCategory.routes');
 const logger = require('./logs/logger');
+const productTypeRoutes = require('./routes/productType.routes');
+const sizeRoutes = require('./routes/size.routes');
+const cartRoutes = require('./routes/cart.routes');
+const orderRoutes = require('./routes/order.routes');
 
 
 const app = express();
@@ -25,6 +32,13 @@ app.use(cors({
 }));
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/prices', priceRoutes);
+app.use('/api/categories', productCategoryRoutes);
+app.use('/api/product-types', productTypeRoutes);
+app.use('/api/sizes', sizeRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {
