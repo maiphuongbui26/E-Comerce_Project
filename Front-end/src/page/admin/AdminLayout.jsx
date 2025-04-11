@@ -15,7 +15,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const { admin,handleAdminLogout } = useAuthAdmin();
+  const { admin,handleAdminLogout,getAdmin  } = useAuthAdmin();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -31,7 +31,10 @@ const AdminLayout = () => {
    }
    console.log(res);
   };
-  
+  useEffect(() => {
+    getAdmin()
+    console.log("adminadmin",admin)
+}, []);
   return (
     <Box sx={{ display: 'flex' }}>
       <NavbarAdmin />
@@ -90,10 +93,10 @@ const AdminLayout = () => {
               {/* User Info */}
               <Box sx={{ px: 2, py: 1.5, borderBottom: '1px solid #eee' }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                  {admin?.user?.HoVaTen}
+                  {admin?.HoVaTen}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '13px' }}>
-                  {admin?.user?.ThuDienTu}
+                  {admin?.ThuDienTu}
                 </Typography>
               </Box>
               

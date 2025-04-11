@@ -38,17 +38,16 @@ export const getCurrentAdmin = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('adminToken');
-      if (!token) {
-        throw new Error('No token found');
-      }
-      
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      const response = await axios.get(`${BASE_URL}/users/me`);
+      if (!token) return null;
+      const response = await axios.get(`${BASE_URL}/users/me`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       return response.data;
     } catch (error) {
-      localStorage.removeItem('adminToken');
-      delete axios.defaults.headers.common['Authorization'];
-      return rejectWithValue(error.response?.data?.message || 'Failed to get admin profile');
+      return rejectWithValue(error.response?.data || 'Failed to get user data');
     }
   }
 );

@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginAdmin, logoutAdmin } from './adminAuthThunks';
+import { loginAdmin, logoutAdmin,getCurrentAdmin  } from './adminAuthThunks';
 
 const initialState = {
   admin: null,
@@ -31,6 +31,24 @@ const adminAuthSlice = createSlice({
       // Add logout cases
       .addCase(logoutAdmin.fulfilled, (state) => {
         return initialState;
+      })
+
+      //get current admin
+      .addCase(getCurrentAdmin.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getCurrentAdmin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuthenticated = true;
+        state.admin = action.payload;
+        // state.role = action.payload.role;
+      })
+      .addCase(getCurrentAdmin.rejected, (state) => {
+        state.isLoading = false;
+        state.isAuthenticated = false;
+        state.admin = null;
+        state.token = null;
+        // state.role = null;
       });
   },
 });

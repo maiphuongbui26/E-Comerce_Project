@@ -53,9 +53,7 @@ const NavbarAdmin = () => {
     },
   ];
 
-  useEffect(() => {
-      getAdmin()
-  }, [admin]);
+
   return (
     <Box
       sx={{

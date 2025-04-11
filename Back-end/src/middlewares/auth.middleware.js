@@ -20,7 +20,7 @@ const authMiddleware = {
 
   verifyAdmin: (req, res, next) => {
     console.log("req",req.user)
-    if (req.user && req.user.VaiTro === 'admin') {
+    if (req.user.VaiTro === 'admin') {
       next();
     } else {
       res.status(403).json({ message: 'Yêu cầu quyền admin' });
