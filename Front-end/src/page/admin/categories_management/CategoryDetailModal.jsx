@@ -22,11 +22,14 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useState } from 'react';
+import axios from 'axios';
 
-const CategoryDetailModal = ({ open, onClose, category }) => {
+const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Render form based on category type
   // Form field configurations for each category
@@ -41,10 +44,10 @@ const CategoryDetailModal = ({ open, onClose, category }) => {
         { id: 'SanPhamCungCap', label: 'Sản phẩm cung cấp', field: 'SanPhamCungCap' },
       ],
       C_DanhMucSanPham: [
-        { id: 'idDanhMuc', label: 'Mã danh mục', field: 'idDanhMuc' },
-        { id: 'TenDanhMuc', label: 'Tên danh mục', field: 'TenDanhMuc' },
-        { id: 'MoTa', label: 'Mô tả', field: 'MoTa' },
-        { id: 'HinhAnh', label: 'Hình ảnh', field: 'HinhAnh', type: 'file' },
+        { id: 'idDanhMuc', label: 'Mã danh mục', field: 'idDanhMuc', required: false }, 
+        { id: 'TenDanhMuc', label: 'Tên danh mục', field: 'TenDanhMuc', required: true },
+        { id: 'MoTa', label: 'Mô tả', field: 'MoTa', required: true },
+        { id: 'HinhAnh', label: 'Hình ảnh', field: 'HinhAnh', type: 'file', required: true },
       ],
       C_KichThuoc: [
         { id: 'id', label: 'Mã kích thước', field: 'id' },
@@ -83,6 +86,49 @@ const CategoryDetailModal = ({ open, onClose, category }) => {
       return titles[categoryType] || 'danh mục';
     };
   
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      setError(null);
+  
+      try {
+        const token = localStorage.getItem('adminToken');
+        const config = {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        };
+  
+        let response;
+        if (isAdding) {
+          response = await axios.post(
+            'http://localhost:8080/api/categories/create',
+            formData,
+            config
+          );
+        } else {
+          response = await axios.put(
+            `http://localhost:8080/api/categories/update/${editingId}`,
+            formData,
+            config
+          );
+        }
+  
+        if (response.data) {
+          setFormData({});
+          setIsAdding(false);
+          setEditingId(null);
+          if (onUpdate) onUpdate();
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    // Update your existing renderForm function
     const renderForm = () => {
       if (!category?.TenMuc) return null;
   
@@ -90,10 +136,19 @@ const CategoryDetailModal = ({ open, onClose, category }) => {
       const formTitle = getFormTitle(category.TenMuc);
   
       return (
-        <Box sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 1, mb: 3 }}>
+        <Box 
+          component="form" 
+          onSubmit={handleSubmit}
+          sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 1, mb: 3 }}
+        >
           <Typography variant="subtitle1" sx={{ mb: 2 }}>
             {isAdding ? `Thêm ${formTitle} mới` : `Cập nhật ${formTitle}`}
           </Typography>
+          {error && (
+            <Typography color="error" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+          )}
           <Box sx={{ 
             display: 'grid', 
             gap: 2, 
@@ -103,6 +158,7 @@ const CategoryDetailModal = ({ open, onClose, category }) => {
               <TextField
                 key={field.id}
                 fullWidth
+                required={field.required !== false}
                 size="small"
                 type={field.type || 'text'}
                 label={field.type !== 'file' ? field.label : ""}
@@ -111,6 +167,7 @@ const CategoryDetailModal = ({ open, onClose, category }) => {
                   ...formData, 
                   [field.field]: e.target.value 
                 })}
+                error={Boolean(error)}
               />
             ))}
           </Box>
@@ -122,6 +179,7 @@ const CategoryDetailModal = ({ open, onClose, category }) => {
                 setIsAdding(false);
                 setEditingId(null);
                 setFormData({});
+                setError(null);
               }}
             >
               Hủy
@@ -129,8 +187,10 @@ const CategoryDetailModal = ({ open, onClose, category }) => {
             <Button 
               variant="contained" 
               size="small"
+              type="submit"
+              disabled={loading}
             >
-              {isAdding ? 'Thêm' : 'Cập nhật'}
+              {loading ? 'Đang xử lý...' : (isAdding ? 'Thêm' : 'Cập nhật')}
             </Button>
           </Box>
         </Box>

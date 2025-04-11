@@ -19,6 +19,7 @@ const authMiddleware = {
   },
 
   verifyAdmin: (req, res, next) => {
+    console.log("req",req.user)
     if (req.user && req.user.VaiTro === 'admin') {
       next();
     } else {
