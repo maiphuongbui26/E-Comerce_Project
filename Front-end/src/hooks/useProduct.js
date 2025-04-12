@@ -59,11 +59,7 @@ export const useProduct = () => {
 
   const handleFetchProducts = async (page = 1) => {
     try {
-      await dispatch(fetchProducts({
-        page,
-        limit: pagination.limit,
-        filters
-      })).unwrap();
+      await dispatch(fetchProducts()).unwrap();
       return true;
     } catch (error) {
       return false;
@@ -72,15 +68,17 @@ export const useProduct = () => {
 
   const handleFetchProductById = async (id) => {
     try {
-      await dispatch(fetchProductById(id)).unwrap();
-      return true;
+      const result = await dispatch(fetchProductById(id)).unwrap();
+      return result;
     } catch (error) {
-      return false;
+      console.error('Error fetching product:', error);
+      return null;
     }
   };
 
   const handleCreateProduct = async (productData) => {
     try {
+      console.log(productData);
       await dispatch(createProduct(productData)).unwrap();
       return true;
     } catch (error) {

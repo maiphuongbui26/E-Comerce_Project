@@ -5,10 +5,15 @@ const BASE_URL = 'http://localhost:8080/api';
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
-  async ({ page, limit, filters }, { rejectWithValue }) => {
+  async (filters, { rejectWithValue }) => {
     try {
+      const token = localStorage.getItem('adminToken');
       const response = await axios.get(`${BASE_URL}/products`, {
-        params: { page, limit, ...filters }
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        params: filters // Add filters to query params
       });
       return response.data;
     } catch (error) {
@@ -33,23 +38,73 @@ export const createProduct = createAsyncThunk(
   'products/createProduct',
   async (productData, { rejectWithValue }) => {
     try {
-      const formData = new FormData();
+      const token = localStorage.getItem('adminToken');
       
-      if (productData.HinhAnh) {
-        productData.HinhAnh.forEach(file => {
-          formData.append('HinhAnh', file);
-        });
+      // Convert and optimize files to base64
+      let imageBase64Array = [];
+      if (productData.HinhAnh && productData.HinhAnh.length > 0) {
+        imageBase64Array = await Promise.all(
+          productData.HinhAnh.map(file => {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              const img = new Image();
+              
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Set maximum dimensions
+                const maxWidth = 1024;
+                const maxHeight = 1024;
+                let width = img.width;
+                let height = img.height;
+
+                // Calculate new dimensions
+                if (width > height) {
+                  if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                  }
+                } else {
+                  if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                  }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                // Draw and compress image
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compress with 70% quality
+              };
+
+              img.onerror = reject;
+              
+              reader.onload = (e) => {
+                img.src = e.target.result;
+              };
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            });
+          })
+        );
       }
 
-      Object.keys(productData).forEach(key => {
-        if (key !== 'HinhAnh') {
-          formData.append(key, JSON.stringify(productData[key]));
+      // Prepare the data object
+      const requestData = {
+        ...productData,
+        HinhAnh: imageBase64Array
+      };
+
+      const response = await axios.post(`${BASE_URL}/products/create`, requestData, {
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       });
-
-      const response = await axios.post(`${BASE_URL}/products`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);
@@ -61,23 +116,35 @@ export const updateProduct = createAsyncThunk(
   'products/updateProduct',
   async ({ id, productData }, { rejectWithValue }) => {
     try {
-      const formData = new FormData();
-      
-      if (productData.HinhAnh) {
-        productData.HinhAnh.forEach(file => {
-          formData.append('HinhAnh', file);
-        });
+      const token = localStorage.getItem('adminToken');
+      // Convert new files to base64
+      let imageBase64Array = [];
+      if (productData.HinhAnh && productData.HinhAnh.length > 0) {
+        imageBase64Array = await Promise.all(
+          productData.HinhAnh.map(file => {
+            if (typeof file === 'string') return file; // Keep existing image URLs
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = error => reject(error);
+              reader.readAsDataURL(file);
+            });
+          })
+        );
       }
 
-      Object.keys(productData).forEach(key => {
-        if (key !== 'HinhAnh') {
-          formData.append(key, JSON.stringify(productData[key]));
+      const requestData = {
+        ...productData,
+        HinhAnh: imageBase64Array
+      };
+   console.log("requestData",requestData);
+      const response = await axios.put(`${BASE_URL}/products/${id}`, requestData, {
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       });
-
-      const response = await axios.put(`${BASE_URL}/products/${id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);
@@ -89,7 +156,16 @@ export const deleteProduct = createAsyncThunk(
   'products/deleteProduct',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${BASE_URL}/products/${id}`);
+      const token = localStorage.getItem('adminToken');
+
+      await axios.delete(`${BASE_URL}/products/${id}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
       return id;
     } catch (error) {
       return rejectWithValue(error.response?.data);

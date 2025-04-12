@@ -46,6 +46,11 @@ const productSchema = new mongoose.Schema({
   MauSac: String,
   DanhGia: String,
   HinhAnh: [String],
+  TrangThai: {
+    type: String,
+    enum: ['available', 'outOfStock', 'discontinued'],
+    default: 'available'
+  },
   YeuThich: {
     type: Boolean,
     default: false

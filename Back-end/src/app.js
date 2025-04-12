@@ -12,16 +12,20 @@ const cartRoutes = require('./routes/cart.routes');
 const orderRoutes = require('./routes/order.routes');
 const styleRoutes = require('./routes/style.routes');
 const discountRoutes = require('./routes/discount.routes');
+const productRoutes = require('./routes/product.routes');
 
 
 const app = express();
 
 // Connect to MongoDB
 connectDB();
-
+// Increase payload size limit
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 // Thêm vào sau các middleware cơ bản
@@ -41,8 +45,9 @@ app.use('/api/product-types', productTypeRoutes);
 app.use('/api/sizes', sizeRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/styles', styleRoutes); // Add this line
-app.use('/api/discounts', discountRoutes); // Add this line
+app.use('/api/styles', styleRoutes);
+app.use('/api/discounts', discountRoutes); 
+app.use('/api/products', productRoutes); 
 
 // Basic route for testing
 app.get('/', (req, res) => {

@@ -19,7 +19,7 @@ const initialState = {
     productType: '',
     minPrice: '',
     maxPrice: '',
-    status: '',
+    status: 'all',
     sortBy: 'createdAt',
     order: 'desc'
   },
@@ -37,6 +37,12 @@ const productSlice = createSlice({
   reducers: {
     setFilters: (state, action) => {
       state.filters = { ...state.filters, ...action.payload };
+    },
+    setSearchTerm: (state, action) => {
+      state.filters.search = action.payload;
+    },
+    setStatusFilter: (state, action) => {
+      state.filters.status = action.payload;
     },
     setPagination: (state, action) => {
       state.pagination = { ...state.pagination, ...action.payload };

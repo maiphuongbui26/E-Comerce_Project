@@ -1,9 +1,11 @@
-import { Box, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem, Paper, Divider } from '@mui/material';
+import { Box, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem, Paper, Divider,IconButton } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { useProduct } from '../../../hooks/useProduct';
 
 const AddProduct = () => {
@@ -33,7 +35,7 @@ const AddProduct = () => {
       MoTa: ''
     },
     GiaSanPham: '',
-    SoLuong: 0,
+    SoLuong: null,
     MoTa: '',
     MauSac: '',
     TrangThai: 'available',
@@ -46,11 +48,57 @@ const AddProduct = () => {
     fetchAllData();
   }, []); // Added dependency
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
+  const { handleCreateProduct } = useProduct();
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
+
+  // Add this function to handle file selection
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    // Limit the number of files (optional)
+    const maxFiles = 5;
+    const selectedFiles = files.slice(0, maxFiles);
+
+    setSelectedFiles(prevFiles => [...prevFiles, ...selectedFiles]);
+
+    // Create preview URLs
+    const newUrls = selectedFiles.map(file => URL.createObjectURL(file));
+    setPreviewUrls(prevUrls => [...prevUrls, ...newUrls]);
   };
 
+  const handleRemoveImage = (index) => {
+    setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+    
+    // Revoke the URL to free up memory
+    URL.revokeObjectURL(previewUrls[index]);
+    setPreviewUrls(prevUrls => prevUrls.filter((_, i) => i !== index));
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      // Use the state formData directly
+      const productData = {
+        ...formData,
+        HinhAnh: selectedFiles
+      };
+
+      const success = await handleCreateProduct(productData);
+      
+      if (success) {
+        // Clean up preview URLs
+        previewUrls.forEach(url => URL.revokeObjectURL(url));
+        // Show success message
+        alert('Thêm sản phẩm thành công!');
+        // Navigate back to products list
+        navigate('/admin/products');
+      }
+    } catch (error) {
+      console.error('Error creating product:', error);
+      alert('Có lỗi xảy ra khi thêm sản phẩm!');
+    }
+  };
+  // Update the image preview section
   return (
     <>
       <Box sx={{ p: 2, bgcolor: '#fff', borderRadius: '4px 4px 0 0', borderBottom: '1px solid #e0e0e0' }}>
@@ -246,11 +294,56 @@ const AddProduct = () => {
                 accept="image/*"
                 type="file"
                 multiple
-                onChange={(e) => {
-                  const files = Array.from(e.target.files);
-                  // Handle file uploads here
-                }}
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+                id="product-images"
               />
+              <label htmlFor="product-images">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  fullWidth
+                  sx={{ mb: 2 }}
+                  startIcon={<CloudUploadOutlinedIcon />}
+                >
+                  Chọn hình ảnh ({selectedFiles.length}/5)
+                </Button>
+              </label>
+              
+              {previewUrls.length > 0 && (
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                  {previewUrls.map((url, index) => (
+                    <Box
+                      key={index}
+                      sx={{ position: 'relative' }}
+                    >
+                      <Box
+                        component="img"
+                        src={url}
+                        sx={{
+                          width: 100,
+                          height: 100,
+                          objectFit: 'cover',
+                          borderRadius: 1
+                        }}
+                      />
+                      <IconButton
+                        size="small"
+                        sx={{
+                          position: 'absolute',
+                          top: -10,
+                          right: -10,
+                          bgcolor: 'background.paper',
+                          '&:hover': { bgcolor: 'error.light', color: 'white' }
+                        }}
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        <CloseOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  ))}
+                </Box>
+              )}
             </Box>
           </Box>
 
