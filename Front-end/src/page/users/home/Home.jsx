@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Slider from "react-slick";
 import {
   Box,
@@ -11,9 +11,23 @@ import {
 } from "@mui/material";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import { useNavigate } from "react-router-dom";
+// Add useProduct import and get categories data
+import { useProduct } from "../../../hooks/useProduct";
 
 const Home = () => {
   const navigate = useNavigate();
+  // Update the destructuring to include products and handleFetchProducts
+  const { categories, products, fetchAllData, handleFetchProducts } =
+    useProduct();
+
+  // Add this effect to fetch products
+  useEffect(() => {
+    fetchAllData();
+    handleFetchProducts();
+  }, []);
+
+  // Replace the product grid section
+
   var settings = {
     dots: false,
     infinite: true,
@@ -25,7 +39,7 @@ const Home = () => {
   };
   return (
     <>
-    {/* Start Banner */}
+      {/* Start Banner */}
       <Box className="relative" sx={{ margin: "0 auto" }}>
         <Slider {...settings}>
           <div>
@@ -98,15 +112,15 @@ const Home = () => {
             justifyContent: "center",
           }}
         >
-          {[...Array(5)].map((_, index) => (
+          {categories?.map((category, index) => (
             <Box
-              key={index}
+              key={category.id}
               sx={{
                 display: "inline-block",
                 border: "1px dashed #969696",
                 padding: "9px",
                 borderRadius: "50%",
-                marginRight: index < 4 ? "30px" : "0", // Remove margin for the last item
+                marginRight: index < categories.length - 1 ? "30px" : "0",
               }}
             >
               <Box
@@ -117,8 +131,8 @@ const Home = () => {
                   alignItems: "center",
                   background: "#EEEEEE",
                   borderRadius: "50%",
-                  width: "100px",
-                  height: "100px",
+                  width: "120px",
+                  height: "120px",
                   padding: "15px 0",
                   "&:hover ": {
                     cursor: "pointer",
@@ -137,8 +151,8 @@ const Home = () => {
                 <img
                   width={40}
                   height={40}
-                  src="../../../../public/image/dam.png"
-                  alt=""
+                  src={`${category.HinhAnh}`}
+                  alt={category.TenDanhMuc}
                 />
                 <Typography
                   sx={{
@@ -150,7 +164,7 @@ const Home = () => {
                     fontSize: "14px",
                   }}
                 >
-                  Đầm
+                  {category.TenDanhMuc}
                 </Typography>
               </Box>
             </Box>
@@ -215,23 +229,25 @@ const Home = () => {
             </Typography>
             <Grid2
               container
-              sx={{padding: {xs: "0 14px", md: "0 100px"}}}
+              sx={{ padding: { xs: "0 14px", md: "0 100px" } }}
               spacing={{ xs: 1, md: 3 }}
               justifyContent="center"
             >
-              {[...Array(6)].map((_, index) => (
-                <Grid2
-                  size={{ xs: 6, md: 2 }}
-                  key={index}
-                >
-                  <Box sx={{ "&:hover ": {
-                    transform: "translateY(-10px) scale(1.02)",
-                    transition: "transform 0.3s ease-in-out",
-                    cursor: "pointer",
-                  }}}>
+              {products?.map((product, index) => (
+                <Grid2 size={{ xs: 6, md: 2 }} key={product.id}>
+                  <Box
+                    sx={{
+                      "&:hover ": {
+                        transform: "translateY(-10px) scale(1.02)",
+                        transition: "transform 0.3s ease-in-out",
+                        cursor: "pointer",
+                      },
+                    }}
+                  >
                     <img
-                      src="../../../../public/image/image_product_1.jpeg"
-                      alt=""
+                      src={product.HinhAnh[0]} // Assuming HinhAnh is an array of image URLs
+                      alt={product.TenSanPham}
+                      style={{ width: "100%", height: "auto" }}
                     />
                     <Typography
                       sx={{
@@ -246,7 +262,7 @@ const Home = () => {
                         fontWeight: "600",
                       }}
                     >
-                      Chân váy đổ 2 tầng đan dây
+                      {product.TenSanPham}
                     </Typography>
                     <Box
                       sx={{
@@ -262,43 +278,23 @@ const Home = () => {
                           alignItems: "center",
                         }}
                       >
-                        <Box
+                        <Typography
                           sx={{
-                            borderRadius: "50%",
-                            padding: "3px",
-                            display: "inline-block",
+                            fontSize: "14px",
+                            color: "#303030",
+                            fontWeight: "600",
                           }}
                         >
-                          <Typography
-                            sx={{
-                              width: "14px",
-                              height: "14px",
-                              display: "block",
-                              borderRadius: "50%",
-                              border: "1px solid #D8D8D8",
-                            }}
-                          ></Typography>
-                        </Box>
-                        <Box
-                          sx={{
-                            borderRadius: "50%",
-                            padding: "3px",
-                            display: "inline-block",
-                          }}
-                        >
-                          <Typography
-                            sx={{
-                              width: "14px",
-                              height: "14px",
-                              display: "block",
-                              borderRadius: "50%",
-                              border: "1px solid #D8D8D8",
-                            }}
-                          ></Typography>
-                        </Box>
+                          {product.GiaSanPham?.toLocaleString("vi-VN")} đ
+                        </Typography>
                       </Box>
                       <Box sx={{ display: "inline-block", marginLeft: "10px" }}>
-                        <IconButton sx={{ color: "#808284", p: 0 }}>
+                        <IconButton
+                          sx={{
+                            color: product.YeuThich ? "#ff4d4f" : "#808284",
+                            p: 0,
+                          }}
+                        >
                           <FavoriteBorderOutlinedIcon
                             sx={{ fontSize: "20px" }}
                           />
@@ -315,8 +311,9 @@ const Home = () => {
                       <Rating
                         sx={{ "&.MuiRating-sizeMedium": { fontSize: "16px" } }}
                         name="half-rating"
-                        defaultValue={2.5}
+                        value={product.DanhGia || 0}
                         precision={0.5}
+                        readOnly
                       />
                       <Typography
                         sx={{
@@ -326,7 +323,7 @@ const Home = () => {
                           fontWeight: "600",
                         }}
                       >
-                        (322 đã bán)
+                        ({product.SoLuong} đã bán)
                       </Typography>
                     </Box>
                   </Box>
@@ -335,7 +332,7 @@ const Home = () => {
             </Grid2>
           </Box>
         </Box>
-      {/* End Best saler */}
+        {/* End Best saler */}
       </Box>
       {/* End container */}
     </>

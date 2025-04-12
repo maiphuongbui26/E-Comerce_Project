@@ -151,7 +151,7 @@ const ProductManagement = () => {
                       {product.TenSanPham}
                     </Box>
                   </TableCell>
-                  <TableCell>{product.LoaiSanPham?.TenLoaiSanPham}</TableCell>
+                  <TableCell>{product.DanhMucSanPham?.TenDanhMuc}</TableCell>
                   <TableCell>
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",

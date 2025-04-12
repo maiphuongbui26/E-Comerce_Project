@@ -6,22 +6,98 @@ import {
 } from "@mui/material";
 import SearchForm from "../../../component/header/SearchForm";
 import ProductItem from "../../../component/main_component/productItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useProduct } from "../../../hooks/useProduct";
 
 const Dresses = () => {
+  const { products, categories, handleFetchProducts, fetchAllData } = useProduct();
   const [isExpanded, setIsExpanded] = useState(true);
   const [isShowPrice, setIsShowPrice] = useState(true);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState('newest');
+  const itemsPerPage = 24;
+
+  // Add these constants and handlers
   const priceRanges = [
     { value: 'under350', label: 'Dưới 350.000đ' },
     { value: '350to750', label: 'Từ 350.000đ - 750.000đ' },
     { value: 'above750', label: 'Trên 750.000đ' }
   ];
+
   const handlePriceRangeToggle = (range) => {
     setSelectedPriceRanges(prev => 
       prev.includes(range) 
         ? prev.filter(r => r !== range)
         : [...prev, range]
+    );
+  };
+
+  useEffect(() => {
+    const initializePage = async () => {
+      await Promise.all([handleFetchProducts(), fetchAllData()]);
+      // Find the dress category and set it as selected
+      const dressCategory = categories?.find(cat => 
+        cat.TenDanhMuc.toLowerCase().includes('đầm')
+      );
+      if (dressCategory) {
+        setSelectedCategories([dressCategory.id]);
+      }
+    };
+
+    initializePage();
+  }, []);
+
+  // Update filteredProducts to always filter by dress category
+  const filteredProducts = products?.filter(product => {
+    // Always filter for dress products
+    const isDressProduct = selectedCategories.length > 0 
+      ? selectedCategories.includes(product.DanhMucSanPham.id)
+      : product.DanhMucSanPham.TenDanhMuc.toLowerCase().includes('đầm');
+
+    // Apply price filter if selected
+    if (selectedPriceRanges.length > 0) {
+      const price = product.GiaSanPham;
+      return isDressProduct && selectedPriceRanges.some(range => {
+        switch (range) {
+          case 'under350': return price < 350000;
+          case '350to750': return price >= 350000 && price <= 750000;
+          case 'above750': return price > 750000;
+          default: return true;
+        }
+      });
+    }
+
+    return isDressProduct;
+  });
+
+  // Sort products
+  const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {
+    switch (sortBy) {
+      case 'priceAsc': return a.GiaSanPham - b.GiaSanPham;
+      case 'priceDesc': return b.GiaSanPham - a.GiaSanPham;
+      case 'newest': return new Date(b.createdAt) - new Date(a.createdAt);
+      default: return 0;
+    }
+  });
+
+  // Pagination
+  const totalPages = Math.ceil((sortedProducts?.length || 0) / itemsPerPage);
+  const displayedProducts = sortedProducts?.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+ 
+  const handleCategoryToggle = (categoryId) => {
+    setSelectedCategories(prev => 
+      prev.includes(categoryId)
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
     );
   };
   return (
@@ -38,7 +114,7 @@ const Dresses = () => {
             fontWeight: "600",
           }}
         >
-          <span>175</span> sản phẩm <span>Đầm</span>
+          <span>{sortedProducts?.length || 0}</span> sản phẩm <span>Đầm</span>
         </Typography>
         <Box sx={{ borderBottom: "1px solid #E1E1E1", paddingBottom: "38px" }} />
         <Grid2
@@ -51,6 +127,7 @@ const Dresses = () => {
           <Grid2 size={{ xs: 6, md: 3 }}>
             <Box sx={{ padding: "20px", bgcolor: "#fff", width: "300px" }}>
               {/* Product Line Filter */}
+             
               <Box>
                 <Typography
                   onClick={() => setIsExpanded(!isExpanded)}
@@ -75,32 +152,11 @@ const Dresses = () => {
                     +
                   </span>
                 </Typography>
-                <Box
-                  sx={{
-                    mt: 2,
-                    height: "110px",
-                    maxHeight: isExpanded ? "110px" : "0",
-                    overflow: isExpanded ? "auto" : "hidden",
-                    transition: "all 0.3s ease-in-out",
-                    opacity: isExpanded ? 1 : 0,
-                    position: "relative",
-                    "&::-webkit-scrollbar": {
-                      width: "6px",
-                    },
-                    "&::-webkit-scrollbar-track": {
-                      background: "#f1f1f1",
-                      borderRadius: "10px",
-                    },
-                    "&::-webkit-scrollbar-thumb": {
-                      background: "#D40404",
-                      borderRadius: "10px",
-                    },
-                  }}
-                >
+                <Box sx={{ /* existing Box styles */ }}>
                   <Box>
-                    {[...Array(8)].map((_, index) => (
+                    {categories?.map((category) => (
                       <Box
-                        key={index}
+                        key={category.id}
                         sx={{
                           display: "flex",
                           alignItems: "center",
@@ -108,9 +164,14 @@ const Dresses = () => {
                           "&:last-child": { mb: 0 },
                         }}
                       >
-                        <input type="checkbox" />
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes(category.id)}
+                          onChange={() => handleCategoryToggle(category.id)}
+                          style={{ cursor: 'pointer' }}
+                        />
                         <Typography sx={{ ml: 1, fontSize: "14px" }}>
-                          Đầm {index + 1}
+                          {category.TenDanhMuc}
                         </Typography>
                       </Box>
                     ))}
@@ -191,22 +252,27 @@ const Dresses = () => {
                 <Typography sx={{ fontSize: '14px', color: '#303030', mr: 1, fontWeight: 500 }}>
                   Xem theo
                 </Typography>
-                <select style={{ 
-                  padding: '8px 12px',
-                  border: '1px solid #E1E1E1',
-                  borderRadius: '4px',
-                  fontWeight: 600,
-                  fontSize: '14px',
-                  color: '#303030',
-                  outline: 'none'
-                }}>
-                  <option>Mới nhất</option>
-                  <option>Từ thấp đến cao</option>
-                  <option>Từ cao đến thấp</option>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  style={{ 
+                    padding: '8px 12px',
+                    border: '1px solid #E1E1E1',
+                    borderRadius: '4px',
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    color: '#303030',
+                    outline: 'none'
+                  }}>
+                  <option value="newest">Mới nhất</option>
+                  <option value="priceAsc">Từ thấp đến cao</option>
+                  <option value="priceDesc">Từ cao đến thấp</option>
                 </select>
               </Box>
               <Typography sx={{fontWeight: 600, fontSize: '14px', color: '#303030' }}>
-                Hiển thị <span style={{ color: '#D40404', fontSize: "18px" }}>1 - 24 / 175</span> sản phẩm
+                Hiển thị <span style={{ color: '#D40404', fontSize: "18px" }}>
+                  {((page - 1) * itemsPerPage) + 1} - {Math.min(page * itemsPerPage, sortedProducts?.length || 0)} / {sortedProducts?.length || 0}
+                </span> sản phẩm
               </Typography>
             </Box>
 
@@ -216,9 +282,17 @@ const Dresses = () => {
               columns={{ xs: 4, sm: 8, md: 8 }}
               justifyContent="center"
             >
-              {[...Array(8)].map((_, index) => (
-                <Grid2 size={{ xs: 6, md: 2 }} key={index}>
-                  <ProductItem />
+              {displayedProducts?.map((product) => (
+                <Grid2 size={{ xs: 6, md: 2 }} key={product.id}>
+                  <ProductItem 
+                    product={product}
+                    image={`${product.HinhAnh[0]}`}
+                    name={product.TenSanPham}
+                    price={product.GiaSanPham}
+                    discount={product.GiamGia}
+                    rating={product.DanhGia}
+                    soldCount={product.SoLuong}
+                  />
                 </Grid2>
               ))}
             </Grid2>
@@ -226,7 +300,13 @@ const Dresses = () => {
         </Grid2>
 
         <Box sx={{ display: "flex", justifyContent: "center", margin: "40px 0" }}>
-          <Pagination size="large" count={10} color="secondary" />
+          <Pagination 
+            size="large" 
+            count={totalPages} 
+            page={page}
+            onChange={handlePageChange}
+            color="secondary" 
+          />
         </Box>
       </Box>
     </>
