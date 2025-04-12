@@ -32,6 +32,7 @@ export const useProduct = () => {
   const [prices, setPrices] = useState([]);
   const [styles, setStyles] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const getAuthHeader = () => ({
     headers: {
@@ -41,17 +42,19 @@ export const useProduct = () => {
 
   const fetchAllData = async () => {
     try {
-      const [typesRes, pricesRes, stylesRes, suppliersRes] = await Promise.all([
+      const [typesRes, pricesRes, stylesRes, suppliersRes,categoriesRes] = await Promise.all([
         axios.get('http://localhost:8080/api/product-types', getAuthHeader()),
         axios.get('http://localhost:8080/api/prices', getAuthHeader()),
         axios.get('http://localhost:8080/api/styles', getAuthHeader()),
-        axios.get('http://localhost:8080/api/suppliers', getAuthHeader())
+        axios.get('http://localhost:8080/api/suppliers', getAuthHeader()),
+        axios.get('http://localhost:8080/api/categories', getAuthHeader())
       ]);
 
       setProductTypes(typesRes.data['product-types']);
       setPrices(pricesRes.data.prices);
       setStyles(stylesRes.data.styles);
       setSuppliers(suppliersRes.data.suppliers);
+      setCategories(categoriesRes.data.categories);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -150,6 +153,7 @@ export const useProduct = () => {
     prices,
     styles,
     suppliers,
+    categories,
 
     // Methods
     fetchAllData,

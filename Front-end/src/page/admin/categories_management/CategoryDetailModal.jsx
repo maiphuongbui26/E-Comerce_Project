@@ -26,19 +26,33 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { categoryFormConfigs } from '../../../constants/categoryFormConfigs';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
 const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
-  // Add new state for items
+  // State definitions
   const [items, setItems] = useState([]);
-  
-  // States
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
+  // Constants
   const formFields = category ? categoryFormConfigs[category.TenMuc] : [];
+  const visibleFields = formFields.filter(field => !field.hidden);
+  const BASE_URL = 'http://localhost:8080';
+  const API_ENDPOINT = category ? `${BASE_URL}/api/${category.endpoint}` : '';
+
+  const clearFileSelection = () => {
+    if (selectedFile) {
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      handleInputChange('HinhAnh', null);
+    }
+  };
 
   // Add handleInputChange function
   const handleInputChange = (fieldName, value) => {
@@ -92,7 +106,7 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const response = await axios.get(`http://localhost:8080/api/${category.endpoint}`, {
+      const response = await axios.get(API_ENDPOINT, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setItems(response.data[`${category.endpoint}`]);
@@ -100,6 +114,22 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
       setError('Không thể tải dữ liệu');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Create preview URL
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+  
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        handleInputChange('HinhAnh', reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -115,17 +145,20 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
           'Content-Type': 'application/json'
         }
       };
-
+  
+      // Prepare form data
+      const submitData = { ...formData };
+  
       if (isAdding) {
         await axios.post(
-          `http://localhost:8080/api/${category.endpoint}/create`,
-          formData,
+          `${API_ENDPOINT}/create`,
+          submitData,
           config
         );
       } else {
         await axios.put(
-          `http://localhost:8080/api/${category.endpoint}/update/${editingId}`,
-          formData,
+          `${API_ENDPOINT}/update/${editingId}`,
+          submitData,
           config
         );
       }
@@ -133,6 +166,7 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
       fetchItems();
       handleCancel();
       if (onUpdate) onUpdate();
+      setPreviewUrl(null); // Clear preview
     } catch (err) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra');
     } finally {
@@ -158,10 +192,15 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
   // Update TableBody to render actual data
   // Filter out hidden fields for the table headers
-  const visibleFields = formFields.filter(field => !field.hidden);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -197,23 +236,61 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
             
             {formFields.filter(item => !item.hidden).map((field, index) => (
               field.type === 'file' ? (
-                // Special handling for file input
-                <TextField
-                  key={index}
-                  fullWidth
-                  label={field.field !== 'HinhAnh' ? field.label : ''}
-                  type="file"
-                  onChange={(e) => handleInputChange(field.field, e.target.files[0])}
-                  required={field.required}
-                  InputLabelProps={{ shrink: true }}
-                  sx={{ mb: 2 }}
-                />
+                <Box key={index} sx={{ mb: 2 }}>
+                  <input
+                    accept="image/*"
+                    type="file"
+                    onChange={handleFileSelect}
+                    style={{ display: 'none' }}
+                    id="category-image"
+                  />
+                  <label htmlFor="category-image">
+                    <Button
+                      variant="outlined"
+                      component="span"
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      startIcon={<CloudUploadOutlinedIcon />}
+                    >
+                      Chọn hình ảnh {selectedFile ? '(1/1)' : '(0/1)'}
+                    </Button>
+                  </label>
+                  
+                  {previewUrl && (
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
+                      <Box sx={{ position: 'relative' }}>
+                        <Box
+                          component="img"
+                          src={previewUrl}
+                          sx={{
+                            width: 100,
+                            height: 100,
+                            objectFit: 'cover',
+                            borderRadius: 1
+                          }}
+                        />
+                        <IconButton
+                          size="small"
+                          sx={{
+                            position: 'absolute',
+                            top: -10,
+                            right: -10,
+                            bgcolor: 'background.paper',
+                            '&:hover': { bgcolor: 'error.light', color: 'white' }
+                          }}
+                          onClick={clearFileSelection}
+                        >
+                          <CloseOutlinedIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
               ) : (
-                // Normal text input
                 <TextField
                   key={index}
                   fullWidth
-                  label={field.field !== 'HinhAnh' ? field.label : ''}
+                  label={field.label}
                   value={formData[field.field] || ''}
                   onChange={(e) => handleInputChange(field.field, e.target.value)}
                   required={field.required}
@@ -277,7 +354,20 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
                     {visibleFields.map((field, fieldIndex) => (
                       <TableCell key={`${itemIndex}-${fieldIndex}`}>
                         {field.type === 'file' ? (
-                          item[field.field] ? 'Đã tải lên' : 'Chưa có file'
+                          item[field.field] ? (
+                            <Box
+                              component="img"
+                              src={`${item[field.field]}`}
+                              sx={{
+                                width: 50,
+                                height: 50,
+                                objectFit: 'cover',
+                                borderRadius: 1
+                              }}
+                            />
+                          ) : (
+                            'Chưa có hình ảnh'
+                          )
                         ) : (
                           item[field.field]
                         )}
@@ -317,3 +407,5 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
 };
 
 export default CategoryDetailModal;
+
+// Cleanup effect

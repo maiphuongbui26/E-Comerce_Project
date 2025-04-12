@@ -16,6 +16,10 @@ const productSchema = new mongoose.Schema({
     id: String,
     TenLoaiSanPham: String
   },
+  DanhMucSanPham: {
+    id: String,
+    TenDanhMuc: String
+  },
   DonGia: {
     id: String,
     TenDonGia: String
