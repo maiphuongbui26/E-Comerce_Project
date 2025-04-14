@@ -39,7 +39,7 @@ const Skirts = () => {
       await Promise.all([handleFetchProducts(), fetchAllData()]);
       // Find the skirt category and set it as selected
       const skirtCategory = categories?.find(cat => 
-        cat.TenDanhMuc.toLowerCase().includes('váy')
+        cat.TenDanhMuc.toLowerCase().includes('Váy')
       );
       if (skirtCategory) {
         setSelectedCategories([skirtCategory.id]);

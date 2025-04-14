@@ -77,7 +77,6 @@ const Shirts = () => {
     fetchAllData()
   }, []);
 
-  // Filter and sort products
 
 
   // Sort products

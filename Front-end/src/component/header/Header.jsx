@@ -27,7 +27,7 @@ const menuItems = [
   { label: "QUẦN", path: "/user/pants" },
   { label: "CHÂN VÁY", path: "/user/skirts" },
   { label: "ÁO KHOÁC", path: "/user/jackets" },
-  { label: "BLAZER SS 2025", path: "/user/blazer-ss-2025" },
+  // { label: "BLAZER SS 2025", path: "/user/blazer-ss-2025" },
 ];
 const settings = [
   {
