@@ -1,6 +1,5 @@
-import { Box, IconButton, InputBase, Avatar, Menu, MenuItem, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Box, IconButton, Avatar, Menu, MenuItem, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import NavbarAdmin from "../../component/header/NavbarAdmin";
-import SearchIcon from '@mui/icons-material/Search';
 import { Outlet, useNavigate } from "react-router-dom";
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import FullscreenExitOutlinedIcon from '@mui/icons-material/FullscreenExitOutlined';
@@ -8,7 +7,7 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import SettingsIcon from '@mui/icons-material/Settings';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { use, useEffect, useState } from 'react';
+import {  useEffect, useState } from 'react';
 import { useAuthAdmin } from "../../hooks/useAuthAdmin";
 
 const AdminLayout = () => {

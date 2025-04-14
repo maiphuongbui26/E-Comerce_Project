@@ -9,7 +9,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect } from 'react';
 import { categoryFormConfigs } from '../../../constants/categoryFormConfigs';
-import CategoryDetailModal from './CategoryDetailModal';  // Fix import path
+import { useNavigate } from 'react-router-dom';
 
 const CategoryManagement = () => {
   const [page, setPage] = useState(1);
@@ -20,7 +20,9 @@ const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
+  // Thay đổi useEffect để gọi fetchCategories khi component được mount và khi searchTerm thay đ
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -60,6 +62,11 @@ const CategoryManagement = () => {
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const startIndex = (page - 1) * rowsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+
+  // Replace modal handling with navigation
+  const handleViewCategory = (category) => {
+    navigate(`/admin/categories/${category.MaMuc}`, { state: { category } });
+  };
 
   return (
     <>
@@ -115,10 +122,7 @@ const CategoryManagement = () => {
                     <TableCell align="center">
                       <IconButton 
                         size="small" 
-                        onClick={() => {
-                          setSelectedCategory(row);
-                          setOpenModal(true);
-                        }}
+                        onClick={() => handleViewCategory(row)}
                       >
                         <VisibilityIcon fontSize="small" sx={{ color: '#1976d2' }} />
                       </IconButton>
@@ -162,13 +166,6 @@ const CategoryManagement = () => {
           </Typography>
         )}
       </Box>
-
-      <CategoryDetailModal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        category={selectedCategory}
-        onUpdate={fetchCategories}
-      />
     </>
   );
 };

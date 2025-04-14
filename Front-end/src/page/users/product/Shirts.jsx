@@ -69,15 +69,11 @@ const Shirts = () => {
 
     return isShirtProduct;
   });
- 
-
 
   useEffect(() => {
     handleFetchProducts();
     fetchAllData()
   }, []);
-
-
 
   // Sort products
   const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {

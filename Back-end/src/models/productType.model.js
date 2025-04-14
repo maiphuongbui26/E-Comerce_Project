@@ -10,6 +10,10 @@ const productTypeSchema = new mongoose.Schema({
   TenLoaiSanPham: {
     type: String,
     required: true
+  },
+  DanhMucSanPham: {
+    id: String,
+    TenDanhMuc: String
   }
 }, {
   timestamps: true

@@ -6,6 +6,7 @@ const productTypeController = {
   create: async (req, res) => {
     try {
       const typeData = req.body;
+      console.log(typeData);
       const productType = new ProductType({
         id: generatePTId('LSP'),
         ...typeData
@@ -62,17 +63,18 @@ const productTypeController = {
 
   // Update product type
   update: async (req, res) => {
+    console.log(req.body);
     try {
       const productType = await ProductType.findOneAndUpdate(
         { id: req.params.id },
         req.body,
         { new: true }
       );
-
+      
       if (!productType) {
         return res.status(404).json({ message: 'Không tìm thấy loại sản phẩm' });
       }
-
+      
       res.json({ 
         message: 'Cập nhật loại sản phẩm thành công', 
         productType 

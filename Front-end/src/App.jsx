@@ -31,6 +31,7 @@ import Register from "./page/users/auth_user/Register";
 import AddUser from "./page/admin/user_management/AddUser";
 import EditUser from "./page/admin/user_management/EditUser";
 import LoginAdmin from "./page/admin/auth_admin/LoginAdmin";
+import CategoryDetail from "./page/admin/categories_management/CategoryDetail";
 
 function App() {
   return (
@@ -64,6 +65,7 @@ function App() {
       {/* Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="categories" element={<CategoryManagement />} />
+        <Route path="categories/:id" element={<CategoryDetail />} />
         <Route path="orders" element={<OrderManagement />} />
         <Route path="products" element={<ProductManagement />} />
         <Route path="products/add" element={<AddProduct />} />

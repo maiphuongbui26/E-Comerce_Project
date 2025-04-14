@@ -6,6 +6,7 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
+  Collapse,
 } from "@mui/material";
 import CategoryIcon from "@mui/icons-material/Category";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -13,18 +14,52 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import BusinessIcon from "@mui/icons-material/Business";
 import PeopleIcon from "@mui/icons-material/People";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuthAdmin } from "../../hooks/useAuthAdmin";
+import { categoryFormConfigs } from "../../constants/categoryFormConfigs";
 
 const NavbarAdmin = () => {
   const navigate = useNavigate();
-  const { getAdmin,admin } = useAuthAdmin();
+  const { getAdmin, admin } = useAuthAdmin();
+  const [openCategory, setOpenCategory] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  const handleCategoryClick = () => {
+    setOpenCategory(!openCategory);
+  };
+
+  const handleCategoryItemClick = (category) => {
+    navigate(`/admin/categories/${category.MaMuc}`, { 
+      state: { category: {
+        MaMuc: category.MaMuc,
+        TenMuc: category.MaMuc,
+        endpoint: category.endpoint
+      } } 
+    });
+  };
+
+  useEffect(() => {
+    const categoryList = Object.keys(categoryFormConfigs).map(key => {
+      const apiField = categoryFormConfigs[key].find(field => field.id === 'API');
+      const displayNameField = categoryFormConfigs[key].find(field => field.id === 'DisplayName');
+      return {
+        MaMuc: key,
+        TenMuc: displayNameField?.value || key.replace('C_', ''),
+        endpoint: apiField?.endpoint || key.toLowerCase()
+      };
+    });
+    setCategories(categoryList);
+  }, []);
+
   const menuItems = [
     {
       title: "Quản lý danh mục",
       path: "/admin/categories",
       icon: <CategoryIcon />,
+      hasSubmenu: true
     },
     {
       title: "Quản lý đơn hàng",
@@ -55,30 +90,8 @@ const NavbarAdmin = () => {
 
 
   return (
-    <Box
-      sx={{
-        width: 280,
-        bgcolor: "#fff", // Changed from #1a1a1a
-        height: "100vh",
-        color: "#303030", // Changed text color for better visibility
-        position: "fixed",
-        left: 0,
-        top: 0,
-        borderRight: "1px solid #e0e0e0", // Added border for separation
-      }}
-    >
-      <Box
-        sx={{
-          p: 2,
-          borderBottom: "1px solid ##303030",
-          display: "flex",
-          alignItems: "center",
-          '& :hover': {
-            cursor: 'pointer'
-          },
-        }}
-        onClick={() => navigate("/admin")}
-      >
+    <Box sx={{ width: 280, bgcolor: "#fff", height: "100vh", color: "#303030", position: "fixed", left: 0, top: 0, borderRight: "1px solid #e0e0e0" }}>
+      <Box sx={{ p: 2, borderBottom: "1px solid ##303030", display: "flex", alignItems: "center", '& :hover': { cursor: 'pointer' }, }} onClick={() => navigate("/admin")}>
         <img
           src="../../../public/image/logo_main.jpg"
           width={80}
@@ -104,29 +117,55 @@ const NavbarAdmin = () => {
 
       <List>
         {menuItems.map((item, index) => (
-          <ListItem key={index} disablePadding>
-            <ListItemButton
-              onClick={() => navigate(item.path)}
-              sx={{
-                py: 1.5,
-                "&:hover": {
-                  bgcolor: "rgba(255,255,255,0.1)",
-                },
-              }}
-            >
-              <ListItemIcon sx={{ color: "#303030", minWidth: 40 }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={item.title}
+          <div key={index}>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={item.hasSubmenu ? handleCategoryClick : () => navigate(item.path)}
                 sx={{
-                  "& .MuiListItemText-primary": {
-                    fontSize: "14px",
+                  py: 1.5,
+                  "&:hover": {
+                    bgcolor: "rgba(255,255,255,0.1)",
                   },
                 }}
-              />
-            </ListItemButton>
-          </ListItem>
+              >
+                <ListItemIcon sx={{ color: "#303030", minWidth: 40 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.title}
+                  sx={{
+                    "& .MuiListItemText-primary": {
+                      fontSize: "14px",
+                    },
+                  }}
+                />
+                {item.hasSubmenu && (openCategory ? <ExpandLess /> : <ExpandMore />)}
+              </ListItemButton>
+            </ListItem>
+            
+            {item.hasSubmenu && (
+              <Collapse in={openCategory} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {categories.map((category, subIndex) => (
+                    <ListItemButton
+                      key={subIndex}
+                      sx={{ pl: 4 }}
+                      onClick={() => handleCategoryItemClick(category)}
+                    >
+                      <ListItemText 
+                        primary={category.TenMuc} 
+                        sx={{
+                          "& .MuiListItemText-primary": {
+                            fontSize: "13px",
+                          },
+                        }}
+                      />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Collapse>
+            )}
+          </div>
         ))}
       </List>
     </Box>

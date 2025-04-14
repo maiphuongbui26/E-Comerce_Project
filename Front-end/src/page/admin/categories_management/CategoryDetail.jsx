@@ -1,10 +1,4 @@
-
-
 import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent,
-  IconButton, 
   Typography,
   Box,
   Button,
@@ -15,21 +9,28 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  IconButton,
+  MenuItem 
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { categoryFormConfigs } from '../../../constants/categoryFormConfigs';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
+const CategoryDetail = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const category = location.state?.category;
+
   // State definitions
   const [items, setItems] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
@@ -39,13 +40,14 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
   const [error, setError] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-
+  const [referenceData, setReferenceData] = useState({});
   // Constants
   const formFields = category ? categoryFormConfigs[category.TenMuc] : [];
   const visibleFields = formFields.filter(field => !field.hidden);
   const BASE_URL = 'http://localhost:8080';
   const API_ENDPOINT = category ? `${BASE_URL}/api/${category.endpoint}` : '';
 
+  // Handlers
   const clearFileSelection = () => {
     if (selectedFile) {
       setSelectedFile(null);
@@ -54,14 +56,13 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
     }
   };
 
-  // Add handleInputChange function
   const handleInputChange = (fieldName, value) => {
     setFormData(prevData => ({
       ...prevData,
       [fieldName]: value
     }));
   };
-  // Handlers
+
   const handleAdd = () => {
     setIsAdding(true);
     setFormData({});
@@ -71,11 +72,9 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
     setIsAdding(false);
     setEditingId(item.id);
     
-    // Map the item data directly to formData
     const editData = {};
     formFields.forEach(field => {
       if (!field.hidden) {
-        // For C_DanhMucSanPham, map id to id if needed
         if (field.field === 'id' && !item[field.field]) {
           editData[field.field] = item.id;
         } else {
@@ -84,7 +83,6 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
       }
     });
     
-    console.log('Form data for editing:', editData);
     setFormData(editData);
   };
 
@@ -95,12 +93,9 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
     setError(null);
   };
 
-  // Fetch items when category changes
-  useEffect(() => {
-    if (category) {
-      fetchItems();
-    }
-  }, [category]);
+  const handleBack = () => {
+    navigate('/admin/categories');
+  };
 
   const fetchItems = async () => {
     try {
@@ -116,15 +111,38 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
       setLoading(false);
     }
   };
+  const fetchReferenceData = async (referenceConfig) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const refEndpoint = categoryFormConfigs[referenceConfig.reference].find(
+        field => field.id === 'API'
+      ).endpoint;
+      
+      const response = await axios.get(`${BASE_URL}/api/${refEndpoint}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if(referenceConfig.reference){
+        setReferenceData(prev => ({
+          ...prev,
+          [referenceConfig.reference]: response.data[refEndpoint]
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching reference data:', error);
+    }
+  };
 
+  // Thêm useEffect này để theo dõi thay đổi của referenceData
+  useEffect(() => {
+  }, [referenceData]);
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Create preview URL
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
+      setSelectedFile(file);
   
-      // Convert to base64
       const reader = new FileReader();
       reader.onloadend = () => {
         handleInputChange('HinhAnh', reader.result);
@@ -146,27 +164,17 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
         }
       };
   
-      // Prepare form data
       const submitData = { ...formData };
   
       if (isAdding) {
-        await axios.post(
-          `${API_ENDPOINT}/create`,
-          submitData,
-          config
-        );
+        await axios.post(`${API_ENDPOINT}/create`, submitData, config);
       } else {
-        await axios.put(
-          `${API_ENDPOINT}/update/${editingId}`,
-          submitData,
-          config
-        );
+        await axios.put(`${API_ENDPOINT}/update/${editingId}`, submitData, config);
       }
       
       fetchItems();
       handleCancel();
-      if (onUpdate) onUpdate();
-      setPreviewUrl(null); // Clear preview
+      setPreviewUrl(null);
     } catch (err) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra');
     } finally {
@@ -180,18 +188,28 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      await axios.delete(`http://localhost:8080/api/${category.endpoint}/delete/${id}`, {
+      await axios.delete(`${API_ENDPOINT}/delete/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
       fetchItems();
-      if (onUpdate) onUpdate();
     } catch (err) {
       setError(err.response?.data?.message || 'Không thể xóa');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (category) {
+      fetchItems();
+      formFields.forEach(field => {
+        if (field.type === 'select' && field.reference) {
+          fetchReferenceData(field);
+        }
+      });
+    }
+  }, [category]);
+
   useEffect(() => {
     return () => {
       if (previewUrl) {
@@ -199,23 +217,21 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
       }
     };
   }, [previewUrl]);
-  // Update TableBody to render actual data
-  // Filter out hidden fields for the table headers
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6">
-            {category ? `Chi tiết danh mục: ${category.TenMuc}` : 'Chi tiết danh mục'}
-          </Typography>
-          <IconButton onClick={onClose} size="small">
-            <CloseIcon />
+    <>
+      <Box sx={{ p: 2, bgcolor: '#fff', borderRadius: '4px 4px 0 0', borderBottom: '1px solid #e0e0e0', mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <IconButton onClick={handleBack}>
+            <ArrowBackIcon />
           </IconButton>
+          <Typography variant="h5">
+            {category ? `Chi tiết danh mục: ${category.TenMuc.replace('C_', '')}` : 'Chi tiết danh mục'}
+          </Typography>
         </Box>
-      </DialogTitle>
-      
-      <DialogContent dividers>
+      </Box>
+
+      <Box sx={{ p: 3, bgcolor: '#fff', borderRadius: 1 }}>
         <Box sx={{ mb: 2 }}>
           <Button
             startIcon={<AddIcon />}
@@ -227,7 +243,6 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
           </Button>
         </Box>
 
-        {/* Form for Add/Edit */}
         {(isAdding || editingId) && (
           <Box component="form" sx={{ mb: 3 }}>
             <Typography variant="subtitle1" sx={{ mb: 2 }}>
@@ -286,6 +301,25 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
                     </Box>
                   )}
                 </Box>
+              ): field.type === 'select' ? (
+                <TextField
+                  key={index}
+                  select
+                  fullWidth
+                  label={field.label}
+                  value={formData[field.field] || ''}
+                  onChange={(e) => handleInputChange(field.field, e.target.value)}
+                  required={field.required}
+                  error={error && !formData[field.field] && field.required}
+                  helperText={error && !formData[field.field] && field.required ? 'Trường này là bắt buộc' : ''}
+                  sx={{ mb: 2 }}
+                >
+                  {referenceData[field.reference]?.map((option) => (
+                    <MenuItem key={option.id} value={option}>
+                      {option[field.displayField]}
+                    </MenuItem>
+                  ))}
+                </TextField>
               ) : (
                 <TextField
                   key={index}
@@ -324,7 +358,6 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
           </Box>
         )}
 
-        {/* Data Table */}
         <TableContainer component={Paper} variant="outlined">
           <Table size="small">
             <TableHead>
@@ -368,6 +401,10 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
                           ) : (
                             'Chưa có hình ảnh'
                           )
+                        ):field.type === 'select' ? (
+                          referenceData[field.reference]?.find(
+                            ref => ref.id === item.DanhMucSanPham?.id  // Changed to access nested DanhMucSanPham object
+                          )?.[field.displayField] || 'N/A'
                         ) : (
                           item[field.field]
                         )}
@@ -401,11 +438,9 @@ const CategoryDetailModal = ({ open, onClose, category, onUpdate }) => {
             {error}
           </Typography>
         )}
-      </DialogContent>
-    </Dialog>
+      </Box>
+    </>
   );
 };
 
-export default CategoryDetailModal;
-
-// Cleanup effect
+export default CategoryDetail;
