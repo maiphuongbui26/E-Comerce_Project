@@ -61,6 +61,7 @@ const CategoryDetail = () => {
       ...prevData,
       [fieldName]: value
     }));
+    console.log('Form data:', formData);
   };
 
   const handleAdd = () => {
