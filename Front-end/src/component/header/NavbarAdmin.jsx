@@ -14,6 +14,7 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import BusinessIcon from "@mui/icons-material/Business";
 import PeopleIcon from "@mui/icons-material/People";
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useNavigate } from "react-router-dom";
@@ -55,6 +56,11 @@ const NavbarAdmin = () => {
   }, []);
 
   const menuItems = [
+    {
+      title: "Dashboard",
+      path: "/admin/dashboard",
+      icon: <DashboardIcon />,
+    },
     {
       title: "Quản lý danh mục",
       path: "/admin/categories",

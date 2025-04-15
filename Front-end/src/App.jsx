@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import UserLayout from "./page/users/UserLayout";
-// Add admin layout import
 import AdminLayout from "./page/admin/AdminLayout";
 import AddPromotion from "./page/admin/promotion_management/AddPromotion";
 import EditPromotion from "./page/admin/promotion_management/EditPromotion";
@@ -8,13 +7,12 @@ import AddSupplier from "./page/admin/supplier_management/AddSupplier";
 import EditSupplier from "./page/admin/supplier_management/EditSupplier";
 import Home from "./page/users/home/Home";
 import Cart from "./page/users/cart/Cart";
-import Sales from "./page/users/product/Sale";
-import Dresses from "./page/users/product/Dresses";
-import Shirts from "./page/users/product/shirts";
-import Pants from "./page/users/product/Pants";
-import Skirts from "./page/users/product/Skirts";
-import Jackets from "./page/users/product/Jackets";
-import Blazer from "./page/users/product/Blazer";
+import Sales from "./page/users/product_bak/Sale";
+import Dresses from "./page/users/product_bak/Dresses";
+import Shirts from "./page/users/product_bak/shirts";
+import Pants from "./page/users/product_bak/Pants";
+import Skirts from "./page/users/product_bak/Skirts";
+import Jackets from "./page/users/product_bak/Jackets";
 import ProductDetail from "./page/users/product_details/ProductDetail";
 import Profile from "./page/users/profile/Profile";
 import Order from "./page/users/order/Order";
@@ -32,6 +30,10 @@ import AddUser from "./page/admin/user_management/AddUser";
 import EditUser from "./page/admin/user_management/EditUser";
 import LoginAdmin from "./page/admin/auth_admin/LoginAdmin";
 import CategoryDetail from "./page/admin/categories_management/CategoryDetail";
+import Dashboard from "./page/admin/DashBoard/DashBoard";
+import TShirts from "./page/users/product/casual-wear/t-shirts/t-shirts";
+
+// Add this import near the top with other imports
 
 function App() {
   return (
@@ -46,12 +48,14 @@ function App() {
       <Route path="/user" element={<UserLayout />}>
         <Route path="/user" element={<Home />} />
         <Route path="sale" element={<Sales />} />
+        <Route path="casual-wear">
+          <Route path="t-shirts" element={<TShirts />} />
+        </Route>
         <Route path="dresses" element={<Dresses />} />
         <Route path="shirts" element={<Shirts />} />
         <Route path="pants" element={<Pants />} />
         <Route path="skirts" element={<Skirts />} />
         <Route path="jackets" element={<Jackets />} />
-        <Route path="blazer-ss-2025" element={<Blazer />} />
         <Route path="product-details" element={<ProductDetail />} />
         <Route path="cart" element={<Cart />} />
         <Route path="account" element={<Profile />} />
@@ -64,6 +68,8 @@ function App() {
       </Route>
       {/* Admin Routes */}
       <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<Navigate to="categories" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="categories" element={<CategoryManagement />} />
         <Route path="categories/:id" element={<CategoryDetail />} />
         <Route path="orders" element={<OrderManagement />} />

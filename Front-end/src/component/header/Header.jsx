@@ -14,6 +14,8 @@ import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from "@mui/icons-material/Close";
 import { Drawer, Popper, Paper, Fade, Avatar } from "@mui/material";
@@ -22,12 +24,51 @@ import { useAuth } from '../../hooks/useAuth';
 const menuItems = [
   { label: "Trang chủ", path: "/user", hidden: true },
   { label: "GIẢM GIÁ", path: "/user/sale" },
-  { label: "ĐẦM", path: "/user/dresses" },
-  { label: "ÁO", path: "/user/shirts" },
-  { label: "QUẦN", path: "/user/pants" },
-  { label: "CHÂN VÁY", path: "/user/skirts" },
-  { label: "ÁO KHOÁC", path: "/user/jackets" },
-  // { label: "BLAZER SS 2025", path: "/user/blazer-ss-2025" },
+  { 
+    label: "Công sở", 
+    path: "/user/office-wear",
+    subItems: [
+      { label: "Áo sơ mi", path: "/user/office-wear/shirts" },
+      { label: "Đầm công sở", path: "/user/office-wear/dresses" },
+      { label: "Chân váy", path: "/user/office-wear/skirts" },
+      { label: "Blazer", path: "/user/office-wear/blazers" }
+    ]
+  },
+  { 
+    label: "Dạo phố", 
+    path: "/user/casual-wear",
+    subItems: [
+      { label: "Áo thun", path: "/user/casual-wear/t-shirts" },
+      { label: "Quần sooc", path: "/user/casual-wear/shorts" }
+    ]
+  },
+  { 
+    label: "Xuân Hạ", 
+    path: "/user/spring-summer",
+    subItems: [
+      { label: "Váy babydoll", path: "/user/spring-summer/babydoll" },
+      { label: "Váy 2 dây", path: "/user/spring-summer/strap-dresses" },
+      { label: "Đầm maxi", path: "/user/spring-summer/maxi" },
+      { label: "Váy hoa nhí", path: "/user/spring-summer/floral" }
+    ]
+  },
+  { 
+    label: "Phụ kiện", 
+    path: "/user/accessories",
+    subItems: [
+      { label: "Túi", path: "/user/accessories/bags" },
+      { label: "Mũ", path: "/user/accessories/hats" },
+      { label: "Kính", path: "/user/accessories/glasses" },
+      { label: "Trang sức", path: "/user/accessories/jewelry" }
+    ]
+  },
+  { 
+    label: "Dự tiệc", 
+    path: "/user/party-wear",
+    subItems: [
+      { label: "Đầm dự tiệc", path: "/user/party-wear/dresses" }
+    ]
+  },
 ];
 
 const settings = [
@@ -46,7 +87,9 @@ const Header = () => {
   const { handleLogout,user,getUser } = useAuth();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [anchorElCart, setAnchorElCart] = useState(null); // State for cart dropdown
+  const [anchorElCart, setAnchorElCart] = useState(null); 
+  const [anchorElHover, setAnchorElHover] = useState(null);
+  const [activeMenu, setActiveMenu] = useState(null);
   const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
@@ -83,6 +126,15 @@ const Header = () => {
 
   const handleCartClose = () => {
     setAnchorElCart(null);
+  };
+  const handleMenuHover = (event, menu) => {
+    setAnchorElHover(event.currentTarget);
+    setActiveMenu(menu);
+  };
+
+  const handleMenuLeave = () => {
+    setAnchorElHover(null);
+    setActiveMenu(null);
   };
   useEffect(() => {
     getUser();
@@ -189,24 +241,29 @@ const Header = () => {
             />
           </Typography>
           <Box
-            sx={{
-              flexGrow: 1,
-              display: { xs: "none", md: "flex" },
-              justifyContent: "center",
-            }}
-          >
-            {menuItems
-              .filter((item) => !item.hidden)
-              .map((page, index) => (
+          sx={{
+            flexGrow: 1,
+            display: { xs: "none", md: "flex" },
+            justifyContent: "center",
+          }}
+        >
+          {menuItems
+            .filter((item) => !item.hidden)
+            .map((page, index) => (
+              <Box
+                key={index}
+                onMouseEnter={(e) => handleMenuHover(e, page)}
+                onMouseLeave={handleMenuLeave}
+              >
                 <Button
-                  key={index}
                   onClick={() => handleMenuClick(page.path)}
                   sx={{
                     my: 2,
                     color: "#000",
-                    display: "block",
-                    whiteSpace: "nowrap", // Prevent text wrapping
-                    fontSize: "0.875rem", // Adjust font size for better fit
+                    display: "flex",
+                    alignItems: "center",
+                    whiteSpace: "nowrap",
+                    fontSize: "0.875rem",
                   }}
                 >
                   <Typography
@@ -221,9 +278,82 @@ const Header = () => {
                   >
                     {page.label}
                   </Typography>
+                  {page.subItems && (
+                    <Box sx={{ 
+                      display: 'flex',
+                      alignItems: 'center',
+                      position: 'relative',
+                      width: 20,
+                      height: 20
+                    }}>
+                      <ExpandMoreIcon 
+                        sx={{ 
+                          position: 'absolute',
+                          fontSize: 15,
+                          opacity: activeMenu === page ? 0 : 1,
+                          transition: 'opacity 0.3s ease',
+                        }} 
+                      />
+                      <ExpandLessIcon 
+                        sx={{ 
+                          position: 'absolute',
+                          fontSize: 15,
+                          opacity: activeMenu === page ? 1 : 0,
+                          transition: 'opacity 0.3s ease',
+                        }} 
+                      />
+                    </Box>
+                  )}
                 </Button>
-              ))}
-          </Box>
+                {page.subItems && (
+                  <Popper
+                    open={activeMenu === page}
+                    anchorEl={anchorElHover}
+                    placement="bottom-start"
+                    transition
+                    sx={{ zIndex: 1300 }}
+                  >
+                    {({ TransitionProps }) => (
+                      <Fade {...TransitionProps} timeout={350}>
+                        <Paper
+                          sx={{
+                            mt: 1,
+                            borderRadius: 1,
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                            minWidth: 180,
+                          }}
+                          onMouseEnter={() => setActiveMenu(page)}
+                          onMouseLeave={handleMenuLeave}
+                        >
+                          {page.subItems.map((item, idx) => (
+                            <MenuItem
+                              key={idx}
+                              onClick={() => handleMenuClick(item.path)}
+                              sx={{
+                                py: 1,
+                                '&:hover': {
+                                  backgroundColor: '#f5f5f5'
+                                }
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  fontSize: "13px",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                {item.label}
+                              </Typography>
+                            </MenuItem>
+                          ))}
+                        </Paper>
+                      </Fade>
+                    )}
+                  </Popper>
+                )}
+              </Box>
+            ))}
+        </Box>
           {/* Setting */}
           <Box sx={{ flexGrow: 0 }}>
             {/* Favorite */}

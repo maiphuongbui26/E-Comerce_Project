@@ -39,9 +39,7 @@ const LoginAdmin = () => {
       console.error('Login failed:', error);
     }
   };
-
   useEffect(() => {
-    console.log(error);
     if (admin?.user?.VaiTro === 'khachhang') {
       setAuthError('Tài khoản không có quyền truy cập vào trang quản trị');
       localStorage.removeItem('adminToken');
