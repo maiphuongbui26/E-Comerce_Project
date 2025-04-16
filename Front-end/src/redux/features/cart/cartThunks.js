@@ -35,7 +35,7 @@ export const addToCart = createAsyncThunk(
           },
         }
       );
-      return response.data;
+      return response.data.cart;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -48,8 +48,11 @@ export const updateCartItem = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        `${BASE_URL}/cart/update/${itemId}`,
-        { quantity },
+        `${BASE_URL}/cart/quantity`,
+        { 
+          idSanPham: itemId,
+          SoLuong: quantity 
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -57,7 +60,7 @@ export const updateCartItem = createAsyncThunk(
           },
         }
       );
-      return response.data;
+      return response.data.cart;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -69,10 +72,10 @@ export const removeFromCart = createAsyncThunk(
   async (itemId, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${BASE_URL}/cart/remove/${itemId}`, {
+      const response = await axios.delete(`${BASE_URL}/cart/remove/${itemId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return itemId;
+      return response.data.cart;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

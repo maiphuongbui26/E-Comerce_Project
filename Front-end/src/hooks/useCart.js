@@ -21,6 +21,7 @@ export const useCart = () => {
 
   const handleAddToCart = async (productData) => {
     try {
+    console.log("productData",productData);
       await dispatch(addToCart(productData)).unwrap();
       return true;
     } catch (error) {

@@ -8,8 +8,10 @@ import {
 } from './cartThunks';
 
 const initialState = {
-  cartItems: [],
+  cartItems: [], // Will store DanhSachSanPham
   totalAmount: 0,
+  discount: 0, // GiamGia
+  subTotal: 0, // TamTinh
   isLoading: false,
   error: null
 };
@@ -22,22 +24,20 @@ const cartSlice = createSlice({
       state.error = null;
     },
     calculateTotalAmount: (state) => {
-      state.totalAmount = state.cartItems.reduce((total, item) => 
-        total + (item.GiaSanPham * item.quantity), 0
+      state.subTotal = state.cartItems.reduce((total, item) => 
+        total + (item.GiaTien * item.SoLuong), 0
       );
+      state.totalAmount = state.subTotal - state.discount;
     }
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Cart
-      .addCase(fetchCart.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.cartItems = action.payload.cartItems;
-        state.totalAmount = action.payload.totalAmount;
+        state.cartItems = action.payload.DanhSachSanPham;
+        state.discount = action.payload.GiamGia;
+        state.subTotal = action.payload.TamTinh;
+        state.totalAmount = action.payload.TongTien;
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.isLoading = false;

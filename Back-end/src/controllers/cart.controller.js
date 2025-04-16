@@ -43,38 +43,33 @@ const cartController = {
   // Add product to cart
   addProduct: async (req, res) => {
     try {
-      const { idSanPham, SoLuong, MauSac, KichThuoc } = req.body;
-
+      const { idSanPham, SoLuong, MauSac, KichThuoc,user } = req.body;
+      console.log(req.body)
       let cart = await Cart.findOne({ 
-        NguoiDung: req.user._id,
+        NguoiDung: user.id,
         TrangThai: 'active'
       });
-
+     
       if (!cart) {
         cart = new Cart({
-          Id: generateId('CART'),
-          NguoiDung: req.user._id,
+          id: generateCartId('CART'),
+          NguoiDung: user.id,
           DanhSachSanPham: []
         });
       }
-
-      const product = await Product.findOne({ idSanPham });
+      const product = await Product.findOne({ idSanPham:  idSanPham});
+      console.log("product",product)
       if (!product) {
         return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
       }
-
-      // Check if product already exists in cart
       const existingProductIndex = cart.DanhSachSanPham.findIndex(
         item => item.idSanPham === idSanPham && 
                item.MauSac === MauSac && 
                item.KichThuoc === KichThuoc
       );
-
       if (existingProductIndex > -1) {
-        // Update quantity if product exists
         cart.DanhSachSanPham[existingProductIndex].SoLuong += SoLuong;
       } else {
-        // Add new product to cart
         cart.DanhSachSanPham.push({
           idSanPham: product.idSanPham,
           TenSanPham: product.TenSanPham,
@@ -83,12 +78,11 @@ const cartController = {
           DonGia: product.DonGia,
           HinhAnh: product.HinhAnh[0],
           SoLuong,
-          MauSac,
+          MauSacDaChon: product.MauSac[0].TenMau,
           KichThuoc,
           GiaTien: product.GiaSanPham
         });
       }
-
       await cart.save();
       res.json({ 
         message: 'Thêm sản phẩm vào giỏ hàng thành công',

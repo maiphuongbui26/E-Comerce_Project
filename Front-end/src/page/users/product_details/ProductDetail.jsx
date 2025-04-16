@@ -4,15 +4,20 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import StarIcon from "@mui/icons-material/Star";
+import { ToastContainer, toast } from 'react-toastify';
 import { useParams } from "react-router-dom";
 import { useProduct } from "../../../hooks/useProduct";
+import { useCart } from "../../../hooks/useCart";
+import { useAuth } from "../../../hooks/useAuth";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { handleFetchProductById, selectedProduct,sizes,fetchAllData } = useProduct();
+  const { handleAddToCart } = useCart();
+  const { getUser,user } = useAuth();
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(null); 
-  const [selectedColor, setSelectedColor] = useState("white");
+  const [selectedColor, setSelectedColor] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showSizeChart, setShowSizeChart] = useState(false);
   const [mainImage, setMainImage] = useState("");
@@ -29,6 +34,7 @@ const ProductDetail = () => {
   useEffect(() => {
     handleFetchProductById(id);
     fetchAllData()
+    getUser()
   }, [id]); 
 
   useEffect(() => {
@@ -36,6 +42,32 @@ const ProductDetail = () => {
       setMainImage(selectedProduct.HinhAnh[0]);
     }
   }, [selectedProduct]);
+  const handleAddProductToCart = async () => {
+    if (!selectedSize) {
+      toast.warning("Vui lòng chọn kích thước");
+      return;
+    }
+    if (!selectedColor) {
+      toast.warning("Vui lòng chọn màu sắc");
+      return;
+    }
+    const cartItem = {
+      user,
+      idSanPham: selectedProduct.idSanPham, 
+      SoLuong: quantity,
+      MauSac: selectedColor,
+      KichThuoc: selectedSize,
+    };
+    try {
+      const success = await handleAddToCart(cartItem);
+      if (success) {
+        toast.success("Thêm vào giỏ hàng thành công");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Có lỗi xảy ra khi thêm vào giỏ hàng");
+    }
+  };
   return (
     <Box sx={{ maxWidth: "1240px", margin: "0 auto", padding: "20px" }}>
       <Typography sx={{ mb: 2, color: "#666" }}>
@@ -160,7 +192,7 @@ const ProductDetail = () => {
                 <Button
                   key={size._id} 
                   variant={selectedSize === size._id ? "contained" : "outlined"} 
-                  onClick={() => setSelectedSize(size._id)} 
+                  onClick={() => setSelectedSize(size.id)} 
                   sx={{
                     minWidth: "40px",
                     height: "40px",
@@ -228,6 +260,7 @@ const ProductDetail = () => {
             </Button>
             <Button
               variant="outlined"
+              onClick={handleAddProductToCart}
               sx={{
                 flex: 1,
                 height: 48,
@@ -333,6 +366,7 @@ const ProductDetail = () => {
           </Box>
         </Grid>
       </Grid>
+      <ToastContainer />
     </Box>
   );
 };

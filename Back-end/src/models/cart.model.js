@@ -41,18 +41,14 @@ const cartSchema = new mongoose.Schema(
           min: 1,
           default: 1,
         },
-        MauSac: [{
-          MaMau: String,  
-          TenMau: String  
-        }],
         KichThuoc: {
           id: String,
           TenKichThuoc: {
             type: String,
             enum: ['S', 'M', 'L'],
-            required: true
           }
         },
+        MauSacDaChon: String,
         GiaTien: {
           type: Number,
           required: true,
