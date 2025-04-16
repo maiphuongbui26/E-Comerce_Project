@@ -34,6 +34,7 @@ const AddProduct = () => {
   } = useProduct();
 
   // In formData state, replace LoaiSanPham with DanhMuc
+  // First, update the formData state initialization
   const [formData, setFormData] = useState({
     TenSanPham: "",
     DanhMucSanPham: { id: "", TenDanhMuc: "" }, // Changed from LoaiSanPham
@@ -50,7 +51,7 @@ const AddProduct = () => {
     GiaSanPham: "",
     SoLuong: null,
     MoTa: "",
-    MauSac: "",
+    MauSac: [], // Change from string to array of objects
     TrangThai: "available",
     DanhGia: "",
     HinhAnh: [],
@@ -64,6 +65,8 @@ const AddProduct = () => {
   const { handleCreateProduct } = useProduct();
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
+  const [newColor, setNewColor] = useState({ MaMau: '', TenMau: '' });
+
 
   // Add this function to handle file selection
   const handleFileSelect = (e) => {
@@ -88,16 +91,13 @@ const AddProduct = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       // Use the state formData directly
       const productData = {
         ...formData,
         HinhAnh: selectedFiles,
       };
-
       const success = await handleCreateProduct(productData);
-
       if (success) {
         // Clean up preview URLs
         previewUrls.forEach((url) => URL.revokeObjectURL(url));
@@ -112,6 +112,22 @@ const AddProduct = () => {
     }
   };
   // Update the image preview section
+  const handleAddColor = () => {
+    if (newColor.MaMau && newColor.TenMau) {
+      setFormData({
+        ...formData,
+        MauSac: [...formData.MauSac, newColor]
+      });
+      // setNewColor({ MaMau: '', TenMau: '' }); 
+    }
+  };
+  
+  const handleRemoveColor = (index) => {
+    setFormData({
+      ...formData,
+      MauSac: formData.MauSac.filter((_, i) => i !== index)
+    });
+  };
   return (
     <>
       <Box
@@ -286,15 +302,6 @@ const AddProduct = () => {
                   })
                 }
               />
-
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: 2,
-                  gridColumn: "span 2",
-                }}
-              >
                 <TextField
                   required
                   fullWidth
@@ -310,17 +317,7 @@ const AddProduct = () => {
                     });
                   }}
                 />
-
-                <TextField
-                  fullWidth
-                  label="Màu sắc"
-                  value={formData.MauSac}
-                  onChange={(e) =>
-                    setFormData({ ...formData, MauSac: e.target.value })
-                  }
-                />
-
-                <FormControl fullWidth>
+                 <FormControl fullWidth>
                   <InputLabel>Trạng thái</InputLabel>
                   <Select
                     value={formData.TrangThai}
@@ -334,7 +331,97 @@ const AddProduct = () => {
                     <MenuItem value="discontinued">Ngừng kinh doanh</MenuItem>
                   </Select>
                 </FormControl>
-              </Box>
+                <Box sx={{ gridColumn: "span 2" }}>
+                  <Typography variant="subtitle1" sx={{ mb: 1 }}>Màu sắc:</Typography>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    gap: 2,
+                    p: 2,
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 1,
+                    bgcolor: '#fafafa'
+                  }}>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                      <Box sx={{ flex: 1, display: 'flex', gap: 2 }}>
+                        <TextField
+                          size="small"
+                          type="color"
+                          label="Mã màu"
+                          value={newColor.MaMau}
+                          onChange={(e) => setNewColor({ ...newColor, MaMau: e.target.value })}
+                          sx={{ width: '120px' }}
+                        />
+                        <TextField
+                          size="small"
+                          label="Tên màu"
+                          value={newColor.TenMau}
+                          onChange={(e) => setNewColor({ ...newColor, TenMau: e.target.value })}
+                          sx={{ flex: 1 }}
+                          placeholder="Ví dụ: Đỏ, Xanh, Vàng..."
+                        />
+                      </Box>
+                      <Button
+                        variant="contained"
+                        onClick={handleAddColor}
+                        disabled={!newColor.MaMau || !newColor.TenMau}
+                        size="medium"
+                        sx={{ minWidth: '100px' }}
+                      >
+                        Thêm màu
+                      </Button>
+                    </Box>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexWrap: 'wrap', 
+                      gap: 1,
+                      minHeight: '50px',
+                      p: formData.MauSac.length > 0 ? 2 : 0,
+                      bgcolor: formData.MauSac.length > 0 ? '#fff' : 'transparent',
+                      borderRadius: 1,
+                      border: formData.MauSac.length > 0 ? '1px dashed #e0e0e0' : 'none'
+                    }}>
+                      {formData.MauSac.map((color, index) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            bgcolor: '#fff',
+                            border: '1px solid #e0e0e0',
+                            borderRadius: 1,
+                            p: 1,
+                            pr: 0.5
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: 24,
+                              height: 24,
+                              bgcolor: color.MaMau,
+                              borderRadius: '50%',
+                              border: '1px solid #ddd'
+                            }}
+                          />
+                          <Typography variant="body2" sx={{ mx: 1 }}>{color.TenMau}</Typography>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleRemoveColor(index)}
+                            sx={{ 
+                              '&:hover': { 
+                                color: 'error.main',
+                                bgcolor: 'error.lighter'
+                              }
+                            }}
+                          >
+                            <CloseOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                </Box>
 
               <TextField
                 fullWidth

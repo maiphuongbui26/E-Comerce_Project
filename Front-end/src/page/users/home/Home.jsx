@@ -17,9 +17,8 @@ import { useProduct } from "../../../hooks/useProduct";
 const Home = () => {
   const navigate = useNavigate();
   // Update the destructuring to include products and handleFetchProducts
-  const { categories, products, fetchAllData, handleFetchProducts } =
-    useProduct();
-
+  const { categories, products, fetchAllData, handleFetchProducts } = useProduct();
+  console.log(categories);
   // Add this effect to fetch products
   useEffect(() => {
     fetchAllData();
@@ -36,6 +35,20 @@ const Home = () => {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
+  };
+  const handleCategoryClick = (category) => {
+    const categoryRouteMap = {
+      'Công sở': '/user/office-wear/shirts',
+      'Dạo phố': '/user/casual-wear/t-shirts',
+      'Xuân hạ': '/user/spring-summer/babydoll',
+      'Phụ kiện': '/user/accessories/bags',
+      'Dự tiệc': '/user/party-wear/dresses'
+    };
+  
+    const route = categoryRouteMap[category.TenDanhMuc];
+    if (route) {
+      navigate(route);
+    }
   };
   return (
     <>
@@ -122,6 +135,7 @@ const Home = () => {
                 borderRadius: "50%",
                 marginRight: index < categories.length - 1 ? "30px" : "0",
               }}
+              onClick={() => handleCategoryClick(category)}
             >
               <Box
                 sx={{

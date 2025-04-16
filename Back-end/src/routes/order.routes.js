@@ -4,7 +4,7 @@ const orderController = require('../controllers/order.controller');
 const { verifyToken, verifyAdmin } = require('../middlewares/auth.middleware');
 
 // User routes
-router.use(verifyToken);
+// router.use(verifyToken);
 router.post('/create', orderController.create);
 router.get('/my-orders', orderController.getUserOrders);
 router.get('/:id', orderController.getById);

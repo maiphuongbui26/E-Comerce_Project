@@ -47,9 +47,6 @@ const productSlice = createSlice({
     setPagination: (state, action) => {
       state.pagination = { ...state.pagination, ...action.payload };
     },
-    clearSelectedProduct: (state) => {
-      state.selectedProduct = null;
-    },
     clearError: (state) => {
       state.error = null;
     }
@@ -76,15 +73,18 @@ const productSlice = createSlice({
       // Fetch Product By Id
       .addCase(fetchProductById.pending, (state) => {
         state.isLoading = true;
+        state.selectedProduct = null; 
+        state.error = null;
       })
       .addCase(fetchProductById.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.selectedProduct = action.payload;
+        state.selectedProduct = action.payload; 
         state.error = null;
       })
       .addCase(fetchProductById.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload?.message || 'Failed to fetch product';
+        state.selectedProduct = null; 
+        state.error = action.payload?.message || 'Failed to fetch product details';
       })
 
       // Create Product
@@ -159,7 +159,6 @@ const productSlice = createSlice({
 export const {
   setFilters,
   setPagination,
-  clearSelectedProduct,
   clearError
 } = productSlice.actions;
 

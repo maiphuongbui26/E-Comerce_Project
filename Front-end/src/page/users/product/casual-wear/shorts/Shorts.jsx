@@ -1,22 +1,33 @@
-import { useState, useEffect } from 'react';
-import CategoryTemplate from '../../../../../components/templates/CategoryTemplate';
-import { useProduct } from '../../../../../hooks/useProduct';
+import { useEffect } from "react";
+import { useProduct } from "../../../../../hooks/useProduct";
+import ProductTemplate from "../../../../../components/templates/ProductTemplate";
 
 const Shorts = () => {
-  const [filters, setFilters] = useState({ category: 'casual-wear', subCategory: 'shorts' });
-  const { products, handleFetchProducts } = useProduct();
+  const { products, categories, handleFetchProducts, fetchAllData } = useProduct();
 
   useEffect(() => {
-    handleFetchProducts(filters);
-  }, [filters]);
+    const initializePage = async () => {
+      await Promise.all([handleFetchProducts(), fetchAllData()]);
+    };
+    initializePage();
+  }, []);
+
+  const shortsCategory = categories?.find(cat => 
+    cat.TenDanhMuc.toLowerCase().includes('quần sooc')
+  );
 
   return (
-    <CategoryTemplate
+    <ProductTemplate
       title="Quần Sooc"
-      description="Bộ sưu tập quần sooc dạo phố"
       products={products}
-      filters={filters}
-      onFilterChange={setFilters}
+      categories={categories}
+      initialCategory={shortsCategory?.id}
+      onCategoryChange={(categoryIds) => {
+        // Optional: Handle category changes
+      }}
+      onPriceRangeChange={(priceRanges) => {
+        // Optional: Handle price range changes
+      }}
     />
   );
 };

@@ -4,7 +4,7 @@ const sizeController = require('../controllers/size.controller');
 const { verifyToken, verifyAdmin } = require('../middlewares/auth.middleware');
 
 // All routes require authentication and admin privileges
-router.use(verifyToken, verifyAdmin);
+// router.use(verifyToken, verifyAdmin);
 
 router.post('/create', sizeController.create);
 router.get('/', sizeController.getAll);

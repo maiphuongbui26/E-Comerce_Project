@@ -13,7 +13,6 @@ import {
 import {
   setFilters,
   setPagination,
-  clearSelectedProduct,
   clearError
 } from '../redux/features/product/productSlice';
 
@@ -33,6 +32,7 @@ export const useProduct = () => {
   const [styles, setStyles] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [sizes, setSizes] = useState([]);
 
   const getAuthHeader = () => ({
     headers: {
@@ -42,19 +42,21 @@ export const useProduct = () => {
 
   const fetchAllData = async () => {
     try {
-      const [typesRes, pricesRes, stylesRes, suppliersRes,categoriesRes] = await Promise.all([
+      const [typesRes, pricesRes, stylesRes, suppliersRes,categoriesRes,sizesRes] = await Promise.all([
         axios.get('http://localhost:8080/api/product-types', getAuthHeader()),
         axios.get('http://localhost:8080/api/prices', getAuthHeader()),
         axios.get('http://localhost:8080/api/styles', getAuthHeader()),
         axios.get('http://localhost:8080/api/suppliers', getAuthHeader()),
-        axios.get('http://localhost:8080/api/categories', getAuthHeader())
+        axios.get('http://localhost:8080/api/categories', getAuthHeader()),
+        axios.get('http://localhost:8080/api/sizes', getAuthHeader())
       ]);
-
+console.log("sizesRes",sizesRes)
       setProductTypes(typesRes.data['product-types']);
       setPrices(pricesRes.data.prices);
       setStyles(stylesRes.data.styles);
       setSuppliers(suppliersRes.data.suppliers);
       setCategories(categoriesRes.data.categories);
+      setSizes(sizesRes.data.sizes);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -133,9 +135,7 @@ export const useProduct = () => {
     dispatch(setPagination(newPagination));
   };
 
-  const handleClearSelectedProduct = () => {
-    dispatch(clearSelectedProduct());
-  };
+
 
   const handleClearError = () => {
     dispatch(clearError());
@@ -154,6 +154,8 @@ export const useProduct = () => {
     styles,
     suppliers,
     categories,
+    sizes,
+
 
     // Methods
     fetchAllData,
@@ -166,7 +168,6 @@ export const useProduct = () => {
     handleToggleFavorite,
     handleSetFilters,
     handleSetPagination,
-    handleClearSelectedProduct,
     handleClearError
   };
 };

@@ -7,7 +7,6 @@ import AddSupplier from "./page/admin/supplier_management/AddSupplier";
 import EditSupplier from "./page/admin/supplier_management/EditSupplier";
 import Home from "./page/users/home/Home";
 import Cart from "./page/users/cart/Cart";
-import Sales from "./page/users/product_bak/Sale";
 import Dresses from "./page/users/product_bak/Dresses";
 import Shirts from "./page/users/product_bak/shirts";
 import Pants from "./page/users/product_bak/Pants";
@@ -32,8 +31,22 @@ import LoginAdmin from "./page/admin/auth_admin/LoginAdmin";
 import CategoryDetail from "./page/admin/categories_management/CategoryDetail";
 import Dashboard from "./page/admin/DashBoard/DashBoard";
 import TShirts from "./page/users/product/casual-wear/t-shirts/t-shirts";
-
-// Add this import near the top with other imports
+import Shorts from "./page/users/product/casual-wear/shorts/shorts";
+import Blazers from "./page/users/product/office-wear/blazers/blazers";
+import OfficeDresses from "./page/users/product/office-wear/dresses/dresses";
+import OfficeShirts from "./page/users/product/office-wear/shirts/shirts";
+import OfficeSkirts from "./page/users/product/office-wear/skirts/skirts";
+import PartyDresses from "./page/users/product/party-wear/dresses/dresses";
+import EveningGowns from "./page/users/product/party-wear/gowns/gowns";
+import BabydollDresses from "./page/users/product/spring-summer/babydoll/babydoll";
+import FloralDresses from "./page/users/product/spring-summer/floral/floral";
+import MaxiDresses from "./page/users/product/spring-summer/maxi/maxi";
+import StrapDresses from "./page/users/product/spring-summer/strap-dresses/strap-dresses";
+import Bags from "./page/users/product/accessories/bags/bags";
+import Glasses from "./page/users/product/accessories/glasses/glasses";
+import Hats from "./page/users/product/accessories/hats/hats";
+import Jewelry from "./page/users/product/accessories/jewelry/jewelry";
+import Sales from "./page/users/product/sale/Sale";
 
 function App() {
   return (
@@ -43,23 +56,40 @@ function App() {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
       </Route>
-
       {/* User Routes */}
       <Route path="/user" element={<UserLayout />}>
-        <Route path="/user" element={<Home />} />
         <Route path="sale" element={<Sales />} />
-        <Route path="casual-wear">
-          <Route path="t-shirts" element={<TShirts />} />
-        </Route>
-        <Route path="dresses" element={<Dresses />} />
-        <Route path="shirts" element={<Shirts />} />
-        <Route path="pants" element={<Pants />} />
-        <Route path="skirts" element={<Skirts />} />
-        <Route path="jackets" element={<Jackets />} />
-        <Route path="product-details" element={<ProductDetail />} />
+        <Route index element={<Home />} /> {/* Use index route for home */}
         <Route path="cart" element={<Cart />} />
         <Route path="account" element={<Profile />} />
         <Route path="order" element={<Order />} />
+        <Route path="product/:id" element={<ProductDetail />} /> 
+        <Route path="casual-wear">
+          <Route path="t-shirts" element={<TShirts />} />
+          <Route path="shorts" element={<Shorts />} />
+        </Route>
+        <Route path="office-wear">
+          <Route path="blazers" element={<Blazers />} />
+          <Route path="dresses" element={<OfficeDresses />} />
+          <Route path="shirts" element={<OfficeShirts />} />
+          <Route path="skirts" element={<OfficeSkirts />} />
+        </Route>
+        <Route path="party-wear">
+          <Route path="dresses" element={<PartyDresses />} />
+          <Route path="gowns" element={<EveningGowns />} />
+        </Route>
+        <Route path="spring-summer">
+          <Route path="babydoll" element={<BabydollDresses />} />
+          <Route path="floral" element={<FloralDresses />} />
+          <Route path="maxi" element={<MaxiDresses />} />
+          <Route path="strap-dresses" element={<StrapDresses />} />
+        </Route>
+        <Route path="accessories">
+          <Route path="bags" element={<Bags />} />
+          <Route path="glasses" element={<Glasses />} />
+          <Route path="hats" element={<Hats />} />
+          <Route path="jewelry" element={<Jewelry />} />
+        </Route>
       </Route>
 
       {/* Auth Routes User */}

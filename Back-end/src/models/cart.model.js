@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const cartSchema = new mongoose.Schema(
   {
-    Id: {
+    id: {
       type: String,
       required: true,
       unique: true,
@@ -41,7 +41,10 @@ const cartSchema = new mongoose.Schema(
           min: 1,
           default: 1,
         },
-        MauSac: String,
+        MauSac: [{
+          MaMau: String,  
+          TenMau: String  
+        }],
         KichThuoc: {
           id: String,
           TenKichThuoc: {

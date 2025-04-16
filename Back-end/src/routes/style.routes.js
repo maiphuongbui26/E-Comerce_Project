@@ -4,7 +4,7 @@ const styleController = require('../controllers/style.controller');
 const { verifyToken, verifyAdmin } = require('../middlewares/auth.middleware');
 
 // All routes require authentication and admin privileges
-router.use(verifyToken, verifyAdmin);
+// router.use(verifyToken, verifyAdmin);
 
 // CRUD routes
 router.post('/create', styleController.create);

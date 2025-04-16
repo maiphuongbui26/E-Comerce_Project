@@ -47,7 +47,10 @@ const productSchema = new mongoose.Schema({
     required: true
   },
   MoTa: String,
-  MauSac: String,
+  MauSac: [{
+    MaMau: String,  
+    TenMau: String  
+  }],
   DanhGia: String,
   HinhAnh: [String],
   TrangThai: {
