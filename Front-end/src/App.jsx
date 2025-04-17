@@ -48,6 +48,9 @@ import Glasses from "./page/users/product/accessories/glasses/glasses";
 import Hats from "./page/users/product/accessories/hats/hats";
 import Jewelry from "./page/users/product/accessories/jewelry/jewelry";
 import Sales from "./page/users/product/sale/Sale";
+import WarehouseManagement from "./page/admin/warehouse_management/WarehouseManagement";
+import WarehouseForm from "./page/admin/warehouse_management/WarehouseForm";
+import WarehouseDetail from "./page/admin/warehouse_management/WarehouseDetail";
 
 function App() {
   return (
@@ -127,6 +130,14 @@ function App() {
           <Route index element={<UserManagement />} />
           <Route path="add" element={<AddUser />} />
           <Route path="edit/:id" element={<EditUser />} />
+        </Route>
+        
+        {/* Warehouse Management Routes */}
+        <Route path="warehouse">
+          <Route index element={<WarehouseManagement />} />
+          <Route path="add" element={<WarehouseForm />} />
+          <Route path="edit/:id" element={<WarehouseForm />} />
+          <Route path=":id" element={<WarehouseDetail />} />
         </Route>
       </Route>
 
