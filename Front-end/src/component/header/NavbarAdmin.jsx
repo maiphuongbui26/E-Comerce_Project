@@ -15,6 +15,7 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import BusinessIcon from "@mui/icons-material/Business";
 import PeopleIcon from "@mui/icons-material/People";
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import WarehouseIcon from '@mui/icons-material/Warehouse';
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useNavigate } from "react-router-dom";
@@ -86,6 +87,11 @@ const NavbarAdmin = () => {
       title: "Quản lý nhà cung cấp",
       path: "/admin/suppliers",
       icon: <BusinessIcon />,
+    },
+    {
+      title: "Quản lý kho hàng",
+      path: "/admin/warehouses",
+      icon: <WarehouseIcon />,
     },
     {
       title: "Quản lý tài khoản",

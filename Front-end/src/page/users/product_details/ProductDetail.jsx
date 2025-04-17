@@ -190,17 +190,17 @@ const ProductDetail = () => {
             <Box sx={{ display: "flex", gap: 1 }}>
               {sizes.map((size) => (
                 <Button
-                  key={size._id} 
-                  variant={selectedSize === size._id ? "contained" : "outlined"} 
+                  key={size.id} 
+                  variant={selectedSize === size.id ? "contained" : "outlined"} 
                   onClick={() => setSelectedSize(size.id)} 
                   sx={{
                     minWidth: "40px",
                     height: "40px",
-                    bgcolor: selectedSize === size._id ? "#333" : "transparent", 
-                    color: selectedSize === size._id ? "#fff" : "#333", 
+                    bgcolor: selectedSize === size.id ? "#333" : "transparent", 
+                    color: selectedSize === size.id ? "#fff" : "#333", 
                     border: "1px solid #ddd",
                     "&:hover": {
-                      bgcolor: selectedSize === size._id ? "#333" : "transparent", 
+                      bgcolor: selectedSize === size.id ? "#333" : "transparent", 
                     },
                   }}
                 >

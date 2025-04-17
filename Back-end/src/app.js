@@ -13,6 +13,7 @@ const orderRoutes = require('./routes/order.routes');
 const styleRoutes = require('./routes/style.routes');
 const discountRoutes = require('./routes/discount.routes');
 const productRoutes = require('./routes/product.routes');
+const warehouseRoutes = require('./routes/warehouse.routes');
 
 
 const app = express();
@@ -48,7 +49,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/styles', styleRoutes);
 app.use('/api/discounts', discountRoutes); 
 app.use('/api/products', productRoutes); 
-
+app.use('/api/warehouse', warehouseRoutes);
 // Basic route for testing
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to E-Commerce API' });

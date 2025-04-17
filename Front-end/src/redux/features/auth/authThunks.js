@@ -53,6 +53,7 @@ export const getCurrentUser = createAsyncThunk(
           'Content-Type': 'application/json'
         }
       });
+      localStorage.setItem('user', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to get user data');

@@ -1,6 +1,6 @@
 import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, Radio, FormControlLabel, IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SearchForm from "../../../component/header/SearchForm";
 import {
   Table,
@@ -14,11 +14,14 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ClearIcon from '@mui/icons-material/Clear';
+import { useCart } from "../../../hooks/useCart";
 
 const Cart = () => {
+  const {handleFetchCart,cartItems} = useCart()
+  console.log("cartItems",cartItems)
   const [openVoucher, setOpenVoucher] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
-  const [cartItems, setCartItems] = useState([
+  const [cartItem, setCartItems] = useState([
     {
       id: 1,
       image: '/path-to-image.jpg',
@@ -51,7 +54,14 @@ const Cart = () => {
     setSelectedVoucher(voucher);
     handleVoucherClose();
   };
-
+useEffect(() => {
+  handleFetchCart()
+}, [])
+const getTotalQuantityForProduct = (productId) => {
+  return cartItems.reduce((total, item) => {
+    return item.id === productId ? total + item.quantity : total;
+  }, 0);
+};image.png
   return (
     <>
       <SearchForm />
@@ -63,7 +73,7 @@ const Cart = () => {
           GIỎ HÀNG CỦA BẠN
         </Typography>
         <Typography sx={{ textAlign: "center", color: "#666", mb: 4 }}>
-          Có 0 sản phẩm trong giỏ hàng
+          Có {cartItems.length} sản phẩm trong giỏ hàng
         </Typography>
 
         <Box sx={{ display: "flex", gap: 4 }}>
@@ -81,78 +91,16 @@ const Cart = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {cartItems.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <Box
-                          component="img"
-                          src={item.image}
-                          sx={{
-                            width: 100,
-                            height: 133,
-                            objectFit: 'cover'
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography sx={{ mb: 1 }}>
-                          {item.name}
-                        </Typography>
-                        <Button
-                          sx={{
-                            color: '#666',
-                            textTransform: 'none',
-                            p: 0,
-                            '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
-                          }}
-                        >
-                          Xem lại
-                        </Button>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                          <IconButton 
-                            size="small"
-                            onClick={() => handleQuantityChange(item.id, -1)}
-                            sx={{ border: '1px solid #ddd' }}
-                          >
-                            <RemoveIcon fontSize="small" />
-                          </IconButton>
-                          <Typography sx={{ minWidth: 20,fontWeight:600, textAlign: 'center' }}>
-                            {item.quantity}
-                          </Typography>
-                          <IconButton 
-                            size="small"
-                            onClick={() => handleQuantityChange(item.id, 1)}
-                            sx={{ border: '1px solid #ddd' }}
-                          >
-                            <AddIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography sx={{ color: '#dc0606',fontWeight:600 }}>
-                          {item.price.toLocaleString()}đ
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <IconButton 
-                          size="small"
-                          onClick={() => handleRemoveItem(item.id)}
-                          sx={{ color: '#666' }}
-                        >
-                          <ClearIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {/* Cart items rendering */}
                 </TableBody>
               </Table>
             </TableContainer>
 
-            <Typography sx={{ textAlign: "center", py: 4 }}>
-              Bạn chưa có sản phẩm yêu thích nào !
-            </Typography>
+            {cartItems.length === 0 && (
+              <Typography sx={{ textAlign: "center", py: 4 }}>
+                Bạn chưa có sản phẩm yêu thích nào !
+              </Typography>
+            )}
           </Box>
 
           {/* Order Summary */}
@@ -161,7 +109,6 @@ const Cart = () => {
               Tóm tắt đơn hàng
             </Typography>
 
-            {/* Enhanced Voucher Button */}
             <Box sx={{ mb: 3, bgcolor: '#fff', borderRadius: 1, p: 2 }}>
               <Typography sx={{ mb: 1, fontSize: '0.875rem', color: '#666' }}>
                 Mã giảm giá
@@ -326,3 +273,6 @@ const Cart = () => {
 };
 
 export default Cart;
+
+
+

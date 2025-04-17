@@ -8,11 +8,6 @@ import AddSupplier from "./page/admin/supplier_management/AddSupplier";
 import EditSupplier from "./page/admin/supplier_management/EditSupplier";
 import Home from "./page/users/home/Home";
 import Cart from "./page/users/cart/Cart";
-import Dresses from "./page/users/product_bak/Dresses";
-import Shirts from "./page/users/product_bak/shirts";
-import Pants from "./page/users/product_bak/Pants";
-import Skirts from "./page/users/product_bak/Skirts";
-import Jackets from "./page/users/product_bak/Jackets";
 import ProductDetail from "./page/users/product_details/ProductDetail";
 import Profile from "./page/users/profile/Profile";
 import Order from "./page/users/order/Order";
@@ -131,13 +126,11 @@ function App() {
           <Route path="add" element={<AddUser />} />
           <Route path="edit/:id" element={<EditUser />} />
         </Route>
-        
-        {/* Warehouse Management Routes */}
-        <Route path="warehouse">
-          <Route index element={<WarehouseManagement />} />
-          <Route path="add" element={<WarehouseForm />} />
-          <Route path="edit/:id" element={<WarehouseForm />} />
-          <Route path=":id" element={<WarehouseDetail />} />
+        <Route path="warehouses">
+        <Route index element={<WarehouseManagement />} />
+        <Route path="warehouses/import" element={<WarehouseForm />} />
+        <Route path="warehouses/export" element={<WarehouseForm />} />
+        <Route path="warehouses/:id" element={<WarehouseDetail />} />\
         </Route>
       </Route>
 

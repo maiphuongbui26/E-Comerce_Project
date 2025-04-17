@@ -21,45 +21,29 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useWarehouse } from "../../../hooks/useWarehouse";
+import Checkbox from "@mui/material/Checkbox";
 
 const WarehouseManagement = () => {
-  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const navigate = useNavigate();
+  const { warehouses, handleFetchWarehouses, handleDeleteWarehouse } =
+    useWarehouse();
 
-  const mockData = [
-    {
-      id: "WH001",
-      productName: "Áo sơ mi trắng",
-      quantity: 100,
-      location: "Kho A - Kệ 1",
-      lastUpdated: "2024-01-20",
-      status: "inStock",
-    },
-    // Add more mock data...
-  ];
-
-  const getStatusColor = (status) => {
-    const colors = {
-      inStock: "#66bb6a",
-      lowStock: "#ffa726",
-      outOfStock: "#ef5350",
-    };
-    return colors[status] || "#757575";
+  useEffect(() => {
+    handleFetchWarehouses({ page, limit: rowsPerPage, search: searchTerm });
+  }, [page, searchTerm]);
+  const formatDate = (date) => {
+    if (!date) return "-";
+    try {
+      return new Date(date).toLocaleDateString("vi-VN");
+    } catch {
+      return "-";
+    }
   };
-
-  const getStatusText = (status) => {
-    const statusMap = {
-      inStock: "Còn hàng",
-      lowStock: "Sắp hết",
-      outOfStock: "Hết hàng",
-    };
-    return statusMap[status] || status;
-  };
-
   return (
     <>
       <Box
@@ -75,82 +59,66 @@ const WarehouseManagement = () => {
       </Box>
 
       <Box sx={{ p: 3, bgcolor: "#fff", borderRadius: 1 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
-          }}
-        >
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
             <TextField
               size="small"
-              placeholder="Tìm kiếm sản phẩm"
+              placeholder="Tìm kiếm phiếu kho"
               InputProps={{
                 startAdornment: (
                   <SearchIcon sx={{ color: "action.active", mr: 1 }} />
                 ),
               }}
-              sx={{ width: 250 }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Select
-              size="small"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              sx={{ width: 150 }}
-            >
-              <MenuItem value="all">Tất cả</MenuItem>
-              <MenuItem value="inStock">Còn hàng</MenuItem>
-              <MenuItem value="lowStock">Sắp hết</MenuItem>
-              <MenuItem value="outOfStock">Hết hàng</MenuItem>
-            </Select>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => navigate("/admin/warehouse/add")}
-          >
-            Thêm mới
-          </Button>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<AddIcon />}
+              onClick={() => navigate("import")}
+            >
+              Nhập kho
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={() => navigate("export")}
+            >
+              Xuất kho
+            </Button>
+          </Box>
         </Box>
 
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Mã SP</TableCell>
-                <TableCell>Tên sản phẩm</TableCell>
-                <TableCell align="right">Số lượng</TableCell>
-                <TableCell>Vị trí</TableCell>
-                <TableCell>Cập nhật cuối</TableCell>
-                <TableCell>Trạng thái</TableCell>
+                <TableCell>Mã phiếu</TableCell>
+                <TableCell>Sản phẩm</TableCell>
+                <TableCell>Ngày nhập kho</TableCell>
+                <TableCell>Ngày xuất kho</TableCell>
+                <TableCell>Hạn bán lô hàng</TableCell>
                 <TableCell align="center">Thao tác</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockData.map((item) => (
+              {warehouses.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.id}</TableCell>
-                  <TableCell>{item.productName}</TableCell>
-                  <TableCell align="right">{item.quantity}</TableCell>
-                  <TableCell>{item.location}</TableCell>
-                  <TableCell>{item.lastUpdated}</TableCell>
+                  <TableCell>{item.SanPham?.TenSanPham}</TableCell>
+              
                   <TableCell>
-                    <Box
-                      sx={{
-                        bgcolor: `${getStatusColor(item.status)}15`,
-                        color: getStatusColor(item.status),
-                        py: 0.5,
-                        px: 1,
-                        borderRadius: 1,
-                        display: "inline-block",
-                      }}
-                    >
-                      {getStatusText(item.status)}
-                    </Box>
+                    {formatDate(item.NgayNhapKho)}
+                  </TableCell>
+                  <TableCell>
+                    {formatDate(item.NgayXuatKho)}
+                  </TableCell>
+                  <TableCell>
+                    {formatDate(item.HanBanLoHang)}
                   </TableCell>
                   <TableCell align="center">
                     <IconButton
@@ -161,11 +129,9 @@ const WarehouseManagement = () => {
                     </IconButton>
                     <IconButton
                       size="small"
-                      onClick={() => navigate(`/admin/warehouse/edit/${item.id}`)}
+                      color="error"
+                      onClick={() => handleDeleteWarehouse(item.id)}
                     >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton size="small" color="error">
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>

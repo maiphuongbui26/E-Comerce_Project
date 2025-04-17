@@ -25,8 +25,9 @@ const cartController = {
   // Get cart by user
   getCart: async (req, res) => {
     try {
+      console.log(req)
       const cart = await Cart.findOne({ 
-        NguoiDung: req.user._id,
+        NguoiDung: req.params.idUser,
         TrangThai: 'active'
       });
 

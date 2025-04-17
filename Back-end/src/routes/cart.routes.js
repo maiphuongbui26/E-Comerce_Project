@@ -7,7 +7,7 @@ const { verifyToken } = require('../middlewares/auth.middleware');
 // router.use(verifyToken);
 
 router.post('/create', cartController.create);
-router.get('/', cartController.getCart);
+router.get('/:idUser', cartController.getCart);
 router.post('/add', cartController.addProduct);
 router.put('/quantity', cartController.updateQuantity);
 router.delete('/remove/:idSanPham', cartController.removeProduct);

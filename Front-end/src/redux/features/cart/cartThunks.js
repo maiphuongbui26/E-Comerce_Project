@@ -8,12 +8,15 @@ export const fetchCart = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`${BASE_URL}/cart`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
+      const user = JSON.parse(localStorage.getItem("user"));
+      if(user?.id){
+        const response = await axios.get(`${BASE_URL}/cart/${user?.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return response?.data;
+      }
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
