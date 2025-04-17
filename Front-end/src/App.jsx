@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import ProtectedAdminLayout from "./layouts/ProtectedAdminLayout";
 import UserLayout from "./page/users/UserLayout";
 import AdminLayout from "./page/admin/AdminLayout";
 import AddPromotion from "./page/admin/promotion_management/AddPromotion";
@@ -51,15 +52,21 @@ import Sales from "./page/users/product/sale/Sale";
 function App() {
   return (
     <Routes>
-      {/* Auth Routes User */}
-      <Route path="/auth/user">
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
+      {/* Auth Routes */}
+      <Route path="/auth">
+        <Route path="user">
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+        </Route>
+        <Route path="admin">
+          <Route path="login" element={<LoginAdmin />} />
+        </Route>
       </Route>
+
       {/* User Routes */}
       <Route path="/user" element={<UserLayout />}>
+        <Route index element={<Home />} />
         <Route path="sale" element={<Sales />} />
-        <Route index element={<Home />} /> {/* Use index route for home */}
         <Route path="cart" element={<Cart />} />
         <Route path="account" element={<Profile />} />
         <Route path="order" element={<Order />} />
@@ -92,31 +99,38 @@ function App() {
         </Route>
       </Route>
 
-      {/* Auth Routes User */}
-      <Route path="/auth/admin">
-        <Route path="login" element={<LoginAdmin />} />
-      </Route>
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Navigate to="categories" replace />} />
+      {/* Protected Admin Routes */}
+      <Route path="/admin" element={<ProtectedAdminLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="categories" element={<CategoryManagement />} />
-        <Route path="categories/:id" element={<CategoryDetail />} />
+        <Route path="categories">
+          <Route index element={<CategoryManagement />} />
+          <Route path=":id" element={<CategoryDetail />} />
+        </Route>
         <Route path="orders" element={<OrderManagement />} />
-        <Route path="products" element={<ProductManagement />} />
-        <Route path="products/add" element={<AddProduct />} />
-        <Route path="products/edit/:id" element={<EditProduct />} />
-        <Route path="promotions" element={<PromotionManagement />} />
-        <Route path="promotions/add" element={<AddPromotion />} />
-        <Route path="promotions/edit/:id" element={<EditPromotion />} />
-        <Route path="suppliers" element={<SupplierManagement />} />
-        <Route path="suppliers/add" element={<AddSupplier />} />
-        <Route path="suppliers/edit/:id" element={<EditSupplier />} />
-        <Route path="users" element={<UserManagement />} />
-        <Route path="users/add" element={<AddUser />} />
-        <Route path="users/edit/:id" element={<EditUser />} />
+        <Route path="products">
+          <Route index element={<ProductManagement />} />
+          <Route path="add" element={<AddProduct />} />
+          <Route path="edit/:id" element={<EditProduct />} />
+        </Route>
+        <Route path="promotions">
+          <Route index element={<PromotionManagement />} />
+          <Route path="add" element={<AddPromotion />} />
+          <Route path="edit/:id" element={<EditPromotion />} />
+        </Route>
+        <Route path="suppliers">
+          <Route index element={<SupplierManagement />} />
+          <Route path="add" element={<AddSupplier />} />
+          <Route path="edit/:id" element={<EditSupplier />} />
+        </Route>
+        <Route path="users">
+          <Route index element={<UserManagement />} />
+          <Route path="add" element={<AddUser />} />
+          <Route path="edit/:id" element={<EditUser />} />
+        </Route>
       </Route>
-      {/* Redirect from root to user home */}
+
+      {/* Root Redirect */}
       <Route path="/" element={<Navigate to="/user" replace />} />
     </Routes>
   );

@@ -24,12 +24,6 @@ const AdminLayout = () => {
   const { admin, handleAdminLogout, getAdmin } = useAuthAdmin();
 
   useEffect(() => {
-    const adminToken = localStorage.getItem("adminToken");
-    console.log(adminToken);
-    if (!adminToken) {
-      navigate("/auth/admin/login");
-      return;
-    }
     getAdmin();
   }, []);
   const [anchorEl, setAnchorEl] = useState(null);
