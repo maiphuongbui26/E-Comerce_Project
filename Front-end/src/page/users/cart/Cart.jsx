@@ -15,21 +15,16 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useCart } from "../../../hooks/useCart";
+import { useProduct } from "../../../hooks/useProduct";
 
 const Cart = () => {
   const {handleFetchCart,cartItems} = useCart()
+  const {handleFetchProducts,products} = useProduct()
   console.log("cartItems",cartItems)
   const [openVoucher, setOpenVoucher] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
-  const [cartItem, setCartItems] = useState([
-    {
-      id: 1,
-      image: '/path-to-image.jpg',
-      name: 'Đầm cổ trơn dáng suông chân phối tơ - Đen - M',
-      price: 795000,
-      quantity: 1
-    }
-  ]);
+ 
+  const [cartItem, setCartItems] = useState([]);
   const vouchers = [
     { id: 1, code: 'SUMMER23', discount: '100.000đ', description: 'Giảm 100k cho đơn hàng từ 500k' },
     { id: 2, code: 'NEWYEAR', discount: '150.000đ', description: 'Giảm 150k cho đơn hàng từ 1000k' },
@@ -56,16 +51,30 @@ const Cart = () => {
   };
 useEffect(() => {
   handleFetchCart()
+  handleFetchProducts()
+  // Example usage within the component
+
 }, [])
+
 const getTotalQuantityForProduct = (productId) => {
   return cartItems.reduce((total, item) => {
-    return item.id === productId ? total + item.quantity : total;
+    return item.id === productId ? total + (item.quantity || 0) : total;
   }, 0);
-};image.png
+};
+ // Consolidate cart items by idSanPham
+ const consolidatedCartItems = cartItems.reduce((acc, item) => {
+  const existingItem = acc.find(i => i.idSanPham === item.idSanPham);
+  if (existingItem) {
+    existingItem.quantity += 1; 
+  } else {
+    acc.push({ ...item, quantity: 1 }); 
+  }
+  return acc;
+}, []);
   return (
     <>
       <SearchForm />
-      <Box sx={{ maxWidth: "1240px", margin: "0 auto", padding: "20px" }}>
+      <Box sx={{ maxWidth: "1240px", margin: "30px auto", padding: "20px" }}>
         <Typography
           variant="h4"
           sx={{ textAlign: "center", fontWeight: 600, mb: 2 }}
@@ -73,7 +82,7 @@ const getTotalQuantityForProduct = (productId) => {
           GIỎ HÀNG CỦA BẠN
         </Typography>
         <Typography sx={{ textAlign: "center", color: "#666", mb: 4 }}>
-          Có {cartItems.length} sản phẩm trong giỏ hàng
+          Có {consolidatedCartItems.length} sản phẩm trong giỏ hàng
         </Typography>
 
         <Box sx={{ display: "flex", gap: 4 }}>
@@ -91,7 +100,49 @@ const getTotalQuantityForProduct = (productId) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {/* Cart items rendering */}
+                  {consolidatedCartItems.map((cartItem) => (
+                    <TableRow key={cartItem.idSanPham}>
+                      <TableCell>
+                        <img 
+                          src={`http://localhost:8080${cartItem?.HinhAnh}`} 
+                          alt={cartItem?.TenSanPham}
+                          width={80}
+                          height={80}
+                          style={{ objectFit: 'cover' }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                          {cartItem?.TenSanPham}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <IconButton 
+                            size="small" 
+                            onClick={() => handleQuantityChange(cartItem.idSanPham, -1)}
+                          >
+                            <RemoveIcon />
+                          </IconButton>
+                          <Typography sx={{ mx: 2 }}>{cartItem.quantity}</Typography>
+                          <IconButton 
+                            size="small" 
+                            onClick={() => handleQuantityChange(cartItem.idSanPham, 1)}
+                          >
+                            <AddIcon />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">
+                        {(cartItem?.GiaTien * cartItem.quantity).toLocaleString('vi-VN')}đ
+                      </TableCell>
+                      <TableCell align="right">
+                        <IconButton onClick={() => handleRemoveItem(cartItem.idSanPham)}>
+                          <ClearIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -273,6 +324,9 @@ const getTotalQuantityForProduct = (productId) => {
 };
 
 export default Cart;
+
+
+
 
 
 

@@ -82,7 +82,7 @@ const ProductTemplate = ({
   };
 
   return (
-    <Box sx={{ maxWidth: "1240px", margin: "0 auto" }}>
+    <Box sx={{ maxWidth: "1240px", margin: "30px auto" }}>
       <SearchForm />
       <Box></Box>
       <Typography
