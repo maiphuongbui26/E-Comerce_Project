@@ -6,22 +6,11 @@ const orderController = {
   // Create new order
   create: async (req, res) => {
     try {
-      const { cartId, DiaChiGiaoHang, PhuongThucThanhToan, GhiChu, PhiShip } = req.body;
-
+       console.log(req.body)
       const order = new Order({
         idDonHang: generateOrderId('DH'),
-        NguoiDung: {
-          id: req.user._id
-        },
-        GioHang: {
-          Id: cartId
-        },
-        DiaChiGiaoHang,
-        PhuongThucThanhToan,
-        GhiChu,
-        PhiShip: PhiShip || 0
+        ...req.body
       });
-
       await order.save();
       res.status(201).json({
         message: 'Tạo đơn hàng thành công',

@@ -1,24 +1,225 @@
+import { Box, Typography, Button, Paper, Chip, Grid } from "@mui/material";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import HomeIcon from "@mui/icons-material/Home";
+import PhoneIcon from "@mui/icons-material/Phone";
+import EmailIcon from "@mui/icons-material/Email";
+import { useEffect, useState } from "react";
+import { useOrder } from "../../../hooks/useOrder";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../hooks/useAuth";
 
-import { Box, Typography, Button } from "@mui/material";
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import HomeIcon from '@mui/icons-material/Home';
-import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
+const getStatusColor = (status) => {
+  switch (status) {
+    case "pending":
+      return { bg: "#fff3cd", color: "#856404" };
+    case "confirmed":
+      return { bg: "#cce5ff", color: "#004085" };
+    case "shipping":
+      return { bg: "#d4edda", color: "#155724" };
+    case "delivered":
+      return { bg: "#d1e7dd", color: "#0f5132" };
+    case "cancelled":
+      return { bg: "#f8d7da", color: "#842029" };
+    default:
+      return { bg: "#e2e3e5", color: "#383d41" };
+  }
+};
+
+const getStatusText = (status) => {
+  const statusMap = {
+    pending: "Chờ xác nhận",
+    confirmed: "Đã xác nhận",
+    shipping: "Đang giao hàng",
+    delivered: "Đã giao hàng",
+    cancelled: "Đã hủy",
+  };
+  return statusMap[status] || status;
+};
 
 const Order = () => {
+  const { handleFetchOrders } = useOrder();
+  const { getUser,user } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const result = await handleFetchOrders();
+      setOrders(Array.isArray(result) ? result : result.orders || []);
+    };
+    fetchOrders();
+    getUser()
+  }, []);
+// Thêm hàm helper để tổng hợp sản phẩm
+const consolidateProducts = (products) => {
+  const consolidated = {};
+  products.forEach(product => {
+    if (consolidated[product.idSanPham]) {
+      consolidated[product.idSanPham].SoLuong += product.SoLuong;
+      consolidated[product.idSanPham].ThanhTien += product.ThanhTien;
+    } else {
+      consolidated[product.idSanPham] = { ...product };
+    }
+  });
+  console.log("consolidated",consolidated)
+  return Object.values(consolidated);
+};
+// Trong phần render products, thay đổi như sau:
   return (
     <Box sx={{ maxWidth: "1240px", margin: "0 auto", padding: "40px 20px" }}>
       <Box sx={{ display: "flex", gap: 4 }}>
         {/* Left side - Orders */}
         <Box sx={{ flex: 2 }}>
-          <Typography variant="h4" sx={{ fontSize: 28, fontWeight: 600, mb: 3 }}>
+          <Typography
+            variant="h4"
+            sx={{ fontSize: 28, fontWeight: 600, mb: 3 }}
+          >
             ĐƠN HÀNG
           </Typography>
-          
-          <Typography sx={{ color: "#666", mb: 4 }}>
-            Chưa có đơn hàng nào
-          </Typography>
+
+          {orders.length === 0 ? (
+            <Typography sx={{ color: "#666", mb: 4 }}>
+              Chưa có đơn hàng nào
+            </Typography>
+          ) : (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+              {orders?.map((order) => (
+                <Paper key={order.idDonHang} sx={{ p: 3, borderRadius: 2 }}>
+                  {/* Order Header */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      Đơn hàng #{order.idDonHang}
+                    </Typography>
+                    <Chip
+                      label={getStatusText(order.TrangThaiDonHang)}
+                      sx={{
+                        bgcolor: getStatusColor(order.TrangThaiDonHang).bg,
+                        color: getStatusColor(order.TrangThaiDonHang).color,
+                        fontWeight: 500,
+                      }}
+                    />
+                  </Box>
+
+                  {/* Order Info */}
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    <Grid item xs={6}>
+                      <Typography sx={{ color: "#666" }}>
+                        Ngày đặt:{" "}
+                        {new Date(order.NgayDatHang).toLocaleDateString(
+                          "vi-VN"
+                        )}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography sx={{ color: "#666" }}>
+                        Thanh toán:{" "}
+                        {order.PhuongThucThanhToan === "cash"
+                          ? "Tiền mặt"
+                          : order.PhuongThucThanhToan}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+
+                  
+                  {/* Products */}
+                  <Box sx={{ mb: 3 }}>
+                    {consolidateProducts(order.GioHang.DanhSachSanPham).map((product) => (
+                      <Box
+                        key={product.idSanPham}
+                        sx={{
+                          display: "flex",
+                          gap: 2,
+                          p: 2,
+                          borderBottom: "1px solid #eee",
+                          "&:last-child": { borderBottom: "none" },
+                        }}
+                      >
+                        <img
+                          src={`http://localhost:8080${product.HinhAnh}`}
+                          alt={product.TenSanPham}
+                          style={{
+                            width: 80,
+                            height: 80,
+                            objectFit: "cover",
+                            borderRadius: 8,
+                          }}
+                        />
+                        <Box sx={{ flex: 1 }}>
+                          <Typography sx={{ fontWeight: 500, mb: 1 }}>
+                            {product.TenSanPham}
+                          </Typography>
+                          <Typography
+                            sx={{ color: "#666", fontSize: "0.875rem" }}
+                          >
+                            Số lượng: {product.SoLuong}
+                          </Typography>
+                          <Typography
+                            sx={{ color: "#dc0606", fontWeight: 500 }}
+                          >
+                            {(product?.ThanhTien || 0).toLocaleString("vi-VN")}đ
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                  {/* Order Summary */}
+                  <Box sx={{ borderTop: "1px solid #eee", pt: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
+                      <Typography>Tổng tiền hàng:</Typography>
+                      <Typography>
+                        {order.GioHang.TongTienHang?.toLocaleString("vi-VN")}đ
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
+                      <Typography>Giảm giá:</Typography>
+                      <Typography>
+                        -{order.GioHang.GiamGia?.toLocaleString("vi-VN")}đ
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mt: 2,
+                      }}
+                    >
+                      <Typography sx={{ fontWeight: 600 }}>
+                        Tổng thanh toán:
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: "#dc0606",
+                          fontWeight: 600,
+                          fontSize: "1.1rem",
+                        }}
+                      >
+                        {order.GioHang.TongTien?.toLocaleString("vi-VN")}đ
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Paper>
+              ))}
+            </Box>
+          )}
         </Box>
 
         {/* Right side - Account Info */}
@@ -28,34 +229,24 @@ const Order = () => {
               Tài khoản của tôi
             </Typography>
             <Typography sx={{ fontWeight: 500, mb: 2 }}>
-              Tên tài khoản: Cường Nguyễn !
+              Họ và tên: {user?.HoVaTen}
             </Typography>
           </Box>
 
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <ApartmentIcon sx={{ color: "#666" }} />
-              <Typography>Thành phố:</Typography>
-            </Box>
-
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <LocationOnIcon sx={{ color: "#666" }} />
-              <Typography>Quận:</Typography>
-            </Box>
-
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <HomeIcon sx={{ color: "#666" }} />
-              <Typography>Địa chỉ:</Typography>
+              <Typography>Địa chỉ: {user?.DiaChi}</Typography>
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <PhoneIcon sx={{ color: "#666" }} />
-              <Typography>Điện thoại:</Typography>
+              <Typography>Điện thoại: {user?.SoDienThoai}</Typography>
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <EmailIcon sx={{ color: "#666" }} />
-              <Typography>Email: cuonghc2k2abc@gmail.com</Typography>
+              <Typography>Email: {user?.ThuDienTu}</Typography>
             </Box>
 
             <Button 
@@ -68,8 +259,9 @@ const Order = () => {
                   bgcolor: "#1a1a1a"
                 }
               }}
+              onClick={() => {navigate('/user/account')}}
             >
-              Sửa
+              Chỉnh sửa thông tin
             </Button>
           </Box>
         </Box>
@@ -79,4 +271,3 @@ const Order = () => {
 };
 
 export default Order;
-  

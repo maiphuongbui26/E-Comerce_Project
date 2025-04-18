@@ -12,7 +12,8 @@ const AddPromotion = () => {
   const [formData, setFormData] = useState({
     TenChuongTrinh: '',
     NgayBatDau: '',
-    NgayKetThuc: ''
+    NgayKetThuc: '',
+    PhanTramGiam: '' // Thêm trường mới
   });
 
   const handleSubmit = async (e) => {
@@ -41,6 +42,19 @@ const AddPromotion = () => {
               label="Tên chương trình"
               value={formData.TenChuongTrinh}
               onChange={(e) => setFormData({ ...formData, TenChuongTrinh: e.target.value })}
+            />
+            {/* Thêm field mới */}
+            <TextField
+              required
+              fullWidth
+              label="Phần trăm giảm"
+              type="number"
+              InputProps={{ 
+                inputProps: { min: 0, max: 100 },
+                endAdornment: <Typography>%</Typography>
+              }}
+              value={formData.PhanTramGiam}
+              onChange={(e) => setFormData({ ...formData, PhanTramGiam: e.target.value })}
             />
             <TextField
               required

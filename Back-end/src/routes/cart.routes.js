@@ -13,5 +13,6 @@ router.put('/quantity', cartController.updateQuantity);
 router.delete('/remove/:idSanPham', cartController.removeProduct);
 router.put('/discount', cartController.applyDiscount);
 router.delete('/clear', cartController.clearCart);
+router.delete('/cart/removeAll/:idSanPham', cartController.removeAllProduct);
 
 module.exports = router;

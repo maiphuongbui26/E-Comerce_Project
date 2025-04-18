@@ -39,7 +39,6 @@ const orderSchema = new mongoose.Schema({
         TenKichThuoc: {
           type: String,
           enum: ['S', 'M', 'L'],
-          required: true
         }
       },
       GiaTien: Number,
@@ -51,26 +50,12 @@ const orderSchema = new mongoose.Schema({
     TamTinh: Number,
     TongTien: Number,
   },
-  MaGiamGia: {
-    type: String,
-    trim: true,
-  },
-  PhiShip: {
-    type: Number,
-    default: 0,
-  },
-  TongTien: {
-    type: Number,
-    required: true,
-  },
   DiaChiGiaoHang: {
     type: String,
-    required: true,
   },
   PhuongThucThanhToan: {
     type: String,
     enum: ["cash", "credit_card", "bank_transfer", "e_wallet"],
-    required: true,
   },
   TrangThaiDonHang: {
     type: String,

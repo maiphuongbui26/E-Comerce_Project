@@ -13,7 +13,8 @@ const EditPromotion = () => {
   const [formData, setFormData] = useState({
     TenChuongTrinh: '',
     NgayBatDau: '',
-    NgayKetThuc: ''
+    NgayKetThuc: '',
+    PhanTramGiam: '' // Thêm trường mới
   });
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +32,8 @@ const EditPromotion = () => {
         setFormData({
           TenChuongTrinh: discount.TenChuongTrinh,
           NgayBatDau: new Date(discount.NgayBatDau).toISOString().split('T')[0],
-          NgayKetThuc: new Date(discount.NgayKetThuc).toISOString().split('T')[0]
+          NgayKetThuc: new Date(discount.NgayKetThuc).toISOString().split('T')[0],
+          PhanTramGiam: discount.PhanTramGiam || '' // Thêm giá trị PhanTramGiam
         });
       }
     }
@@ -55,6 +57,19 @@ const EditPromotion = () => {
               label="Tên chương trình"
               value={formData.TenChuongTrinh}
               onChange={(e) => setFormData({ ...formData, TenChuongTrinh: e.target.value })}
+            />
+            {/* Thêm field mới */}
+            <TextField
+              required
+              fullWidth
+              label="Phần trăm giảm"
+              type="number"
+              InputProps={{ 
+                inputProps: { min: 0, max: 100 },
+                endAdornment: <Typography>%</Typography>
+              }}
+              value={formData.PhanTramGiam}
+              onChange={(e) => setFormData({ ...formData, PhanTramGiam: e.target.value })}
             />
             <TextField
               required

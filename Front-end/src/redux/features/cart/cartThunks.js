@@ -50,11 +50,13 @@ export const updateCartItem = createAsyncThunk(
   async ({ itemId, quantity }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
       const response = await axios.put(
         `${BASE_URL}/cart/quantity`,
         { 
           idSanPham: itemId,
-          SoLuong: quantity 
+          SoLuong: quantity,
+          idUser: user?.id
         },
         {
           headers: {
@@ -72,11 +74,15 @@ export const updateCartItem = createAsyncThunk(
 
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
-  async (itemId, { rejectWithValue }) => {
+  async ({ itemId, userId }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.delete(`${BASE_URL}/cart/remove/${itemId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        data: { idUser: userId }
       });
       return response.data.cart;
     } catch (error) {
@@ -94,6 +100,25 @@ export const clearCart = createAsyncThunk(
         headers: { Authorization: `Bearer ${token}` },
       });
       return true;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const removeAllFromCart = createAsyncThunk(
+  "cart/removeAllFromCart",
+  async ({ itemId, userId }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.delete(`${BASE_URL}/cart/removeAll/${itemId}`, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        data: { idUser: userId }
+      });
+      return response.data.cart;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

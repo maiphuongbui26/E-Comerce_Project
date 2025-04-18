@@ -6,6 +6,7 @@ import {
   removeFromCart,
   clearCart 
 } from '../redux/features/cart/cartThunks';
+import { removeAllFromCart } from '../redux/features/cart/cartThunks';
 
 export const useCart = () => {
   const dispatch = useDispatch();
@@ -31,7 +32,12 @@ export const useCart = () => {
 
   const handleUpdateCartItem = async (itemId, quantity) => {
     try {
-      await dispatch(updateCartItem({ itemId, quantity })).unwrap();
+      const user = JSON.parse(localStorage.getItem("user"));
+      await dispatch(updateCartItem({ 
+        itemId, 
+        quantity,
+        userId: user?.id 
+      })).unwrap();
       return true;
     } catch (error) {
       console.error('Error updating cart item:', error);
@@ -41,7 +47,11 @@ export const useCart = () => {
 
   const handleRemoveFromCart = async (itemId) => {
     try {
-      await dispatch(removeFromCart(itemId)).unwrap();
+      const user = JSON.parse(localStorage.getItem("user"));
+      await dispatch(removeFromCart({ 
+        itemId,
+        userId: user?.id
+      })).unwrap();
       return true;
     } catch (error) {
       console.error('Error removing from cart:', error);
@@ -59,6 +69,20 @@ export const useCart = () => {
     }
   };
 
+  const handleRemoveAllFromCart = async (itemId) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      await dispatch(removeAllFromCart({ 
+        itemId,
+        userId: user?.id
+      })).unwrap();
+      return true;
+    } catch (error) {
+      console.error('Error removing all items from cart:', error);
+      return false;
+    }
+  };
+
   return {
     cartItems,
     isLoading,
@@ -68,6 +92,7 @@ export const useCart = () => {
     handleAddToCart,
     handleUpdateCartItem,
     handleRemoveFromCart,
+    handleRemoveAllFromCart,
     handleClearCart
   };
 };

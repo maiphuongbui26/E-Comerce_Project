@@ -1,54 +1,23 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  fetchOrders,
-  fetchOrderById,
-  createOrder,
-  updateOrder,
-  deleteOrder,
-  updateOrderStatus
-} from './orderThunks';
+import { fetchOrders, fetchOrderById, createOrder, updateOrderStatus } from './orderThunks';
 
 const initialState = {
   orders: [],
   selectedOrder: null,
   isLoading: false,
   error: null,
-  filters: {
-    search: '',
-    status: 'all',
-    dateRange: {
-      start: null,
-      end: null
-    }
-  },
-  totalOrders: 0,
-  stats: {
-    pending: 0,
-    confirmed: 0,
-    shipping: 0,
-    completed: 0,
-    cancelled: 0
-  }
+  totalOrders: 0
 };
 
 const orderSlice = createSlice({
   name: 'orders',
   initialState,
   reducers: {
-    setFilters: (state, action) => {
-      state.filters = { ...state.filters, ...action.payload };
-    },
     clearSelectedOrder: (state) => {
       state.selectedOrder = null;
     },
     clearError: (state) => {
       state.error = null;
-    },
-    updateOrderStats: (state) => {
-      state.stats = state.orders.reduce((acc, order) => {
-        acc[order.status.toLowerCase()] = (acc[order.status.toLowerCase()] || 0) + 1;
-        return acc;
-      }, {});
     }
   },
   extraReducers: (builder) => {
@@ -89,42 +58,9 @@ const orderSlice = createSlice({
       })
       .addCase(createOrder.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orders.unshift(action.payload);
-        state.totalOrders += 1;
+        state.orders.unshift(action.payload.order);
       })
       .addCase(createOrder.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-
-      // Update Order
-      .addCase(updateOrder.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(updateOrder.fulfilled, (state, action) => {
-        state.isLoading = false;
-        const index = state.orders.findIndex(order => order.id === action.payload.id);
-        if (index !== -1) {
-          state.orders[index] = action.payload;
-        }
-      })
-      .addCase(updateOrder.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-
-      // Delete Order
-      .addCase(deleteOrder.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(deleteOrder.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.orders = state.orders.filter(order => order.id !== action.payload);
-        state.totalOrders -= 1;
-      })
-      .addCase(deleteOrder.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
@@ -136,9 +72,9 @@ const orderSlice = createSlice({
       })
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
         state.isLoading = false;
-        const index = state.orders.findIndex(order => order.id === action.payload.id);
+        const index = state.orders.findIndex(order => order.idDonHang === action.payload.order.idDonHang);
         if (index !== -1) {
-          state.orders[index] = action.payload;
+          state.orders[index] = action.payload.order;
         }
       })
       .addCase(updateOrderStatus.rejected, (state, action) => {
@@ -148,16 +84,12 @@ const orderSlice = createSlice({
   }
 });
 
-// Actions
-export const { setFilters, clearSelectedOrder, clearError, updateOrderStats } = orderSlice.actions;
+export const { clearSelectedOrder, clearError } = orderSlice.actions;
 
-// Selectors
 export const selectAllOrders = (state) => state.orders.orders;
 export const selectSelectedOrder = (state) => state.orders.selectedOrder;
 export const selectOrderLoading = (state) => state.orders.isLoading;
 export const selectOrderError = (state) => state.orders.error;
-export const selectOrderFilters = (state) => state.orders.filters;
 export const selectTotalOrders = (state) => state.orders.totalOrders;
-export const selectOrderStats = (state) => state.orders.stats;
 
 export default orderSlice.reducer;

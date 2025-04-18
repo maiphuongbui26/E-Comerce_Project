@@ -6,6 +6,7 @@ import {
   removeFromCart,
   clearCart
 } from './cartThunks';
+import { removeAllFromCart } from './cartThunks';
 
 const initialState = {
   cartItems: [], // Will store DanhSachSanPham
@@ -107,6 +108,23 @@ const cartSlice = createSlice({
         state.totalAmount = 0;
       })
       .addCase(clearCart.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      // Remove All From Cart
+      .addCase(removeAllFromCart.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(removeAllFromCart.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.cartItems = action.payload.DanhSachSanPham;
+        state.totalAmount = state.cartItems.reduce((total, item) => 
+          total + (item.GiaSanPham * item.SoLuong), 0
+        );
+      })
+      .addCase(removeAllFromCart.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

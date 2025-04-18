@@ -72,6 +72,7 @@ const PromotionManagement = () => {
               <TableRow>
                 <TableCell>Mã giảm giá</TableCell>
                 <TableCell>Tên chương trình</TableCell>
+                <TableCell>Phần trăm giảm</TableCell> {/* Thêm cột mới */}
                 <TableCell>Ngày bắt đầu</TableCell>
                 <TableCell>Ngày kết thúc</TableCell>
                 <TableCell align="center">Thao tác</TableCell>
@@ -97,6 +98,7 @@ const PromotionManagement = () => {
                   <TableRow key={discount.id}>
                     <TableCell>{discount.id}</TableCell>
                     <TableCell>{discount.TenChuongTrinh}</TableCell>
+                    <TableCell>{discount?.PhanTramGiam ?`${discount?.PhanTramGiam}%`: "Chưa đặt giảm giá"}</TableCell> {/* Thêm cell mới */}
                     <TableCell>{new Date(discount.NgayBatDau).toLocaleDateString('vi-VN')}</TableCell>
                     <TableCell>{new Date(discount.NgayKetThuc).toLocaleDateString('vi-VN')}</TableCell>
                     <TableCell align="center">

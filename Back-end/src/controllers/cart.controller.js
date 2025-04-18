@@ -25,7 +25,6 @@ const cartController = {
   // Get cart by user
   getCart: async (req, res) => {
     try {
-      console.log(req)
       const cart = await Cart.findOne({ 
         NguoiDung: req.params.idUser,
         TrangThai: 'active'
@@ -45,7 +44,6 @@ const cartController = {
   addProduct: async (req, res) => {
     try {
       const { idSanPham, SoLuong, MauSac, KichThuoc,user } = req.body;
-      console.log(req.body)
       let cart = await Cart.findOne({ 
         NguoiDung: user.id,
         TrangThai: 'active'
@@ -59,7 +57,6 @@ const cartController = {
         });
       }
       const product = await Product.findOne({ idSanPham:  idSanPham});
-      console.log("product",product)
       if (!product) {
         return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
       }
@@ -97,28 +94,34 @@ const cartController = {
   // Update product quantity in cart
   updateQuantity: async (req, res) => {
     try {
-      const { idSanPham, SoLuong } = req.body;
-      
+      const { idSanPham, SoLuong, idUser } = req.body;
+      // Tìm giỏ hàng
       const cart = await Cart.findOne({ 
-        NguoiDung: req.user._id,
+        NguoiDung: idUser,
         TrangThai: 'active'
       });
-
       if (!cart) {
         return res.status(404).json({ message: 'Không tìm thấy giỏ hàng' });
       }
-
-      const productIndex = cart.DanhSachSanPham.findIndex(
-        item => item.idSanPham === idSanPham
-      );
-
-      if (productIndex === -1) {
-        return res.status(404).json({ message: 'Không tìm thấy sản phẩm trong giỏ hàng' });
+      // Tìm sản phẩm trong database
+      const product = await Product.findOne({ idSanPham: idSanPham });
+      if (!product) {
+        return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
       }
-
-      cart.DanhSachSanPham[productIndex].SoLuong = SoLuong;
+        // Nếu sản phẩm chưa có trong giỏ hàng, thêm mới
+        cart.DanhSachSanPham.push({
+          idSanPham: product.idSanPham,
+          TenSanPham: product.TenSanPham,
+          LoaiSanPham: product.LoaiSanPham,
+          DanhMuc: product.DanhMuc,
+          DonGia: product.DonGia,
+          HinhAnh: product.HinhAnh.length > 0 ? product.HinhAnh[0] : [],
+          SoLuong,
+          MauSacDaChon: product.MauSac[0].TenMau,
+          KichThuoc: product.KichThuoc ? product.KichThuoc[0] : [], 
+          GiaTien: product.GiaSanPham
+        });
       await cart.save();
-
       res.json({ 
         message: 'Cập nhật số lượng thành công',
         cart 
@@ -132,21 +135,30 @@ const cartController = {
   removeProduct: async (req, res) => {
     try {
       const { idSanPham } = req.params;
+      const { idUser } = req.body;
       
       const cart = await Cart.findOne({ 
-        NguoiDung: req.user._id,
+        NguoiDung: idUser,
         TrangThai: 'active'
       });
-
+  
       if (!cart) {
         return res.status(404).json({ message: 'Không tìm thấy giỏ hàng' });
       }
-
-      cart.DanhSachSanPham = cart.DanhSachSanPham.filter(
-        item => item.idSanPham !== idSanPham
+  
+      // Tìm và xóa một sản phẩm có idSanPham
+      const productIndex = cart.DanhSachSanPham.findIndex(
+        item => item.idSanPham === idSanPham
       );
-
+  
+      if (productIndex === -1) {
+        return res.status(404).json({ message: 'Không tìm thấy sản phẩm trong giỏ hàng' });
+      }
+  
+      // Xóa một sản phẩm khỏi mảng
+      cart.DanhSachSanPham.splice(productIndex, 1);
       await cart.save();
+  
       res.json({ 
         message: 'Xóa sản phẩm khỏi giỏ hàng thành công',
         cart 
@@ -194,6 +206,7 @@ const cartController = {
         return res.status(404).json({ message: 'Không tìm thấy giỏ hàng' });
       }
 
+    
       cart.DanhSachSanPham = [];
       cart.TongTienHang = 0;
       cart.GiamGia = 0;
@@ -208,7 +221,36 @@ const cartController = {
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
-  }
+  },
+    removeAllProduct: async (req, res) => {
+      try {
+        const { idSanPham } = req.params;
+        const { idUser } = req.body;
+        
+        const cart = await Cart.findOne({ 
+          NguoiDung: idUser,
+          TrangThai: 'active'
+        });
+    
+        if (!cart) {
+          return res.status(404).json({ message: 'Không tìm thấy giỏ hàng' });
+        }
+    
+        // Lọc bỏ tất cả sản phẩm có idSanPham khớp
+        cart.DanhSachSanPham = cart.DanhSachSanPham.filter(
+          item => item.idSanPham !== idSanPham
+        );
+    
+        await cart.save();
+    
+        res.json({ 
+          message: 'Đã xóa tất cả sản phẩm khỏi giỏ hàng',
+          cart 
+        });
+      } catch (error) {
+        res.status(400).json({ message: error.message });
+      }
+    }
 };
 
 module.exports = cartController;

@@ -31,7 +31,20 @@ export const createOrder = createAsyncThunk(
   'orders/createOrder',
   async (orderData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${BASE_URL}/orders`, orderData);
+      const user = JSON.parse(localStorage.getItem('user'));
+      const response = await axios.post(`${BASE_URL}/orders/create`, {...orderData,idUser: user.id});
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const updateOrderStatus = createAsyncThunk(
+  'orders/updateStatus',
+  async ({ orderId, TrangThaiDonHang }, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(`${BASE_URL}/orders/${orderId}/status`, { TrangThaiDonHang });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -57,18 +70,6 @@ export const deleteOrder = createAsyncThunk(
     try {
       await axios.delete(`${BASE_URL}/orders/${orderId}`);
       return orderId;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const updateOrderStatus = createAsyncThunk(
-  'orders/updateStatus',
-  async ({ orderId, status }, { rejectWithValue }) => {
-    try {
-      const response = await axios.patch(`${BASE_URL}/orders/${orderId}/status`, { status });
-      return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

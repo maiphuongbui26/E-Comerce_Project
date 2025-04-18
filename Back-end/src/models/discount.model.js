@@ -19,6 +19,12 @@ const discountSchema = new mongoose.Schema({
   NgayKetThuc: {
     type: Date,
     required: true
+  },
+  PhanTramGiam: {
+    type: Number,
+    required: true,
+    min: 0,
+    max: 100 // Giới hạn phần trăm từ 0-100
   }
 }, {
   timestamps: true
