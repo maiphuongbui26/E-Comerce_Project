@@ -1,43 +1,114 @@
-import { Box, Typography, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Select, MenuItem } from '@mui/material';
+import { Box, Typography, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, Menu, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import { useState } from 'react';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useOrder } from '../../../hooks/useOrder';
 
 const OrderManagement = () => {
   const navigate = useNavigate();
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const { handleFetchOrders, orders, handleUpdateOrderStatus, handleDeleteOrder } = useOrder();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
-  const mockData = [
-    { id: 1, orderNumber: "#9603", customerName: "Joe Schilder", phone: "0123456789", address: "1631 Melgu Square", registered: "29.07.2023", status: "Confirm", total: "1,550,000đ" },
-    { id: 2, orderNumber: "#7174", customerName: "Phoebe Venturi", phone: "0987654321", address: "1804 Ahedi Trail", registered: "14.07.2023", status: "Complete", total: "2,150,000đ" },
-    { id: 3, orderNumber: "#2585", customerName: "Caroline Pandolfi", phone: "0369852147", address: "1060 Ejeaba Square", registered: "10.07.2023", status: "Pending", total: "850,000đ" },
-  ];
+  useEffect(() => {
+    handleFetchOrders()
+  }, []);
 
-  const handleOpenModal = (order) => {
+  const handleStatusClick = (event, order) => {
+    setAnchorEl(event.currentTarget);
     setSelectedOrder(order);
-    setOpenModal(true);
   };
 
-  const handleCloseModal = () => {
+  const handleStatusClose = () => {
+    setAnchorEl(null);
     setSelectedOrder(null);
-    setOpenModal(false);
+  };
+
+  const handleStatusUpdate = async (newStatus) => {
+    if (selectedOrder) {
+      try {
+        await handleUpdateOrderStatus({
+          orderId: selectedOrder.idDonHang,
+          TrangThaiDonHang: newStatus
+        });
+        // Refresh orders after update
+        await handleFetchOrders();
+        handleStatusClose();
+      } catch (error) {
+        console.error('Error updating order status:', error);
+      }
+    }
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      Pending: '#ffa726',
-      Confirm: '#42a5f5',
-      Shipping: '#ab47bc',
-      Complete: '#66bb6a',
-      Cancel: '#ef5350'
+      pending: '#ffa726',
+      confirmed: '#42a5f5',
+      shipping: '#ab47bc',
+      delivered: '#66bb6a',
+      cancelled: '#ef5350'
     };
     return colors[status] || '#757575';
+  };
+
+  const getStatusText = (status) => {
+    const statusMap = {
+      pending: "Chờ xác nhận",
+      confirmed: "Đã xác nhận",
+      shipping: "Đang giao hàng",
+      delivered: "Đã giao hàng",
+      cancelled: "Đã hủy",
+    };
+    return statusMap[status] || status;
+  };
+
+  const getPaymentMethodText = (method) => {
+    const paymentMethodMap = {
+      cash: "Tiền mặt khi nhận hàng",
+      credit_card: "Thẻ tín dụng",
+      bank_transfer: "Chuyển khoản ngân hàng",
+      e_wallet: "Ví điện tử"
+    };
+    return paymentMethodMap[method] || method;
+  };
+
+  const filteredOrders = orders.filter(order => {
+    const matchesStatus = statusFilter === 'all' || order.TrangThaiDonHang === statusFilter;
+    const matchesSearch = searchTerm === '' || 
+      order.idDonHang.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.DiaChiGiaoHang.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
+
+  const handleDeleteClick = (order) => {
+    setOrderToDelete(order);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (orderToDelete) {
+      try {
+        const success = await handleDeleteOrder(orderToDelete.idDonHang);
+        if (success) {
+          await handleFetchOrders();
+        }
+      } catch (error) {
+        console.error('Error deleting order:', error);
+      }
+    }
+    setDeleteDialogOpen(false);
+    setOrderToDelete(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setOrderToDelete(null);
   };
 
   return (
@@ -58,6 +129,8 @@ const OrderManagement = () => {
             <TextField 
               size="small"
               placeholder="Tìm kiếm đơn hàng"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
                 startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />,
               }}
@@ -70,20 +143,13 @@ const OrderManagement = () => {
               sx={{ width: 150 }}
             >
               <MenuItem value="all">Tất cả</MenuItem>
-              <MenuItem value="Pending">Chờ xác nhận</MenuItem>
-              <MenuItem value="Confirm">Đã xác nhận</MenuItem>
-              <MenuItem value="Shipping">Đang giao</MenuItem>
-              <MenuItem value="Complete">Hoàn thành</MenuItem>
-              <MenuItem value="Cancel">Đã hủy</MenuItem>
+              <MenuItem value="pending">Chờ xác nhận</MenuItem>
+              <MenuItem value="confirmed">Đã xác nhận</MenuItem>
+              <MenuItem value="shipping">Đang giao</MenuItem>
+              <MenuItem value="delivered">Hoàn thành</MenuItem>
+              <MenuItem value="cancelled">Đã hủy</MenuItem>
             </Select>
           </Box>
-          {/* <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => navigate('/admin/orders/add')}
-          >
-            Thêm đơn hàng
-          </Button> */}
         </Box>
 
         <TableContainer component={Paper} elevation={0}>
@@ -91,8 +157,8 @@ const OrderManagement = () => {
             <TableHead sx={{ bgcolor: '#f8f9fa' }}>
               <TableRow>
                 <TableCell>Mã đơn hàng</TableCell>
-                <TableCell>Khách hàng</TableCell>
-                <TableCell>Số điện thoại</TableCell>
+                <TableCell>Địa chỉ giao hàng</TableCell>
+                <TableCell>Phương thức thanh toán</TableCell>
                 <TableCell>Ngày đặt</TableCell>
                 <TableCell>Tổng tiền</TableCell>
                 <TableCell>Trạng thái</TableCell>
@@ -100,37 +166,48 @@ const OrderManagement = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockData.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>{row.orderNumber}</TableCell>
-                  <TableCell>{row.customerName}</TableCell>
-                  <TableCell>{row.phone}</TableCell>
-                  <TableCell>{row.registered}</TableCell>
-                  <TableCell>{row.total}</TableCell>
+              {filteredOrders.map((order) => (
+                <TableRow key={order._id}>
+                  <TableCell>{order.idDonHang}</TableCell>
+                  <TableCell>{order.DiaChiGiaoHang}</TableCell>
+                  <TableCell>{getPaymentMethodText(order.PhuongThucThanhToan)}</TableCell>
                   <TableCell>
-                    <Box
+                    {new Date(order.NgayDatHang).toLocaleDateString('vi-VN')}
+                  </TableCell>
+                  <TableCell>
+                    {order.GioHang.TongTien.toLocaleString('vi-VN')}đ
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      onClick={(e) => handleStatusClick(e, order)}
                       sx={{
-                        bgcolor: `${getStatusColor(row.status)}20`,
-                        color: getStatusColor(row.status),
+                        bgcolor: `${getStatusColor(order.TrangThaiDonHang)}20`,
+                        color: getStatusColor(order.TrangThaiDonHang),
                         py: 0.5,
                         px: 1.5,
                         borderRadius: 1,
-                        display: 'inline-block',
-                        fontSize: '0.875rem'
+                        fontSize: '0.875rem',
+                        textTransform: 'none',
+                        '&:hover': {
+                          bgcolor: `${getStatusColor(order.TrangThaiDonHang)}30`,
+                        }
                       }}
                     >
-                      {row.status}
-                    </Box>
+                      {getStatusText(order.TrangThaiDonHang)}
+                    </Button>
                   </TableCell>
                   <TableCell align="center">
                     <IconButton 
                       size="small"
-                      onClick={() => navigate(`/admin/orders/edit/${row.id}`)}
+                      onClick={() => navigate(`/admin/orders/${order._id}`)}
                       sx={{ mr: 1 }}
                     >
-                      <EditIcon fontSize="small" sx={{ color: '#66bb6a' }} />
+                      <VisibilityIcon fontSize="small" sx={{ color: '#1976d2' }} />
                     </IconButton>
-                    <IconButton size="small">
+                    <IconButton 
+                      size="small"
+                      onClick={() => handleDeleteClick(order)}
+                    >
                       <DeleteIcon fontSize="small" sx={{ color: '#f44336' }} />
                     </IconButton>
                   </TableCell>
@@ -139,6 +216,90 @@ const OrderManagement = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
+        {/* Status Update Menu */}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleStatusClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+        >
+          <MenuItem 
+            onClick={() => handleStatusUpdate('pending')}
+            sx={{ 
+              color: getStatusColor('pending'),
+              '&:hover': { bgcolor: `${getStatusColor('pending')}10` }
+            }}
+          >
+            {getStatusText('pending')}
+          </MenuItem>
+          <MenuItem 
+            onClick={() => handleStatusUpdate('confirmed')}
+            sx={{ 
+              color: getStatusColor('confirmed'),
+              '&:hover': { bgcolor: `${getStatusColor('confirmed')}10` }
+            }}
+          >
+            {getStatusText('confirmed')}
+          </MenuItem>
+          <MenuItem 
+            onClick={() => handleStatusUpdate('shipping')}
+            sx={{ 
+              color: getStatusColor('shipping'),
+              '&:hover': { bgcolor: `${getStatusColor('shipping')}10` }
+            }}
+          >
+            {getStatusText('shipping')}
+          </MenuItem>
+          <MenuItem 
+            onClick={() => handleStatusUpdate('delivered')}
+            sx={{ 
+              color: getStatusColor('delivered'),
+              '&:hover': { bgcolor: `${getStatusColor('delivered')}10` }
+            }}
+          >
+            {getStatusText('delivered')}
+          </MenuItem>
+          <MenuItem 
+            onClick={() => handleStatusUpdate('cancelled')}
+            sx={{ 
+              color: getStatusColor('cancelled'),
+              '&:hover': { bgcolor: `${getStatusColor('cancelled')}10` }
+            }}
+          >
+            {getStatusText('cancelled')}
+          </MenuItem>
+        </Menu>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={handleDeleteCancel}
+        >
+          <DialogTitle>
+            Xác nhận xóa đơn hàng
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Bạn có chắc chắn muốn xóa đơn hàng #{orderToDelete?.idDonHang}? Hành động này không thể hoàn tác.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeleteCancel} color="primary">
+              Hủy
+            </Button>
+            <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+              Xóa
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </>
   );

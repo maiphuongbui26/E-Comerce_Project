@@ -37,8 +37,18 @@ const getStatusText = (status) => {
   return statusMap[status] || status;
 };
 
+const getPaymentMethodText = (method) => {
+  const paymentMethodMap = {
+    cash: "Tiền mặt khi nhận hàng",
+    credit_card: "Thẻ tín dụng",
+    bank_transfer: "Chuyển khoản ngân hàng",
+    e_wallet: "Ví điện tử"
+  };
+  return paymentMethodMap[method] || method;
+};
+
 const Order = () => {
-  const { handleFetchOrders } = useOrder();
+  const { handleFetchOrders, handleCancelOrder } = useOrder();
   const { getUser,user } = useAuth();
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
@@ -50,21 +60,33 @@ const Order = () => {
     fetchOrders();
     getUser()
   }, []);
-// Thêm hàm helper để tổng hợp sản phẩm
-const consolidateProducts = (products) => {
-  const consolidated = {};
-  products.forEach(product => {
-    if (consolidated[product.idSanPham]) {
-      consolidated[product.idSanPham].SoLuong += product.SoLuong;
-      consolidated[product.idSanPham].ThanhTien += product.ThanhTien;
-    } else {
-      consolidated[product.idSanPham] = { ...product };
+
+  const consolidateProducts = (products) => {
+    return products.reduce((acc, product) => {
+      const existingProduct = acc.find(p => p.idSanPham === product.idSanPham);
+      if (existingProduct) {
+        existingProduct.SoLuong += product.SoLuong;
+        existingProduct.ThanhTien += product.ThanhTien;
+      } else {
+        acc.push({ ...product });
+      }
+      return acc;
+    }, []);
+  };
+
+  const handleCancel = async (orderId) => {
+    try {
+      const result = await handleCancelOrder(orderId);
+      if (result) {
+        // Refresh orders list after cancellation
+        const updatedOrders = await handleFetchOrders();
+        setOrders(Array.isArray(updatedOrders) ? updatedOrders : updatedOrders.orders || []);
+      }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
     }
-  });
-  console.log("consolidated",consolidated)
-  return Object.values(consolidated);
-};
-// Trong phần render products, thay đổi như sau:
+  };
+
   return (
     <Box sx={{ maxWidth: "1240px", margin: "0 auto", padding: "40px 20px" }}>
       <Box sx={{ display: "flex", gap: 4 }}>
@@ -97,14 +119,34 @@ const consolidateProducts = (products) => {
                     <Typography variant="h6" sx={{ fontWeight: 600 }}>
                       Đơn hàng #{order.idDonHang}
                     </Typography>
-                    <Chip
-                      label={getStatusText(order.TrangThaiDonHang)}
-                      sx={{
-                        bgcolor: getStatusColor(order.TrangThaiDonHang).bg,
-                        color: getStatusColor(order.TrangThaiDonHang).color,
-                        fontWeight: 500,
-                      }}
-                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      {order.TrangThaiDonHang === "pending" && (
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          onClick={() => handleCancel(order.idDonHang)}
+                          sx={{
+                            borderColor: '#dc0606',
+                            color: '#dc0606',
+                            '&:hover': {
+                              borderColor: '#b00404',
+                              backgroundColor: 'rgba(220, 6, 6, 0.04)'
+                            }
+                          }}
+                        >
+                          Hủy đơn hàng
+                        </Button>
+                      )}
+                      <Chip
+                        label={getStatusText(order.TrangThaiDonHang)}
+                        sx={{
+                          bgcolor: getStatusColor(order.TrangThaiDonHang).bg,
+                          color: getStatusColor(order.TrangThaiDonHang).color,
+                          fontWeight: 500,
+                        }}
+                      />
+                    </Box>
                   </Box>
 
                   {/* Order Info */}
@@ -120,9 +162,7 @@ const consolidateProducts = (products) => {
                     <Grid item xs={6}>
                       <Typography sx={{ color: "#666" }}>
                         Thanh toán:{" "}
-                        {order.PhuongThucThanhToan === "cash"
-                          ? "Tiền mặt"
-                          : order.PhuongThucThanhToan}
+                        {getPaymentMethodText(order.PhuongThucThanhToan)}
                       </Typography>
                     </Grid>
                   </Grid>

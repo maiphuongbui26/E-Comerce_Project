@@ -337,7 +337,7 @@ const Home = () => {
                           fontWeight: "600",
                         }}
                       >
-                        ({product.SoLuong} đã bán)
+                        ({product?.DaBan} đã bán)
                       </Typography>
                     </Box>
                   </Box>

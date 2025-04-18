@@ -46,6 +46,7 @@ import Sales from "./page/users/product/sale/Sale";
 import WarehouseManagement from "./page/admin/warehouse_management/WarehouseManagement";
 import WarehouseForm from "./page/admin/warehouse_management/WarehouseForm";
 import WarehouseDetail from "./page/admin/warehouse_management/WarehouseDetail";
+import OrderDetail from "./page/admin/order_management/OrderDetail";
 
 function App() {
   return (
@@ -105,7 +106,10 @@ function App() {
           <Route index element={<CategoryManagement />} />
           <Route path=":id" element={<CategoryDetail />} />
         </Route>
-        <Route path="orders" element={<OrderManagement />} />
+        <Route path="orders">
+          <Route index element={<OrderManagement />} />
+          <Route path=":id" element={<OrderDetail />} />
+        </Route>
         <Route path="products">
           <Route index element={<ProductManagement />} />
           <Route path="add" element={<AddProduct />} />

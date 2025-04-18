@@ -3,16 +3,19 @@ const router = express.Router();
 const orderController = require('../controllers/order.controller');
 const { verifyToken, verifyAdmin } = require('../middlewares/auth.middleware');
 
-// User routes
-// router.use(verifyToken);
-router.get('/', orderController.getAll);
-router.post('/create', orderController.create);
-router.get('/my-orders', orderController.getUserOrders);
-router.get('/:id', orderController.getById);
-router.put('/cancel/:id', orderController.cancelOrder);
+// Apply verifyToken to all routes
+router.use(verifyToken);
 
-// Admin routes
+// Public routes (require only authentication)
+router.get('/user-orders', orderController.getUserOrders);
+router.post('/:id/cancel', orderController.cancelOrder);
+
+// Admin routes (require both authentication and admin role)
 router.use(verifyAdmin);
-router.put('/status/:id', orderController.updateStatus);
+router.get('/', orderController.getAll);
+router.get('/:id', orderController.getById);
+router.post('/create', orderController.create);
+router.patch('/:id/status', orderController.updateStatus);
+router.delete('/:id', orderController.deleteOrder);
 
 module.exports = router;

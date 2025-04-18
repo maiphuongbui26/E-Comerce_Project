@@ -34,8 +34,8 @@ app.use(cookieParser());
 app.use(cors({
   origin: 'http://localhost:5173', // Frontend URL
   credentials: true, // Cho phép gửi cookies
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 // Routes
 app.use('/api/users', userRoutes);

@@ -3,11 +3,21 @@ import axios from 'axios';
 
 const BASE_URL = 'http://localhost:8080/api';
 
+// Helper function to get auth header
+const getAuthHeader = () => {
+  const token = localStorage.getItem('adminToken');
+  return {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  };
+};
+
 export const fetchOrders = createAsyncThunk(
   'orders/fetchOrders',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/orders`);
+      const response = await axios.get(`${BASE_URL}/orders`, getAuthHeader());
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -19,7 +29,7 @@ export const fetchOrderById = createAsyncThunk(
   'orders/fetchOrderById',
   async (orderId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/orders/${orderId}`);
+      const response = await axios.get(`${BASE_URL}/orders/${orderId}`, getAuthHeader());
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -32,7 +42,10 @@ export const createOrder = createAsyncThunk(
   async (orderData, { rejectWithValue }) => {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
-      const response = await axios.post(`${BASE_URL}/orders/create`, {...orderData,idUser: user.id});
+      const response = await axios.post(`${BASE_URL}/orders/create`, 
+        {...orderData, idUser: user.id},
+        getAuthHeader()
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -44,7 +57,11 @@ export const updateOrderStatus = createAsyncThunk(
   'orders/updateStatus',
   async ({ orderId, TrangThaiDonHang }, { rejectWithValue }) => {
     try {
-      const response = await axios.patch(`${BASE_URL}/orders/${orderId}/status`, { TrangThaiDonHang });
+      const response = await axios.patch(
+        `${BASE_URL}/orders/${orderId}/status`, 
+        { TrangThaiDonHang },
+        getAuthHeader()
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -70,6 +87,22 @@ export const deleteOrder = createAsyncThunk(
     try {
       await axios.delete(`${BASE_URL}/orders/${orderId}`);
       return orderId;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const cancelOrder = createAsyncThunk(
+  'orders/cancelOrder',
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/orders/${orderId}/cancel`,
+        {},
+        getAuthHeader()
+      );
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

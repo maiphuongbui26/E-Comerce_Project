@@ -29,6 +29,11 @@ const productSchema = new mongoose.Schema({
     required: true,
     default: 0
   },
+  DaBan: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
   Style: {
     id: String,
     TenStyle: String,
@@ -70,6 +75,7 @@ productSchema.index({ TenSanPham: 1 });
 productSchema.index({ GiaSanPham: 1 });
 productSchema.index({ 'LoaiSanPham.id': 1 });
 productSchema.index({ 'DanhMuc.id': 1 });
+productSchema.index({ DaBan: -1 });
 
 const Product = mongoose.model('Product', productSchema);
 module.exports = Product;

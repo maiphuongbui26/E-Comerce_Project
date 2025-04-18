@@ -1,5 +1,6 @@
 const Order = require('../models/order.model');
 const Cart = require('../models/cart.model');
+const Product = require('../models/product.model');
 const generateOrderId = require('../utils/generateId');
 
 const orderController = {
@@ -102,6 +103,29 @@ const orderController = {
         return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
       }
 
+      // Nếu đơn hàng chuyển sang trạng thái đã giao
+      if (TrangThaiDonHang === 'delivered' && order.TrangThaiDonHang !== 'delivered') {
+        // Cập nhật số lượng đã bán cho từng sản phẩm trong đơn hàng
+        const updatePromises = order.GioHang.DanhSachSanPham.map(async (item) => {
+          await Product.findOneAndUpdate(
+            { idSanPham: item.idSanPham },
+            { $inc: { DaBan: item.SoLuong } }
+          );
+        });
+        await Promise.all(updatePromises);
+      }
+      // Nếu đơn hàng từ trạng thái đã giao chuyển sang hủy
+      else if (TrangThaiDonHang === 'cancelled' && order.TrangThaiDonHang === 'delivered') {
+        // Giảm số lượng đã bán của sản phẩm
+        const updatePromises = order.GioHang.DanhSachSanPham.map(async (item) => {
+          await Product.findOneAndUpdate(
+            { idSanPham: item.idSanPham },
+            { $inc: { DaBan: -item.SoLuong } }
+          );
+        });
+        await Promise.all(updatePromises);
+      }
+
       order.TrangThaiDonHang = TrangThaiDonHang;
       await order.save();
 
@@ -110,6 +134,7 @@ const orderController = {
         order
       });
     } catch (error) {
+      console.error('Error updating order status:', error);
       res.status(400).json({ message: error.message });
     }
   },
@@ -138,6 +163,33 @@ const orderController = {
       });
     } catch (error) {
       res.status(400).json({ message: error.message });
+    }
+  },
+
+  // Delete order
+  deleteOrder: async (req, res) => {
+    try {
+      const order = await Order.findOne({ idDonHang: req.params.id });
+
+      if (!order) {
+        return res.status(404).json({ message: 'Không tìm thấy đơn hàng' });
+      }
+
+      // Không cho phép xóa đơn hàng đang trong quá trình xử lý
+      if (['confirmed', 'shipping'].includes(order.TrangThaiDonHang)) {
+        return res.status(400).json({ 
+          message: 'Không thể xóa đơn hàng đang trong quá trình xử lý' 
+        });
+      }
+
+      await Order.deleteOne({ _id: order._id });
+
+      res.json({
+        message: 'Xóa đơn hàng thành công',
+        orderId: order.idDonHang
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
   }
 };

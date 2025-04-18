@@ -132,7 +132,7 @@ const Sales = () => {
                     textAlign: "center",
                   }}
                 >
-                  <span style={{color:"#D40404"}}>{product.SoLuong}</span> Sản phẩm đã bán
+                  <span style={{color:"#D40404"}}>{product.DaBan}</span> Sản phẩm đã bán
                 </Typography>
               </Box>
             </Grid2>

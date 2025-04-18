@@ -37,6 +37,7 @@ const Cart = () => {
     cartItems,
     handleUpdateCartItem,
     handleRemoveFromCart,
+    handleRemoveAllFromCart
   } = useCart();
   const { handleFetchDiscounts, discounts } = useDiscount();
   const { handleFetchProducts, products } = useProduct();
@@ -79,7 +80,7 @@ const Cart = () => {
 
   const handleDeleteCartItem = async (idSanPham) => {
     try {
-      await handleRemoveFromCart(idSanPham);
+      await handleRemoveAllFromCart(idSanPham);
       await handleFetchCart();
     } catch (error) {
       console.error("Error deleting cart item:", error);

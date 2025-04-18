@@ -5,13 +5,14 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import StarIcon from "@mui/icons-material/Star";
 import { ToastContainer, toast } from 'react-toastify';
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useProduct } from "../../../hooks/useProduct";
 import { useCart } from "../../../hooks/useCart";
 import { useAuth } from "../../../hooks/useAuth";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate()
   const { handleFetchProductById, selectedProduct,sizes,fetchAllData } = useProduct();
   const { handleAddToCart } = useCart();
   const { getUser,user } = useAuth();
@@ -284,6 +285,7 @@ const ProductDetail = () => {
                   bgcolor: "#000",
                 },
               }}
+              onClick={()=>{navigate('/user/cart')}}
             >
               MUA NGAY
             </Button>
