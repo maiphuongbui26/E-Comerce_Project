@@ -68,6 +68,7 @@ const AddProduct = () => {
   const [newColor, setNewColor] = useState({ MaMau: '', TenMau: '' });
 
 
+
   // Add this function to handle file selection
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);

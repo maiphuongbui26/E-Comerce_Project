@@ -24,7 +24,7 @@ const SearchForm = () => {
           justifyContent: "space-between",
           borderRadius: "3px",
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Add box shadow
-          margin: "0 auto", // Center horizontally
+          margin: "30px auto", // Center horizontally
         }}
       >
         <TextField

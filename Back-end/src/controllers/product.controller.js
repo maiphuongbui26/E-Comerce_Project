@@ -75,7 +75,6 @@ const productController = {
       
         productData.HinhAnh = imageUrls;
       }
-      console.log(productData);
       const product = new Product({
         idSanPham: generateProductId('SP'),
         ...productData
@@ -102,29 +101,25 @@ const productController = {
       }
 
       // Handle image uploads
-      if (req.files && req.files.length > 0) {
-        const newImageUrls = await Promise.all(req.files.map(async file => {
+      if (productData.HinhAnh && productData.HinhAnh.length > 0) {
+        const imageUrls = await Promise.all(productData.HinhAnh.map(async base64String => {
+          // Extract the base64 data
+          const base64Data = base64String.replace(/^data:image\/\w+;base64,/, '');
+          const buffer = Buffer.from(base64Data, 'base64');
+      
+          // Create directory if it doesn't exist
           const uploadDir = path.join(__dirname, '../../public/uploads/products');
           await fs.mkdir(uploadDir, { recursive: true });
-
-          const uniqueFilename = `${Date.now()}-${file.originalname}`;
+      
+          // Generate unique filename
+          const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
           const filePath = path.join(uploadDir, uniqueFilename);
-
-          await fs.writeFile(filePath, file.buffer);
+      
+          // Save file
+          await fs.writeFile(filePath, buffer);
           return `/uploads/products/${uniqueFilename}`;
         }));
-
-        // Keep existing images if specified
-        if (productData.keepExistingImages) {
-          productData.HinhAnh = [...(existingProduct.HinhAnh || []), ...newImageUrls];
-        } else {
-          // Delete old images
-          for (const imageUrl of existingProduct.HinhAnh || []) {
-            const imagePath = path.join(__dirname, '../../public', imageUrl);
-            await fs.unlink(imagePath).catch(console.error);
-          }
-          productData.HinhAnh = newImageUrls;
-        }
+        productData.HinhAnh = imageUrls;
       }
 
       const product = await Product.findOneAndUpdate(
@@ -138,7 +133,6 @@ const productController = {
         product 
       });
     } catch (error) {
-      // Delete new uploaded files if there's an error
       if (req.files) {
         for (const file of req.files) {
           const filePath = path.join(__dirname, '../../public/uploads/products', file.filename);

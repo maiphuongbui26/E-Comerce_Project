@@ -20,6 +20,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from "@mui/icons-material/Close";
 import { Drawer, Popper, Paper, Fade, Avatar } from "@mui/material";
 import { useAuth } from '../../hooks/useAuth'; 
+import { useCart } from "../../hooks/useCart";
 
 const menuItems = [
   { label: "Trang chủ", path: "/user", hidden: true },
@@ -90,6 +91,9 @@ const Header = () => {
   const [anchorElCart, setAnchorElCart] = useState(null); 
   const [anchorElHover, setAnchorElHover] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
+  const { handleFetchCart, cartItems, handleRemoveFromCart } = useCart();
+  // ... existing code ...
+
   const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
@@ -136,9 +140,20 @@ const Header = () => {
     setAnchorElHover(null);
     setActiveMenu(null);
   };
+  const consolidatedCartItems = cartItems.reduce((acc, item) => {
+    const existingItem = acc.find(i => i.idSanPham === item.idSanPham);
+    if (existingItem) {
+      existingItem.quantity = (existingItem.quantity || 1) + 1;
+    } else {
+      acc.push({ ...item, quantity: 1 });
+    }
+    return acc;
+  }, []);
+  
   useEffect(() => {
+    handleFetchCart();
     getUser();
-  },[])
+  }, []);
   return (
     <>
       <AppBar 
@@ -424,59 +439,129 @@ const Header = () => {
         </AppBar>
 
           {/* Cart Dropdown */}
-          <Popper
-            open={Boolean(anchorElCart)}
-            anchorEl={anchorElCart}
-            transition
-            placement="bottom-end"
-            sx={{ zIndex: 1301 }}
-          >
-            {({ TransitionProps }) => (
-              <Fade {...TransitionProps} timeout={350}>
-                <Paper
-                  sx={{
-                    width: { xs: '90vw', sm: 400 },
-                    mt: 1,
-                    borderRadius: 2,
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                  }}
-                >
-                  <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0', display: 'flex', justifyContent: 'flex-end' }}>
-                    <IconButton size="small" onClick={handleCartClose}>
-                      <CloseIcon />
-                    </IconButton>
-                  </Box>
-                  
-                  <Box sx={{ 
-                    p: 4,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    minHeight: 300
-                  }}>
-                    <ShoppingCartOutlinedIcon sx={{ fontSize: 50, color: 'text.secondary', mb: 2 }} />
-                    <Typography variant="h6" color="text.secondary" mb={2}>
-                      Giỏ hàng trống
-                    </Typography>
-                    <Button 
-                      variant="contained"
-                      onClick={() => {
-                        handleCartClose();
-                        handleMenuClick('/user/cart');
-                      }}
-                      sx={{
-                        bgcolor: '#cc0f0f',
-                        color: 'white',
-                        px: 4,
-                        py: 1,
-                        '&:hover': {
-                          bgcolor: '#a30c0c'
-                        }
-                      }}
-                    >
-                      ĐẾN GIỎ HÀNG
-                    </Button>
-                  </Box>
+            <Popper
+              open={Boolean(anchorElCart)}
+              anchorEl={anchorElCart}
+              transition
+              placement="bottom-end"
+              sx={{ zIndex: 1301 }}
+            >
+              {({ TransitionProps }) => (
+                <Fade {...TransitionProps} timeout={350}>
+                  <Paper
+                    sx={{
+                      width: { xs: '90vw', sm: 400 },
+                      mt: 1,
+                      borderRadius: 2,
+                      boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                      maxHeight: '80vh',
+                      overflow: 'auto'
+                    }}
+                  >
+                    <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600 }}>
+                        Giỏ hàng ({consolidatedCartItems.length})
+                      </Typography>
+                      <IconButton size="small" onClick={handleCartClose}>
+                        <CloseIcon />
+                      </IconButton>
+                    </Box>
+                    
+                    {cartItems.length > 0 ? (
+                      <>
+                        <Box sx={{ maxHeight: '400px', overflow: 'auto' }}>
+                          {consolidatedCartItems.map((item) => (
+                            <Box
+                              key={item.idSanPham}
+                              sx={{
+                                p: 2,
+                                display: 'flex',
+                                borderBottom: '1px solid #f0f0f0',
+                                '&:hover': { bgcolor: '#f9f9f9' }
+                              }}
+                            >
+                              <Box sx={{ width: 80, height: 80, flexShrink: 0 }}>
+                                <img
+                                  src={`http://localhost:8080${item.HinhAnh}`}
+                                  alt={item.TenSanPham}
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                              </Box>
+                              <Box sx={{ ml: 2, flex: 1 }}>
+                                <Typography sx={{ fontWeight: 500, fontSize: '0.9rem' }}>
+                                  {item.TenSanPham}
+                                </Typography>
+                                <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem', mt: 0.5 }}>
+                                  Số lượng: {item.quantity}
+                                </Typography>
+                                <Typography sx={{ color: '#cc0f0f', fontWeight: 600, mt: 0.5 }}>
+                                  {(item.GiaTien * item.quantity).toLocaleString('vi-VN')}đ
+                                </Typography>
+                              </Box>
+                              <IconButton 
+                                size="small" 
+                                onClick={() => handleRemoveFromCart(item.idSanPham)}
+                                sx={{ alignSelf: 'flex-start' }}
+                              >
+                                <CloseIcon fontSize="small" />
+                              </IconButton>
+                            </Box>
+                        ))}
+                      </Box>
+                      <Box sx={{ p: 2, borderTop: '1px solid #e0e0e0' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                          <Typography sx={{ fontWeight: 500 }}>Tổng tiền:</Typography>
+                          <Typography sx={{ color: '#cc0f0f', fontWeight: 600 }}>
+                            {consolidatedCartItems.reduce((total, item) => total + (item.GiaTien * item.quantity), 0).toLocaleString('vi-VN')}đ
+                          </Typography>
+                        </Box>
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          onClick={() => {
+                            handleCartClose();
+                            handleMenuClick('/user/cart');
+                          }}
+                          sx={{
+                            bgcolor: '#cc0f0f',
+                            color: 'white',
+                            '&:hover': { bgcolor: '#a30c0c' }
+                          }}
+                        >
+                          XEM GIỎ HÀNG
+                        </Button>
+                      </Box>
+                    </>
+                  ) : (
+                    <Box sx={{ 
+                      p: 4,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      minHeight: 300
+                    }}>
+                      <ShoppingCartOutlinedIcon sx={{ fontSize: 50, color: 'text.secondary', mb: 2 }} />
+                      <Typography variant="h6" color="text.secondary" mb={2}>
+                        Giỏ hàng trống
+                      </Typography>
+                      <Button 
+                        variant="contained"
+                        onClick={() => {
+                          handleCartClose();
+                          handleMenuClick('/user/cart');
+                        }}
+                        sx={{
+                          bgcolor: '#cc0f0f',
+                          color: 'white',
+                          px: 4,
+                          py: 1,
+                          '&:hover': { bgcolor: '#a30c0c' }
+                        }}
+                      >
+                        ĐẾN GIỎ HÀNG
+                      </Button>
+                    </Box>
+                  )}
                 </Paper>
               </Fade>
             )}

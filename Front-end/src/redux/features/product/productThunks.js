@@ -118,12 +118,35 @@ export const updateProduct = createAsyncThunk(
     try {
       const token = localStorage.getItem('adminToken');
       
-      // Convert and optimize files to base64
-      let imageBase64Array = [];
-      console.log("productData.HinhAnh",productData.HinhAnh)
-      if (productData.HinhAnh && productData.HinhAnh.length > 0) {
-        imageBase64Array = await Promise.all(
-          productData.HinhAnh.map(file => {
+      // Convert existing image URLs to base64
+      const existingImagesBase64 = await Promise.all(
+        (productData.HinhAnh || []).map(async (imagePath) => {
+          try {
+            // Skip if already base64
+            if (imagePath.startsWith('data:image')) {
+              return imagePath;
+            }
+            // Convert URL to base64
+            const response = await fetch(`http://localhost:8080${imagePath}`);
+            const blob = await response.blob();
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+          } catch (error) {
+            console.error('Error converting image to base64:', error);
+            return null;
+          }
+        })
+      );
+
+      // Convert new images to base64
+      let newImagesBase64 = [];
+      if (productData.newImages && productData.newImages.length > 0) {
+        newImagesBase64 = await Promise.all(
+          productData.newImages.map(file => {
             return new Promise((resolve, reject) => {
               const reader = new FileReader();
               const img = new Image();
@@ -156,7 +179,7 @@ export const updateProduct = createAsyncThunk(
 
                 // Draw and compress image
                 ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compress with 70% quality
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
               };
 
               img.onerror = reject;
@@ -171,9 +194,13 @@ export const updateProduct = createAsyncThunk(
         );
       }
 
+      // Filter out any null values from failed conversions
+      const allImagesBase64 = [...existingImagesBase64, ...newImagesBase64].filter(img => img !== null);
+
+      // Prepare request data
       const requestData = {
         ...productData,
-        HinhAnh: imageBase64Array
+        HinhAnh: allImagesBase64
       };
 
       const response = await axios.put(`${BASE_URL}/products/${id}`, requestData, {

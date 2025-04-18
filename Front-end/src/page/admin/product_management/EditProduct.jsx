@@ -51,7 +51,7 @@ const EditProduct = () => {
     GiaSanPham: "",
     SoLuong: null,
     MoTa: "",
-    MauSac: "",
+    MauSac: [],
     TrangThai: "available",
     DanhGia: "",
     HinhAnh: [],
@@ -62,6 +62,7 @@ const EditProduct = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
+  const [newColor, setNewColor] = useState({ MaMau: '', TenMau: '' });
 
   useEffect(() => {
     fetchAllData();
@@ -74,18 +75,16 @@ const EditProduct = () => {
       if (response) {
         const productData = response.product || response;
         setFormData({
-          ...formData,
-          ...productData,
           TenSanPham: productData.TenSanPham || "",
           GiaSanPham: productData.GiaSanPham || "",
           SoLuong: productData.SoLuong || 0,
           MoTa: productData.MoTa || "",
-          MauSac: productData.MauSac || "",
+          MauSac: productData.MauSac || [],
           TrangThai: productData.TrangThai || "available",
           DanhMucSanPham: productData.DanhMucSanPham || {
             id: "",
             TenDanhMuc: "",
-          }, // Change from LoaiSanPham
+          },
           DonGia: productData.DonGia || { id: "", TenDonGia: "" },
           Style: productData.Style || { id: "", TenStyle: "", HinhAnh: "" },
           NhaCungCap: productData.NhaCungCap || {
@@ -96,6 +95,7 @@ const EditProduct = () => {
             DiaChi: "",
             MoTa: "",
           },
+          YeuThich: productData.YeuThich || false,
         });
 
         if (productData.HinhAnh && productData.HinhAnh.length > 0) {
@@ -115,9 +115,7 @@ const EditProduct = () => {
     const files = Array.from(e.target.files);
     const maxFiles = 5 - existingImages.length;
     const selectedFiles = files.slice(0, maxFiles);
-
     setSelectedFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
-
     // Create preview URLs for new files
     const newUrls = selectedFiles.map((file) => URL.createObjectURL(file));
     setPreviewUrls((prevUrls) => [...prevUrls, ...newUrls]);
@@ -137,17 +135,19 @@ const EditProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const productData = {
         ...formData,
-        HinhAnh: [...existingImages, ...selectedFiles],
+        HinhAnh: [...existingImages],
       };
 
+      if (selectedFiles.length > 0) {
+        productData.newImages = selectedFiles;
+      }
+       console.log("productData",productData);
       const success = await handleUpdateProduct(id, productData);
 
       if (success) {
-        // Clean up preview URLs
         previewUrls.forEach((url) => {
           if (url.startsWith("blob:")) {
             URL.revokeObjectURL(url);
@@ -161,7 +161,22 @@ const EditProduct = () => {
       alert("Có lỗi xảy ra khi cập nhật sản phẩm!");
     }
   };
-
+  const handleAddColor = () => {
+    if (newColor.MaMau && newColor.TenMau) {
+      setFormData({
+        ...formData,
+        MauSac: [...formData.MauSac, newColor]
+      });
+      // setNewColor({ MaMau: '', TenMau: '' }); 
+    }
+  };
+  
+  const handleRemoveColor = (index) => {
+    setFormData({
+      ...formData,
+      MauSac: formData.MauSac.filter((_, i) => i !== index)
+    });
+  };
   return (
     <>
       <Box
@@ -306,16 +321,6 @@ const EditProduct = () => {
                 required
                 fullWidth
               />
-
-              <TextField
-                label="Màu sắc"
-                value={formData.MauSac}
-                onChange={(e) =>
-                  setFormData({ ...formData, MauSac: e.target.value })
-                }
-                fullWidth
-              />
-
               <FormControl fullWidth>
                 <InputLabel>Trạng thái</InputLabel>
                 <Select
@@ -329,6 +334,115 @@ const EditProduct = () => {
                   <MenuItem value="discontinued">Ngừng kinh doanh</MenuItem>
                 </Select>
               </FormControl>
+              <Box sx={{ gridColumn: "span 2" }}>
+                <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                  Màu sắc:
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                    p: 2,
+                    border: "1px solid #e0e0e0",
+                    borderRadius: 1,
+                    bgcolor: "#fafafa",
+                  }}
+                >
+                  <Box
+                    sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}
+                  >
+                    <Box sx={{ flex: 1, display: "flex", gap: 2 }}>
+                      <TextField
+                        size="small"
+                        type="color"
+                        label="Mã màu"
+                        value={newColor.MaMau}
+                        onChange={(e) =>
+                          setNewColor({ ...newColor, MaMau: e.target.value })
+                        }
+                        sx={{ width: "120px" }}
+                      />
+                      <TextField
+                        size="small"
+                        label="Tên màu"
+                        value={newColor.TenMau}
+                        onChange={(e) =>
+                          setNewColor({ ...newColor, TenMau: e.target.value })
+                        }
+                        sx={{ flex: 1 }}
+                        placeholder="Ví dụ: Đỏ, Xanh, Vàng..."
+                      />
+                    </Box>
+                    <Button
+                      variant="contained"
+                      onClick={handleAddColor}
+                      disabled={!newColor.MaMau || !newColor.TenMau}
+                      size="medium"
+                      sx={{ minWidth: "100px" }}
+                    >
+                      Thêm màu
+                    </Button>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 1,
+                      minHeight: "50px",
+                      p: formData.MauSac.length > 0 ? 2 : 0,
+                      bgcolor:
+                        formData.MauSac.length > 0 ? "#fff" : "transparent",
+                      borderRadius: 1,
+                      border:
+                        formData.MauSac.length > 0
+                          ? "1px dashed #e0e0e0"
+                          : "none",
+                    }}
+                  >
+                    {formData.MauSac.map((color, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          bgcolor: "#fff",
+                          border: "1px solid #e0e0e0",
+                          borderRadius: 1,
+                          p: 1,
+                          pr: 0.5,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 24,
+                            height: 24,
+                            bgcolor: color.MaMau,
+                            borderRadius: "50%",
+                            border: "1px solid #ddd",
+                          }}
+                        />
+                        <Typography variant="body2" sx={{ mx: 1 }}>
+                          {color.TenMau}
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleRemoveColor(index)}
+                          sx={{
+                            "&:hover": {
+                              color: "error.main",
+                              bgcolor: "error.lighter",
+                            },
+                          }}
+                        >
+                          <CloseOutlinedIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              </Box>
             </Box>
 
             <TextField
