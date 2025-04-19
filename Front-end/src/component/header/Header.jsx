@@ -18,7 +18,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from "@mui/icons-material/Close";
-import { Drawer, Popper, Paper, Fade, Avatar } from "@mui/material";
+import { Drawer, Popper, Paper, Fade, Avatar, Badge } from "@mui/material";
 import { useAuth } from '../../hooks/useAuth'; 
 import { useCart } from "../../hooks/useCart";
 
@@ -154,6 +154,11 @@ const Header = () => {
     handleFetchCart();
     getUser();
   }, []);
+
+  const getTotalItems = (items) => {
+    return items.reduce((total, item) => total + (item.quantity || 1), 0);
+  };
+
   return (
     <>
       <AppBar 
@@ -388,7 +393,22 @@ const Header = () => {
                   sx={{ color: "#000", p: 0 }} 
                   onClick={handleCartOpen}
                 >
-                  <LocalMallOutlinedIcon sx={{ margin: "0 10px" }} />
+                  <Badge 
+                    badgeContent={getTotalItems(consolidatedCartItems)} 
+                    color="error"
+                    sx={{
+                      '& .MuiBadge-badge': {
+                        right: 13,
+                        top: 5,
+                        padding: '0 4px',
+                        height: '16px',
+                        minWidth: '16px',
+                        backgroundColor: '#cc0f0f'
+                      }
+                    }}
+                  >
+                    <LocalMallOutlinedIcon sx={{ margin: "0 10px" }} />
+                  </Badge>
                 </IconButton>
                 {/* Personal */}
                 <IconButton

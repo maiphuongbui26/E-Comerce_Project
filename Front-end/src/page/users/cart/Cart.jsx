@@ -29,6 +29,8 @@ import { useProduct } from "../../../hooks/useProduct";
 import { useDiscount } from "../../../hooks/useDiscount";
 import { useNavigate } from "react-router-dom";
 import { useOrder } from "../../../hooks/useOrder";
+import { useAuth } from "../../../hooks/useAuth";
+import { toast,ToastContainer } from "react-toastify";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -42,6 +44,7 @@ const Cart = () => {
   const { handleFetchDiscounts, discounts } = useDiscount();
   const { handleFetchProducts, products } = useProduct();
   const { handleCreateOrder } = useOrder();
+  const { user } = useAuth();
   console.log("cartItems", cartItems);
   const [openVoucher, setOpenVoucher] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState(null);
@@ -110,9 +113,20 @@ const Cart = () => {
   }, 0);
   // Consolidate cart items by idSanPham
   const handlePlaceOrder = async () => {
+    if (!user) {
+      toast.warning("Vui lòng đăng nhập để tiến hành đặt hàng", {
+        autoClose: 3000, // Hiển thị toast trong 3 giây
+      });
+      setTimeout(() => {
+        navigate("/auth/user/login");
+      }, 3000); // Chờ 3 giây rồi mới chuyển trang
+      return;
+    }
+
     if (consolidatedCartItems.length === 0) {
       return;
     }
+
     try {
       const orderData = {
         GioHang: {
@@ -490,6 +504,7 @@ const Cart = () => {
           ))}
         </DialogContent>
       </Dialog>
+      <ToastContainer />
     </>
   );
 };

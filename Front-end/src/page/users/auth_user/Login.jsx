@@ -1,6 +1,6 @@
 import { Box, TextField, Button, Typography, Grid, Backdrop } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import { useAuth } from '../../../hooks/useAuth';
@@ -8,8 +8,9 @@ import { useNavigate } from 'react-router-dom';
 import { CircularProgress, Alert } from '@mui/material';
 
 const Login = () => {
-  const { handleLogin, error, isLoading,isAuthenticated } = useAuth();
+  const { handleLogin, error, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [credentials, setCredentials] = useState({
     ThuDienTu: '',
@@ -32,11 +33,15 @@ const Login = () => {
       console.error('Login failed:', error);
     }
   };
+
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      // Lấy URL trước đó từ state, nếu không có thì về trang chủ
+      const previousPath = location.state?.from || '/user';
+      navigate(previousPath);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, location.state, navigate]);
+
   return (
     <>
       <Backdrop

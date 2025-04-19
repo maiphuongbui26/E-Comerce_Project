@@ -46,8 +46,8 @@ const LoginAdmin = () => {
       return;
     }
     setAuthError(null);
-    if (isAuthenticated && admin?.user?.VaiTro === 'admin') {
-      navigate('/admin/categories');
+    if (isAuthenticated && (admin?.user?.VaiTro === 'admin' || admin?.user?.VaiTro === 'nhanvien')) {
+      navigate('/admin/dashboard');
     }
   }, [isAuthenticated, admin]);
 

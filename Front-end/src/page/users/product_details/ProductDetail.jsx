@@ -14,7 +14,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate()
   const { handleFetchProductById, selectedProduct,sizes,fetchAllData } = useProduct();
-  const { handleAddToCart } = useCart();
+  const { handleAddToCart, handleFetchCart } = useCart();
   const { getUser,user } = useAuth();
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(null); 
@@ -62,6 +62,7 @@ const ProductDetail = () => {
     try {
       const success = await handleAddToCart(cartItem);
       if (success) {
+        await handleFetchCart();
         toast.success("Thêm vào giỏ hàng thành công");
       }
     } catch (error) {

@@ -28,6 +28,7 @@ const NavbarAdmin = () => {
   const { getAdmin, admin } = useAuthAdmin();
   const [openCategory, setOpenCategory] = useState(false);
   const [categories, setCategories] = useState([]);
+  const isStaff = admin?.VaiTro === "nhanvien";
 
   const handleCategoryClick = () => {
     setOpenCategory(!openCategory);
@@ -61,45 +62,56 @@ const NavbarAdmin = () => {
       title: "Dashboard",
       path: "/admin/dashboard",
       icon: <DashboardIcon />,
+      staffAccess: true
     },
     {
       title: "Quản lý danh mục",
       path: "/admin/categories",
       icon: <CategoryIcon />,
-      hasSubmenu: true
+      hasSubmenu: true,
+      staffAccess: false
     },
     {
       title: "Quản lý đơn hàng",
       path: "/admin/orders",
       icon: <ShoppingCartIcon />,
+      staffAccess: true
     },
     {
       title: "Quản lý sản phẩm",
       path: "/admin/products",
       icon: <InventoryIcon />,
+      staffAccess: true
     },
     {
       title: "Quản lý khuyến mãi",
       path: "/admin/promotions",
       icon: <LocalOfferIcon />,
+      staffAccess: false
     },
     {
       title: "Quản lý nhà cung cấp",
       path: "/admin/suppliers",
       icon: <BusinessIcon />,
+      staffAccess: false
     },
     {
       title: "Quản lý kho hàng",
       path: "/admin/warehouses",
       icon: <WarehouseIcon />,
+      staffAccess: true
     },
     {
       title: "Quản lý tài khoản",
       path: "/admin/users",
       icon: <PeopleIcon />,
+      staffAccess: false
     },
   ];
 
+  const filteredMenuItems = isStaff 
+    ? menuItems.filter(item => item.staffAccess)
+    : menuItems;
 
   return (
     <Box sx={{ width: 280, bgcolor: "#fff", height: "100vh", color: "#303030", position: "fixed", left: 0, top: 0, borderRight: "1px solid #e0e0e0" }}>
@@ -128,7 +140,7 @@ const NavbarAdmin = () => {
       </Box>
 
       <List>
-        {menuItems.map((item, index) => (
+        {filteredMenuItems.map((item, index) => (
           <div key={index}>
             <ListItem disablePadding>
               <ListItemButton
@@ -155,7 +167,7 @@ const NavbarAdmin = () => {
               </ListItemButton>
             </ListItem>
             
-            {item.hasSubmenu && (
+            {!isStaff && item.hasSubmenu && (
               <Collapse in={openCategory} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   {categories.map((category, subIndex) => (

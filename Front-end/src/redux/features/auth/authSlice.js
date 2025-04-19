@@ -19,7 +19,7 @@ const authSlice = createSlice({
     setCredentials: (state, action) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
-      state.isAuthenticated = true;
+      state.isAuthenticated = false;
     },
   },
   extraReducers: (builder) => {
@@ -72,7 +72,7 @@ const authSlice = createSlice({
       })
       .addCase(getCurrentUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isAuthenticated = true;
+        state.isAuthenticated = action.payload ? true : false;
         state.user = action.payload;
         // state.role = action.payload.role;
       })

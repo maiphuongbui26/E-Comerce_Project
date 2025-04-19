@@ -78,6 +78,8 @@ const CategoryDetail = () => {
       if (!field.hidden) {
         if (field.field === 'id' && !item[field.field]) {
           editData[field.field] = item.id;
+        } else if (field.type === 'select' && field.reference === 'C_DanhMuc') {
+          editData[field.field] = item.DanhMucSanPham;
         } else {
           editData[field.field] = item[field.field];
         }
@@ -308,15 +310,20 @@ const CategoryDetail = () => {
                   select
                   fullWidth
                   label={field.label}
-                  value={formData[field.field] || ''}
-                  onChange={(e) => handleInputChange(field.field, e.target.value)}
+                  value={formData[field.field]?.id || ''}
+                  onChange={(e) => {
+                    const selectedOption = referenceData[field.reference]?.find(
+                      option => option.id === e.target.value
+                    );
+                    handleInputChange(field.field, selectedOption);
+                  }}
                   required={field.required}
                   error={error && !formData[field.field] && field.required}
                   helperText={error && !formData[field.field] && field.required ? 'Trường này là bắt buộc' : ''}
                   sx={{ mb: 2 }}
                 >
                   {referenceData[field.reference]?.map((option) => (
-                    <MenuItem key={option.id} value={option}>
+                    <MenuItem key={option.id} value={option.id}>
                       {option[field.displayField]}
                     </MenuItem>
                   ))}
