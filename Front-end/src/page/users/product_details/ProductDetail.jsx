@@ -211,7 +211,7 @@ const ProductDetail = () => {
               ))}
             </Box>
           </Box>
-          <Box sx={{ mb: 3 }}>
+          {/* <Box sx={{ mb: 3 }}>
             <Typography sx={{ mb: 1 }}>Số lượng:</Typography>
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Button
@@ -240,7 +240,7 @@ const ProductDetail = () => {
                 <AddIcon />
               </Button>
             </Box>
-          </Box>
+          </Box> */}
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button
               variant="outlined"

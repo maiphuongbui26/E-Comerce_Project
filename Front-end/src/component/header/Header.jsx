@@ -21,56 +21,94 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Drawer, Popper, Paper, Fade, Avatar, Badge } from "@mui/material";
 import { useAuth } from '../../hooks/useAuth'; 
 import { useCart } from "../../hooks/useCart";
+import { useProduct } from "../../hooks/useProduct";
 
-const menuItems = [
-  { label: "Trang chủ", path: "/user", hidden: true },
-  { label: "GIẢM GIÁ", path: "/user/sale" },
-  { 
-    label: "Công sở", 
-    path: "/user/office-wear",
-    subItems: [
-      { label: "Áo sơ mi", path: "/user/office-wear/shirts" },
-      { label: "Đầm công sở", path: "/user/office-wear/dresses" },
-      { label: "Chân váy", path: "/user/office-wear/skirts" },
-      { label: "Blazer", path: "/user/office-wear/blazers" }
-    ]
-  },
-  { 
-    label: "Dạo phố", 
-    path: "/user/casual-wear",
-    subItems: [
-      { label: "Áo thun", path: "/user/casual-wear/t-shirts" },
-      { label: "Quần sooc", path: "/user/casual-wear/shorts" }
-    ]
-  },
-  { 
-    label: "Xuân Hạ", 
-    path: "/user/spring-summer",
-    subItems: [
-      { label: "Váy babydoll", path: "/user/spring-summer/babydoll" },
-      { label: "Váy 2 dây", path: "/user/spring-summer/strap-dresses" },
-      { label: "Đầm maxi", path: "/user/spring-summer/maxi" },
-      { label: "Váy hoa nhí", path: "/user/spring-summer/floral" }
-    ]
-  },
-  { 
-    label: "Phụ kiện", 
-    path: "/user/accessories",
-    subItems: [
-      { label: "Túi", path: "/user/accessories/bags" },
-      { label: "Mũ", path: "/user/accessories/hats" },
-      { label: "Kính", path: "/user/accessories/glasses" },
-      { label: "Trang sức", path: "/user/accessories/jewelry" }
-    ]
-  },
-  { 
-    label: "Dự tiệc", 
-    path: "/user/party-wear",
-    subItems: [
-      { label: "Đầm dự tiệc", path: "/user/party-wear/dresses" }
-    ]
-  },
-];
+const createDynamicMenu = (categories, productTypes) => {
+  const menuItems = [
+    { label: "Trang chủ", path: "/user", hidden: true },
+    { label: "GIẢM GIÁ", path: "/user/sale" }
+  ];
+
+  // Map category names to their respective paths and static subItems
+  const categoryConfig = {
+    "Công sở": {
+      path: "/user/office-wear",
+      staticSubItems: []
+    },
+    "Dạo phố": {
+      path: "/user/casual-wear",
+      staticSubItems: []
+    },
+    "Xuân hạ": {
+      path: "/user/spring-summer",
+      staticSubItems: []
+    },
+    "Phụ kiện": {
+      path: "/user/accessories",
+      staticSubItems: [
+        { label: "Túi", path: "/user/accessories/bags" },
+        { label: "Mũ", path: "/user/accessories/hats" },
+        { label: "Kính", path: "/user/accessories/glasses" },
+        { label: "Trang sức", path: "/user/accessories/jewelry" }
+      ]
+    },
+    "Dự tiệc": {
+      path: "/user/party-wear",
+      staticSubItems: [
+        { label: "Đầm dự tiệc", path: "/user/party-wear/dresses" }
+      ]
+    }
+  };
+
+  // Map product type names to their respective paths
+  const productTypePaths = {
+    "Áo sơ mi": "/user/office-wear/shirts",
+    "Đầm công sở": "/user/office-wear/dresses",
+    "Chân váy": "/user/office-wear/skirts",
+    "Blazer": "/user/office-wear/blazers",
+    "Áo thun": "/user/casual-wear/t-shirts",
+    "Quần sooc": "/user/casual-wear/shorts",
+    "Váy babydoll": "/user/spring-summer/babydoll",
+    "Váy 2 dây": "/user/spring-summer/strap-dresses",
+    "Đầm maxi": "/user/spring-summer/maxi",
+    "Váy hoa nhí": "/user/spring-summer/floral",
+    "Đầm dự tiệc": "/user/party-wear/dresses"
+  };
+
+  // Nhóm productTypes theo danh mục
+  const groupedProducts = productTypes.reduce((acc, type) => {
+    const categoryId = type.DanhMucSanPham.id;
+    if (!acc[categoryId]) {
+      acc[categoryId] = [];
+    }
+    acc[categoryId].push({
+      label: type.TenLoaiSanPham,
+      path: productTypePaths[type.TenLoaiSanPham] || `/user/products/${type.id}`
+    });
+    return acc;
+  }, {});
+
+  // Tạo menu items từ categories và productTypes đã nhóm
+  categories.forEach(category => {
+    const config = categoryConfig[category.TenDanhMuc] || {
+      path: `/user/category/${category.id}`,
+      staticSubItems: []
+    };
+    
+    const dynamicSubItems = groupedProducts[category.id] || [];
+    const subItems = config.staticSubItems.length > 0 
+      ? config.staticSubItems 
+      : dynamicSubItems;
+
+    menuItems.push({
+      label: category.TenDanhMuc,
+      path: config.path,
+      subItems: subItems
+    });
+  });
+
+  return menuItems;
+};
 
 const settings = [
   {
@@ -83,18 +121,72 @@ const settings = [
   }
 ];
 
-
 const Header = () => {
-  const { handleLogout,user,getUser } = useAuth();
+  const { handleLogout, user, getUser } = useAuth();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElCart, setAnchorElCart] = useState(null); 
   const [anchorElHover, setAnchorElHover] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const { handleFetchCart, cartItems, handleRemoveFromCart } = useCart();
-  // ... existing code ...
-
   const navigate = useNavigate();
+  const { fetchAllData, categories, productTypes } = useProduct();
+  const [menuItems, setMenuItems] = useState([
+    { label: "Trang chủ", path: "/user", hidden: true },
+    { label: "GIẢM GIÁ", path: "/user/sale" },
+    { 
+      label: "Công sở", 
+      path: "/user/office-wear",
+      subItems: [
+        { label: "Áo sơ mi", path: "/user/office-wear/shirts" },
+        { label: "Đầm công sở", path: "/user/office-wear/dresses" },
+        { label: "Chân váy", path: "/user/office-wear/skirts" },
+        { label: "Blazer", path: "/user/office-wear/blazers" }
+      ]
+    },
+    { 
+      label: "Dạo phố", 
+      path: "/user/casual-wear",
+      subItems: [
+        { label: "Áo thun", path: "/user/casual-wear/t-shirts" },
+        { label: "Quần sooc", path: "/user/casual-wear/shorts" }
+      ]
+    },
+    { 
+      label: "Xuân Hạ", 
+      path: "/user/spring-summer",
+      subItems: [
+        { label: "Váy babydoll", path: "/user/spring-summer/babydoll" },
+        { label: "Váy 2 dây", path: "/user/spring-summer/strap-dresses" },
+        { label: "Đầm maxi", path: "/user/spring-summer/maxi" },
+        { label: "Váy hoa nhí", path: "/user/spring-summer/floral" }
+      ]
+    },
+    { 
+      label: "Phụ kiện", 
+      path: "/user/accessories",
+      subItems: [
+        { label: "Túi", path: "/user/accessories/bags" },
+        { label: "Mũ", path: "/user/accessories/hats" },
+        { label: "Kính", path: "/user/accessories/glasses" },
+        { label: "Trang sức", path: "/user/accessories/jewelry" }
+      ]
+    },
+    { 
+      label: "Dự tiệc", 
+      path: "/user/party-wear",
+      subItems: [
+        { label: "Đầm dự tiệc", path: "/user/party-wear/dresses" }
+      ]
+    }
+  ]);
+
+  useEffect(() => {
+    if (categories?.length > 0 && productTypes?.length > 0) {
+      const dynamicMenuItems = createDynamicMenu(categories, productTypes);
+      setMenuItems(dynamicMenuItems);
+    }
+  }, [categories, productTypes]);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -153,6 +245,7 @@ const Header = () => {
   useEffect(() => {
     handleFetchCart();
     getUser();
+    fetchAllData()
   }, []);
 
   const getTotalItems = (items) => {

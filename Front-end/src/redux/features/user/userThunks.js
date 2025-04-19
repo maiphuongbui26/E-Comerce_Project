@@ -92,3 +92,32 @@ export const updateUserProfile = createAsyncThunk(
     }
   }
 );
+
+export const updateProfile = createAsyncThunk(
+  'users/updateProfile',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user'));
+      const response = await axios.put(`${BASE_URL}/users/${user.id}`, userData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+const handleUpdateProfile = async (userData) => {
+  try {
+    const result = await dispatch(updateProfile(userData)).unwrap();
+    return result;
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    return false;
+  }
+};

@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useProduct } from "../../../../../hooks/useProduct";
 import ProductTemplate from "../../../../../components/templates/ProductTemplate";
 
 const Glasses = () => {
-  const { products, categories, handleFetchProducts, fetchAllData } = useProduct();
+  const { products, categories, productTypes, handleFetchProducts, fetchAllData } = useProduct();
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
     const initializePage = async () => {
@@ -12,16 +13,34 @@ const Glasses = () => {
     initializePage();
   }, []);
 
-  const glassesCategory = categories?.find(cat => 
-    cat.TenDanhMuc.toLowerCase().includes('kính mắt')
+  useEffect(() => {
+    if (products && productTypes) {
+      // Tìm loại sản phẩm "Kính"
+      const glassesProductType = productTypes.find(type => 
+        type.TenLoaiSanPham.toLowerCase().includes('kính')
+      );
+
+      if (glassesProductType) {
+        // Lọc sản phẩm theo loại sản phẩm
+        const glassesProducts = products.filter(product => 
+          product.LoaiSanPham?.id === glassesProductType.id
+        );
+        setFilteredProducts(glassesProducts);
+      }
+    }
+  }, [products, productTypes]);
+
+  // Tìm danh mục "Phụ kiện"
+  const accessoryCategory = categories?.find(cat => 
+    cat.TenDanhMuc === "Phụ kiện"
   );
 
   return (
     <ProductTemplate
       title="Kính Mắt"
-      products={products}
+      products={filteredProducts}
       categories={categories}
-      initialCategory={glassesCategory?.id}
+      initialCategory={accessoryCategory?.id}
       onCategoryChange={(categoryIds) => {
         // Optional: Handle category changes
       }}

@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useProduct } from "../../../../../hooks/useProduct";
 import ProductTemplate from "../../../../../components/templates/ProductTemplate";
 
 const MaxiDresses = () => {
-  const { products, categories, handleFetchProducts, fetchAllData } = useProduct();
+  const { products, categories, productTypes, handleFetchProducts, fetchAllData } = useProduct();
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
     const initializePage = async () => {
@@ -12,16 +13,35 @@ const MaxiDresses = () => {
     initializePage();
   }, []);
 
-  const maxiCategory = categories?.find(cat => 
-    cat.TenDanhMuc.toLowerCase().includes('đầm maxi')
+  useEffect(() => {
+    if (products && productTypes) {
+      // Tìm loại sản phẩm "Đầm maxi" trong danh mục "Xuân hè"
+      const maxiType = productTypes.find(type => 
+        type.TenLoaiSanPham.toLowerCase().includes('đầm maxi') &&
+        type.DanhMucSanPham.TenDanhMuc === "Xuân hè"
+      );
+
+      if (maxiType) {
+        // Lọc sản phẩm theo loại sản phẩm
+        const maxiProducts = products.filter(product => 
+          product.LoaiSanPham?.id === maxiType.id
+        );
+        setFilteredProducts(maxiProducts);
+      }
+    }
+  }, [products, productTypes]);
+
+  // Tìm danh mục "Xuân hè"
+  const springSummerCategory = categories?.find(cat => 
+    cat.TenDanhMuc === "Xuân hè"
   );
 
   return (
     <ProductTemplate
       title="Đầm Maxi"
-      products={products}
+      products={filteredProducts}
       categories={categories}
-      initialCategory={maxiCategory?.id}
+      initialCategory={springSummerCategory?.id}
       onCategoryChange={(categoryIds) => {
         // Optional: Handle category changes
       }}

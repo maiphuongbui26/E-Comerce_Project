@@ -47,6 +47,8 @@ import WarehouseManagement from "./page/admin/warehouse_management/WarehouseMana
 import WarehouseForm from "./page/admin/warehouse_management/WarehouseForm";
 import WarehouseDetail from "./page/admin/warehouse_management/WarehouseDetail";
 import OrderDetail from "./page/admin/order_management/OrderDetail";
+import SearchResults from "./page/users/product/search/SearchResults";
+import Collection from "./page/users/product/collection/Collection";
 
 function App() {
   return (
@@ -69,7 +71,9 @@ function App() {
         <Route path="cart" element={<Cart />} />
         <Route path="account" element={<Profile />} />
         <Route path="order" element={<Order />} />
-        <Route path="product/:id" element={<ProductDetail />} /> 
+        <Route path="product/:id" element={<ProductDetail />} />
+        <Route path="search" element={<SearchResults />} />
+        <Route path="collection/:collectionName" element={<Collection />} />
         <Route path="casual-wear">
           <Route path="t-shirts" element={<TShirts />} />
           <Route path="shorts" element={<Shorts />} />
@@ -131,10 +135,10 @@ function App() {
           <Route path="edit/:id" element={<EditUser />} />
         </Route>
         <Route path="warehouses">
-        <Route index element={<WarehouseManagement />} />
-        <Route path="warehouses/import" element={<WarehouseForm />} />
-        <Route path="warehouses/export" element={<WarehouseForm />} />
-        <Route path="warehouses/:id" element={<WarehouseDetail />} />\
+          <Route index element={<WarehouseManagement />} />
+          <Route path="warehouses/import" element={<WarehouseForm />} />
+          <Route path="warehouses/export" element={<WarehouseForm />} />
+          <Route path="warehouses/:id" element={<WarehouseDetail />} />
         </Route>
       </Route>
 

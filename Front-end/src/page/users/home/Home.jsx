@@ -13,11 +13,12 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import { useNavigate } from "react-router-dom";
 // Add useProduct import and get categories data
 import { useProduct } from "../../../hooks/useProduct";
+import SearchForm from "../../../component/header/SearchForm";
 
 const Home = () => {
   const navigate = useNavigate();
   // Update the destructuring to include products and handleFetchProducts
-  const { categories, products, fetchAllData, handleFetchProducts } = useProduct();
+  const { categories, products,styles, fetchAllData, handleFetchProducts } = useProduct();
   console.log(categories);
   // Add this effect to fetch products
   useEffect(() => {
@@ -51,7 +52,10 @@ const Home = () => {
     }
   };
   return (
-    <>
+    <Box>
+      {/* Add SearchForm at the top of the page */}
+     
+      
       {/* Start Banner */}
       <Box className="relative" sx={{ margin: "0 auto" }}>
         <Slider {...settings}>
@@ -65,54 +69,8 @@ const Home = () => {
             <img src="../../../../public/image/poster_3.jpg" alt="Slide 3" />
           </div>
         </Slider>
-        <Box
-          sx={{
-            position: "absolute",
-            width: "680px",
-            bottom: "5%",
-            left: "50%",
-            backgroundColor: "#fff",
-            transform: "translate(-50%, -50%)",
-            display: { xs: "none", md: "flex" },
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderRadius: "3px",
-          }}
-        >
-          <TextField
-            variant="outlined"
-            placeholder="Bạn muốn tìm sản phẩm gì?"
-            sx={{
-              backgroundColor: "transparent",
-              color: "#000",
-              width: "80%",
-              "& .css-16wblaj-MuiInputBase-input-MuiOutlinedInput-input": {
-                padding: "10px 20px",
-              },
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "transparent" },
-              },
-              "&:hover fieldset": {
-                border: "none",
-                outline: "none",
-              },
-            }}
-          />
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#303030",
-              display: "block",
-              height: "100%",
-              padding: "10px 10px",
-              borderRadius: "0 4px 4px 0",
-              fontSize: "12px",
-              fontWeight: "bold",
-            }}
-          >
-            Tìm kiếm ngay
-          </Button>
-        </Box>
+        <SearchForm />
+
       </Box>
       {/*End Banner */}
       {/* Start container */}
@@ -192,15 +150,8 @@ const Home = () => {
           spacing={2}
           justifyContent="center"
         >
-          {[
-            "poster_1.jpg",
-            "poster_2.jpg",
-            "poster_3.jpg",
-            "poster_4.jpg",
-            "poster_5.jpg",
-            "poster_6.jpg",
-          ].map((image, index) => (
-            <Grid2 item size={{ xs: 12, md: 6 }} key={index}>
+          {styles?.slice(0, 6).map((style) => (
+            <Grid2 item size={{ xs: 12, md: 6 }} key={style.id}>
               <Box
                 sx={{
                   display: "flex",
@@ -215,10 +166,16 @@ const Home = () => {
                     cursor: "pointer",
                   },
                 }}
+                onClick={() => navigate(`/user/collection/${style.TenStyle?.toLowerCase()}`)}
               >
                 <img
-                  src={`../../../../public/image/${image}`}
-                  alt={`Image ${index + 1}`}
+                  src={style.HinhAnh}
+                  alt={style.TenStyle}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover"
+                  }}
                 />
               </Box>
             </Grid2>
@@ -349,7 +306,7 @@ const Home = () => {
         {/* End Best saler */}
       </Box>
       {/* End container */}
-    </>
+    </Box>
   );
 };
 

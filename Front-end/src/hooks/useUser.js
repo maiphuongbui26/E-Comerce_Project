@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers, createUser, updateUser, deleteUser } from '../redux/features/user/userThunks';
+import { fetchUsers, createUser, updateUser, deleteUser, updateProfile } from '../redux/features/user/userThunks';
 
 export const useUser = () => {
   const dispatch = useDispatch();
-  const { users, isLoading, error, totalUsers } = useSelector(state => state.users);
+  const { users, isLoading, error, totalUsers, profile } = useSelector(state => state.users);
 
   const handleFetchUsers = async (params) => {
     try {
@@ -43,14 +43,26 @@ export const useUser = () => {
     }
   };
 
+  const handleUpdateProfile = async (userData) => {
+    try {
+      const result = await dispatch(updateProfile(userData)).unwrap();
+      return result;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return false;
+    }
+  };
+
   return {
     users,
     isLoading,
     error,
     totalUsers,
+    profile,
     handleFetchUsers,
     handleCreateUser,
     handleUpdateUser,
-    handleDeleteUser
+    handleDeleteUser,
+    handleUpdateProfile
   };
 };

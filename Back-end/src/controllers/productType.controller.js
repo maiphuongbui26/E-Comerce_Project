@@ -33,14 +33,11 @@ const productTypeController = {
       }
 
       const productTypes = await ProductType.find(query)
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
 
       const total = await ProductType.countDocuments(query);
 
       res.json({
         'product-types': productTypes,
-        totalPages: Math.ceil(total / limit),
         currentPage: page
       });
     } catch (error) {

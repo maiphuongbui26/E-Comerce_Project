@@ -2,15 +2,18 @@ import { Box, Grid2, Pagination, Typography } from "@mui/material";
 import SearchForm from "../../../../component/header/SearchForm";
 import { useProduct } from '../../../../hooks/useProduct';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Sales = () => {
-  const { products, handleFetchProducts } = useProduct();
+  const navigate = useNavigate();
+  const { products, styles, handleFetchProducts, fetchAllData } = useProduct();
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const itemsPerPage = 8;
 
   useEffect(() => {
     handleFetchProducts();
+    fetchAllData();
   }, []);
 
   useEffect(() => {
@@ -157,15 +160,8 @@ const Sales = () => {
           spacing={2}
           justifyContent="center"
         >
-          {[
-            "poster_1.jpg",
-            "poster_2.jpg",
-            "poster_3.jpg",
-            "poster_4.jpg",
-            "poster_5.jpg",
-            "poster_6.jpg",
-          ].map((image, index) => (
-            <Grid2 item size={{ xs: 12, md: 6 }} key={index}>
+          {styles?.slice(0, 6).map((style) => (
+            <Grid2 item size={{ xs: 12, md: 6 }} key={style.id}>
               <Box
                 sx={{
                   display: "flex",
@@ -180,10 +176,16 @@ const Sales = () => {
                     cursor: "pointer",
                   },
                 }}
+                onClick={() => navigate(`/user/collection/${style.TenStyle?.toLowerCase()}`)}
               >
                 <img
-                  src={`../../../../public/image/${image}`}
-                  alt={`Image ${index + 1}`}
+                  src={style.HinhAnh}
+                  alt={style.TenStyle}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover"
+                  }}
                 />
               </Box>
             </Grid2>

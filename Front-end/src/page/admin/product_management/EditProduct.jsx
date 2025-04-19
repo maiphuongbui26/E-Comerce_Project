@@ -24,7 +24,8 @@ const EditProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const {
-    categories, // Change from productTypes to categories
+    categories,
+    productTypes,
     prices,
     styles,
     suppliers,
@@ -37,7 +38,8 @@ const EditProduct = () => {
 
   const [formData, setFormData] = useState({
     TenSanPham: "",
-    DanhMucSanPham: { id: "", TenDanhMuc: "" }, // Change from LoaiSanPham
+    DanhMucSanPham: { id: "", TenDanhMuc: "" },
+    LoaiSanPham: { id: "", TenLoaiSanPham: "" },
     DonGia: { id: "", TenDonGia: "" },
     Style: { id: "", TenStyle: "", HinhAnh: "" },
     NhaCungCap: {
@@ -64,10 +66,21 @@ const EditProduct = () => {
   const [existingImages, setExistingImages] = useState([]);
   const [newColor, setNewColor] = useState({ MaMau: '', TenMau: '' });
 
+  const [filteredProductTypes, setFilteredProductTypes] = useState([]);
+
   useEffect(() => {
     fetchAllData();
     loadProductData();
   }, [id]);
+
+  useEffect(() => {
+    if (formData.DanhMucSanPham?.id) {
+      const filtered = productTypes.filter(
+        type => type.DanhMucSanPham.id === formData.DanhMucSanPham.id
+      );
+      setFilteredProductTypes(filtered);
+    }
+  }, [formData.DanhMucSanPham?.id, productTypes]);
 
   const loadProductData = async () => {
     try {
@@ -81,10 +94,8 @@ const EditProduct = () => {
           MoTa: productData.MoTa || "",
           MauSac: productData.MauSac || [],
           TrangThai: productData.TrangThai || "available",
-          DanhMucSanPham: productData.DanhMucSanPham || {
-            id: "",
-            TenDanhMuc: "",
-          },
+          DanhMucSanPham: productData.DanhMucSanPham || { id: "", TenDanhMuc: "" },
+          LoaiSanPham: productData.LoaiSanPham || { id: "", TenLoaiSanPham: "" },
           DonGia: productData.DonGia || { id: "", TenDonGia: "" },
           Style: productData.Style || { id: "", TenStyle: "", HinhAnh: "" },
           NhaCungCap: productData.NhaCungCap || {
@@ -230,6 +241,7 @@ const EditProduct = () => {
                     setFormData({
                       ...formData,
                       DanhMucSanPham: selectedCategory,
+                      LoaiSanPham: { id: "", TenLoaiSanPham: "" }
                     });
                   }}
                 >
@@ -240,6 +252,30 @@ const EditProduct = () => {
                   ))}
                 </Select>
               </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel>Loại sản phẩm</InputLabel>
+                <Select
+                  value={formData.LoaiSanPham?.id || ""}
+                  onChange={(e) => {
+                    const selectedType = filteredProductTypes.find(
+                      (type) => type.id === e.target.value
+                    );
+                    setFormData({
+                      ...formData,
+                      LoaiSanPham: selectedType || { id: "", TenLoaiSanPham: "" }
+                    });
+                  }}
+                  disabled={!formData.DanhMucSanPham?.id}
+                >
+                  {filteredProductTypes.map((type) => (
+                    <MenuItem key={type.id} value={type.id}>
+                      {type.TenLoaiSanPham}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
               <FormControl fullWidth>
                 <InputLabel>Đơn giá</InputLabel>
                 <Select

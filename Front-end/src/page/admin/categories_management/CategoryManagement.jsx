@@ -14,8 +14,6 @@ import { useNavigate } from 'react-router-dom';
 const CategoryManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);

@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useProduct } from "../../../../../hooks/useProduct";
 import ProductTemplate from "../../../../../components/templates/ProductTemplate";
 
 const Hats = () => {
-  const { products, categories, handleFetchProducts, fetchAllData } = useProduct();
+  const { products, categories, productTypes, handleFetchProducts, fetchAllData } = useProduct();
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
     const initializePage = async () => {
@@ -12,16 +13,34 @@ const Hats = () => {
     initializePage();
   }, []);
 
-  const hatCategory = categories?.find(cat => 
-    cat.TenDanhMuc.toLowerCase().includes('mũ nón')
+  useEffect(() => {
+    if (products && productTypes) {
+      // Tìm loại sản phẩm "Mũ"
+      const hatProductType = productTypes.find(type => 
+        type.TenLoaiSanPham.toLowerCase().includes('mũ')
+      );
+
+      if (hatProductType) {
+        // Lọc sản phẩm theo loại sản phẩm
+        const hatsProducts = products.filter(product => 
+          product.LoaiSanPham?.id === hatProductType.id
+        );
+        setFilteredProducts(hatsProducts);
+      }
+    }
+  }, [products, productTypes]);
+
+  // Tìm danh mục "Phụ kiện"
+  const accessoryCategory = categories?.find(cat => 
+    cat.TenDanhMuc === "Phụ kiện"
   );
 
   return (
     <ProductTemplate
       title="Mũ & Nón"
-      products={products}
+      products={filteredProducts}
       categories={categories}
-      initialCategory={hatCategory?.id}
+      initialCategory={accessoryCategory?.id}
       onCategoryChange={(categoryIds) => {
         // Optional: Handle category changes
       }}

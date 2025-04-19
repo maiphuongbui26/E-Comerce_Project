@@ -33,11 +33,10 @@ const AddProduct = () => {
     fetchAllData,
   } = useProduct();
 
-  // In formData state, replace LoaiSanPham with DanhMuc
-  // First, update the formData state initialization
   const [formData, setFormData] = useState({
     TenSanPham: "",
-    DanhMucSanPham: { id: "", TenDanhMuc: "" }, // Changed from LoaiSanPham
+    DanhMucSanPham: { id: "", TenDanhMuc: "" },
+    LoaiSanPham: { id: "", TenLoaiSanPham: "" },
     DonGia: { id: "", TenDonGia: "" },
     Style: { id: "", TenStyle: "", HinhAnh: "" },
     NhaCungCap: {
@@ -51,34 +50,44 @@ const AddProduct = () => {
     GiaSanPham: "",
     SoLuong: null,
     MoTa: "",
-    MauSac: [], // Change from string to array of objects
+    MauSac: [],
     TrangThai: "available",
     DanhGia: "",
     HinhAnh: [],
     YeuThich: false,
   });
 
+  const [filteredProductTypes, setFilteredProductTypes] = useState([]);
+
   useEffect(() => {
     fetchAllData();
-  }, []); // Added dependency
+  }, []);
+
+  useEffect(() => {
+    if (formData.DanhMucSanPham.id) {
+      const filtered = productTypes.filter(
+        type => type.DanhMucSanPham.id === formData.DanhMucSanPham.id
+      );
+      setFilteredProductTypes(filtered);
+      setFormData(prev => ({
+        ...prev,
+        LoaiSanPham: { id: "", TenLoaiSanPham: "" }
+      }));
+    }
+  }, [formData.DanhMucSanPham.id, productTypes]);
 
   const { handleCreateProduct } = useProduct();
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [newColor, setNewColor] = useState({ MaMau: '', TenMau: '' });
 
-
-
-  // Add this function to handle file selection
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
-    // Limit the number of files (optional)
     const maxFiles = 5;
     const selectedFiles = files.slice(0, maxFiles);
 
     setSelectedFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
 
-    // Create preview URLs
     const newUrls = selectedFiles.map((file) => URL.createObjectURL(file));
     setPreviewUrls((prevUrls) => [...prevUrls, ...newUrls]);
   };
@@ -86,25 +95,20 @@ const AddProduct = () => {
   const handleRemoveImage = (index) => {
     setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
 
-    // Revoke the URL to free up memory
     URL.revokeObjectURL(previewUrls[index]);
     setPreviewUrls((prevUrls) => prevUrls.filter((_, i) => i !== index));
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Use the state formData directly
       const productData = {
         ...formData,
         HinhAnh: selectedFiles,
       };
       const success = await handleCreateProduct(productData);
       if (success) {
-        // Clean up preview URLs
         previewUrls.forEach((url) => URL.revokeObjectURL(url));
-        // Show success message
         alert("Thêm sản phẩm thành công!");
-        // Navigate back to products list
         navigate("/admin/products");
       }
     } catch (error) {
@@ -112,14 +116,12 @@ const AddProduct = () => {
       alert("Có lỗi xảy ra khi thêm sản phẩm!");
     }
   };
-  // Update the image preview section
   const handleAddColor = () => {
     if (newColor.MaMau && newColor.TenMau) {
       setFormData({
         ...formData,
         MauSac: [...formData.MauSac, newColor]
       });
-      // setNewColor({ MaMau: '', TenMau: '' }); 
     }
   };
   
@@ -194,6 +196,35 @@ const AddProduct = () => {
                   {categories?.map((category) => (
                     <MenuItem key={category.id} value={category.id}>
                       {category.TenDanhMuc}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel>Loại sản phẩm</InputLabel>
+                <Select
+                  value={formData.LoaiSanPham.id}
+                  label="Loại sản phẩm"
+                  onChange={(e) => {
+                    const selectedType = filteredProductTypes.find(
+                      (type) => type.id === e.target.value
+                    );
+                    if (selectedType) {
+                      setFormData({
+                        ...formData,
+                        LoaiSanPham: {
+                          id: selectedType.id,
+                          TenLoaiSanPham: selectedType.TenLoaiSanPham,
+                        },
+                      });
+                    }
+                  }}
+                  disabled={!formData.DanhMucSanPham.id}
+                >
+                  {filteredProductTypes.map((type) => (
+                    <MenuItem key={type.id} value={type.id}>
+                      {type.TenLoaiSanPham}
                     </MenuItem>
                   ))}
                 </Select>

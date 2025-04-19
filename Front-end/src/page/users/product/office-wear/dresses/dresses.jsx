@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useProduct } from "../../../../../hooks/useProduct";
 import ProductTemplate from "../../../../../components/templates/ProductTemplate";
 
 const OfficeDresses = () => {
-  const { products, categories, handleFetchProducts, fetchAllData } = useProduct();
+  const { products, categories, productTypes, handleFetchProducts, fetchAllData } = useProduct();
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
     const initializePage = async () => {
@@ -12,16 +13,35 @@ const OfficeDresses = () => {
     initializePage();
   }, []);
 
-  const dressCategory = categories?.find(cat => 
-    cat.TenDanhMuc.toLowerCase().includes('đầm công sở')
+  useEffect(() => {
+    if (products && productTypes) {
+      // Tìm loại sản phẩm "Đầm công sở" trong danh mục "Công sở"
+      const dressType = productTypes.find(type => 
+        type.TenLoaiSanPham.toLowerCase().includes('đầm công sở') &&
+        type.DanhMucSanPham.TenDanhMuc === "Công sở"
+      );
+
+      if (dressType) {
+        // Lọc sản phẩm theo loại sản phẩm
+        const dressProducts = products.filter(product => 
+          product.LoaiSanPham?.id === dressType.id
+        );
+        setFilteredProducts(dressProducts);
+      }
+    }
+  }, [products, productTypes]);
+
+  // Tìm danh mục "Công sở"
+  const officeCategory = categories?.find(cat => 
+    cat.TenDanhMuc === "Công sở"
   );
 
   return (
     <ProductTemplate
       title="Đầm Công Sở"
-      products={products}
+      products={filteredProducts}
       categories={categories}
-      initialCategory={dressCategory?.id}
+      initialCategory={officeCategory?.id}
       onCategoryChange={(categoryIds) => {
         // Optional: Handle category changes
       }}

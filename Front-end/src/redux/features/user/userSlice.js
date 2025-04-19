@@ -1,12 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchUsers, createUser, updateUser, deleteUser } from './userThunks';
+import { fetchUsers, createUser, updateUser, deleteUser, updateProfile } from './userThunks';
 
 const initialState = {
   users: [],
   isLoading: false,
   error: null,
   totalUsers: 0,
-  selectedUser: null
+  selectedUser: null,
+  profile: null
 };
 
 const userSlice = createSlice({
@@ -78,6 +79,22 @@ const userSlice = createSlice({
         state.users = state.users.filter(user => user.id !== action.payload);
       })
       .addCase(deleteUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      // Update Profile
+      .addCase(updateProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.profile = action.payload;
+        // Update local storage
+        localStorage.setItem('user', JSON.stringify(action.payload));
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

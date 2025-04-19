@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useProduct } from "../../../../../hooks/useProduct";
 import ProductTemplate from "../../../../../components/templates/ProductTemplate";
 
 const StrapDresses = () => {
-  const { products, categories, handleFetchProducts, fetchAllData } = useProduct();
+  const { products, categories, productTypes, handleFetchProducts, fetchAllData } = useProduct();
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   useEffect(() => {
     const initializePage = async () => {
@@ -12,16 +13,35 @@ const StrapDresses = () => {
     initializePage();
   }, []);
 
-  const strapCategory = categories?.find(cat => 
-    cat.TenDanhMuc.toLowerCase().includes('đầm hai dây')
+  useEffect(() => {
+    if (products && productTypes) {
+      // Tìm loại sản phẩm "Đầm hai dây" trong danh mục "Xuân hè"
+      const strapType = productTypes.find(type => 
+        type.TenLoaiSanPham.toLowerCase().includes('đầm hai dây') &&
+        type.DanhMucSanPham.TenDanhMuc === "Xuân hè"
+      );
+
+      if (strapType) {
+        // Lọc sản phẩm theo loại sản phẩm
+        const strapProducts = products.filter(product => 
+          product.LoaiSanPham?.id === strapType.id
+        );
+        setFilteredProducts(strapProducts);
+      }
+    }
+  }, [products, productTypes]);
+
+  // Tìm danh mục "Xuân hè"
+  const springSummerCategory = categories?.find(cat => 
+    cat.TenDanhMuc === "Xuân hè"
   );
 
   return (
     <ProductTemplate
       title="Đầm Hai Dây"
-      products={products}
+      products={filteredProducts}
       categories={categories}
-      initialCategory={strapCategory?.id}
+      initialCategory={springSummerCategory?.id}
       onCategoryChange={(categoryIds) => {
         // Optional: Handle category changes
       }}

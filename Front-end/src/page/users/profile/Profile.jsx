@@ -1,23 +1,39 @@
 import { Box, Button, TextField, Typography, Avatar, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
+import { useUser } from "../../../hooks/useUser";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 const Profile = () => {
-  const {user} = useAuth();
-  console.log(user);
+  const { user } = useAuth();
+  const { handleUpdateProfile, isLoading } = useUser();
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState({
-    name: user?.HoVaTen || '',
-    phone: user?.SoDienThoai || '',
-    email: user?.ThuDienTu || ''
+    HoVaTen: user?.HoVaTen || '',
+    SoDienThoai: user?.SoDienThoai || '',
+    ThuDienTu: user?.ThuDienTu || ''
   });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfileData(prev => ({
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const result = await handleUpdateProfile(profileData);
+      if (result) {
+        toast.success("Cập nhật thông tin thành công!");
+      } else {
+        toast.error("Cập nhật thông tin thất bại!");
+      }
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi cập nhật thông tin!");
+    }
   };
 
   // Add new states
@@ -54,9 +70,9 @@ const Profile = () => {
   useEffect(() => {
     if (user) {
       setProfileData({
-        name: user.HoVaTen || '',
-        phone: user.SoDienThoai || '',
-        email: user.ThuDienTu || ''
+        HoVaTen: user.HoVaTen || '',
+        SoDienThoai: user.SoDienThoai || '',
+        ThuDienTu: user.ThuDienTu || ''
       });
     }
   }, [user]);
@@ -78,7 +94,7 @@ const Profile = () => {
             <Box>
               <Typography sx={{ fontWeight: 600, mb: 1 }}>{user?.HoVaTen}</Typography>
               <Button 
-              onClick={handlePasswordModalOpen}
+                onClick={handlePasswordModalOpen}
                 sx={{ 
                   color: "#dc0606", 
                   p: 0,
@@ -101,8 +117,8 @@ const Profile = () => {
               <Typography sx={{ mb: 1 }}>Tên</Typography>
               <TextField
                 fullWidth
-                name="name"
-                value={profileData?.name}
+                name="HoVaTen"
+                value={profileData.HoVaTen}
                 onChange={handleChange}
                 placeholder="Họ và tên"
                 size="small"
@@ -112,8 +128,8 @@ const Profile = () => {
               <Typography sx={{ mb: 1 }}>Số điện thoại</Typography>
               <TextField
                 fullWidth
-                name="phone"
-                value={profileData?.phone}
+                name="SoDienThoai"
+                value={profileData.SoDienThoai}
                 onChange={handleChange}
                 placeholder="Điện thoại"
                 size="small"
@@ -123,8 +139,8 @@ const Profile = () => {
               <Typography sx={{ mb: 1 }}>Email</Typography>
               <TextField
                 fullWidth
-                name="email"
-                value={profileData?.email}
+                name="ThuDienTu"
+                value={profileData.ThuDienTu}
                 onChange={handleChange}
                 placeholder="Email"
                 size="small"
@@ -132,6 +148,8 @@ const Profile = () => {
             </Box>
             <Button 
               variant="contained"
+              onClick={handleSubmit}
+              disabled={isLoading}
               sx={{ 
                 width: "fit-content",
                 bgcolor: "#303030",
@@ -140,7 +158,7 @@ const Profile = () => {
                 }
               }}
             >
-              LƯU
+              {isLoading ? "ĐANG LƯU..." : "LƯU"}
             </Button>
           </Box>
         </Box>
@@ -220,6 +238,7 @@ const Profile = () => {
         </Button>
       </DialogActions>
     </Dialog>
+    <ToastContainer />
     </Box>
   );
 };
