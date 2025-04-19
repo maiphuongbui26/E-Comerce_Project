@@ -62,6 +62,7 @@ const Order = () => {
   }, []);
 
   const consolidateProducts = (products) => {
+    console.log(products);
     return products.reduce((acc, product) => {
       const existingProduct = acc.find(p => p.idSanPham === product.idSanPham);
       if (existingProduct) {
