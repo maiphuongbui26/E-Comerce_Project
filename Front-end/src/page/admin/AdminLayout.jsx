@@ -19,6 +19,82 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useEffect, useState } from "react";
 import { useAuthAdmin } from "../../hooks/useAuthAdmin";
 
+const styles = {
+  navbar: {
+    width: 280,
+    bgcolor: "#2c3e50", // Màu nền tối của navbar
+    height: "100vh",
+    color: "#fff",
+    position: "fixed",
+    left: 0,
+    top: 0,
+    borderRight: "1px solid #34495e",
+    boxShadow: "2px 0 5px rgba(0,0,0,0.2)"
+  },
+  header: {
+    p: 2,
+    borderBottom: "1px solid #34495e",
+    display: "flex",
+    alignItems: "center",
+    '& :hover': { 
+      cursor: 'pointer',
+      opacity: 0.9
+    },
+    background: "linear-gradient(to bottom, #2c3e50, #34495e)"
+  },
+  logo: {
+    marginLeft: "16px",
+    fontFamily: "'Playfair Display', serif",
+    fontWeight: 600,
+    letterSpacing: "1px",
+    fontSize: "22px",
+    color: "#fff"
+  },
+  menuItem: (isActive) => ({
+    py: 1.5,
+    color: "#fff",
+    transition: "all 0.3s ease",
+    bgcolor: isActive ? "rgba(26, 188, 156, 0.1)" : "transparent",
+    borderLeft: isActive ? "4px solid #1abc9c" : "4px solid transparent",
+    paddingLeft: isActive ? "12px" : "16px",
+    "&:hover": {
+      bgcolor: "rgba(26, 188, 156, 0.1)",
+      borderLeft: "4px solid #1abc9c",
+      paddingLeft: "12px"
+    }
+  }),
+  menuIcon: (isActive) => ({
+    color: isActive ? "#1abc9c" : "#fff", // Màu xanh mint khi active
+    minWidth: 40,
+    transition: "all 0.3s ease"
+  }),
+  menuText: (isActive) => ({
+    "& .MuiListItemText-primary": {
+      fontSize: "14px",
+      fontWeight: isActive ? 600 : 500,
+      color: isActive ? "#1abc9c" : "#fff"
+    }
+  }),
+  submenuItem: (isActive) => ({
+    pl: 4,
+    py: 1,
+    color: "#fff",
+    bgcolor: isActive ? "rgba(26, 188, 156, 0.1)" : "transparent",
+    borderLeft: isActive ? "4px solid #1abc9c" : "4px solid transparent",
+    "&:hover": {
+      bgcolor: "rgba(26, 188, 156, 0.05)",
+      borderLeft: "4px solid #1abc9c",
+    }
+  }),
+  submenuText: (isActive) => ({
+    "& .MuiListItemText-primary": {
+      fontSize: "13px",
+      color: isActive ? "#1abc9c" : "#bdc3c7",
+      fontWeight: isActive ? 600 : 400
+    }
+  })
+};
+
 const AdminLayout = () => {
   const navigate = useNavigate();
   const { admin, handleAdminLogout, getAdmin } = useAuthAdmin();

@@ -214,6 +214,7 @@ const Home = () => {
                         cursor: "pointer",
                       },
                     }}
+                    onClick={() => navigate(`/user/product/${product.idSanPham}`)} // Navigate to product detail
                   >
                     <img
                       src={product.HinhAnh[0]} // Assuming HinhAnh is an array of image URLs

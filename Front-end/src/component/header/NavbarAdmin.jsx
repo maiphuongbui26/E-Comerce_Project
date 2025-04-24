@@ -18,13 +18,14 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import WarehouseIcon from '@mui/icons-material/Warehouse';
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthAdmin } from "../../hooks/useAuthAdmin";
 import { categoryFormConfigs } from "../../constants/categoryFormConfigs";
 
 const NavbarAdmin = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Add location hook
   const { getAdmin, admin } = useAuthAdmin();
   const [openCategory, setOpenCategory] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -42,6 +43,17 @@ const NavbarAdmin = () => {
         endpoint: category.endpoint
       } } 
     });
+  };
+
+  const isMenuActive = (path) => {
+    if (path === '/admin/categories' && location.pathname.includes('/admin/categories/')) {
+      return true;
+    }
+    return location.pathname === path;
+  };
+
+  const isSubmenuActive = (categoryId) => {
+    return location.pathname === `/admin/categories/${categoryId}`;
   };
 
   useEffect(() => {
@@ -115,7 +127,7 @@ const NavbarAdmin = () => {
 
   return (
     <Box sx={{ width: 280, bgcolor: "#fff", height: "100vh", color: "#303030", position: "fixed", left: 0, top: 0, borderRight: "1px solid #e0e0e0" }}>
-      <Box sx={{ p: 2, borderBottom: "1px solid ##303030", display: "flex", alignItems: "center", '& :hover': { cursor: 'pointer' }, }} onClick={() => navigate("/admin")}>
+      <Box sx={{ p: 2, borderBottom: "1px solid #e0e0e0", display: "flex", alignItems: "center", '& :hover': { cursor: 'pointer' }, }} onClick={() => navigate("/admin")}>
         <img
           src="../../../public/image/logo_main.jpg"
           width={80}
@@ -140,19 +152,25 @@ const NavbarAdmin = () => {
       </Box>
 
       <List>
-        {filteredMenuItems.map((item, index) => (
-          <div key={index}>
-            <ListItem disablePadding>
+        <Typography variant="subtitle1" sx={{ px: 2, py: 1, color: "#007BFF", fontWeight: 600 }}>
+          Dashboard
+        </Typography>
+        {filteredMenuItems.slice(0, 1).map((item, index) => {
+          const isActive = isMenuActive(item.path);
+
+          return (
+            <ListItem disablePadding key={index}>
               <ListItemButton
-                onClick={item.hasSubmenu ? handleCategoryClick : () => navigate(item.path)}
+                onClick={() => navigate(item.path)}
                 sx={{
                   py: 1.5,
+                  bgcolor: isActive ? "rgba(0,0,0,0.1)" : "transparent",
                   "&:hover": {
                     bgcolor: "rgba(255,255,255,0.1)",
                   },
                 }}
               >
-                <ListItemIcon sx={{ color: "#303030", minWidth: 40 }}>
+                <ListItemIcon sx={{ color: isActive ? "#007BFF" : "#303030", minWidth: 40 }}>
                   {item.icon}
                 </ListItemIcon>
                 <ListItemText
@@ -160,37 +178,89 @@ const NavbarAdmin = () => {
                   sx={{
                     "& .MuiListItemText-primary": {
                       fontSize: "14px",
+                      fontWeight: isActive ? 600 : 400,
+                      color: isActive ? "#007BFF" : "#303030",
                     },
                   }}
                 />
-                {item.hasSubmenu && (openCategory ? <ExpandLess /> : <ExpandMore />)}
               </ListItemButton>
             </ListItem>
-            
-            {!isStaff && item.hasSubmenu && (
-              <Collapse in={openCategory} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  {categories.map((category, subIndex) => (
-                    <ListItemButton
-                      key={subIndex}
-                      sx={{ pl: 4 }}
-                      onClick={() => handleCategoryItemClick(category)}
-                    >
-                      <ListItemText 
-                        primary={category.TenMuc} 
-                        sx={{
-                          "& .MuiListItemText-primary": {
-                            fontSize: "13px",
-                          },
-                        }}
-                      />
-                    </ListItemButton>
-                  ))}
-                </List>
-              </Collapse>
-            )}
-          </div>
-        ))}
+          );
+        })}
+
+        <Typography variant="subtitle1" sx={{ px: 2, py: 1, color: "#007BFF", fontWeight: 600 }}>
+          Management
+        </Typography>
+        {filteredMenuItems.slice(1).map((item, index) => {
+          const isActive = isMenuActive(item.path);
+
+          return (
+            <div key={index}>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={item.hasSubmenu ? handleCategoryClick : () => navigate(item.path)}
+                  sx={{
+                    py: 1.5,
+                    bgcolor: isActive ? "rgba(0,0,0,0.1)" : "transparent",
+                    "&:hover": {
+                      bgcolor: "rgba(255,255,255,0.1)",
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ color: isActive ? "#007BFF" : "#303030", minWidth: 40 }}>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.title}
+                    sx={{
+                      "& .MuiListItemText-primary": {
+                        fontSize: "14px",
+                        fontWeight: isActive ? 600 : 400,
+                        color: isActive ? "#007BFF" : "#303030",
+                      },
+                    }}
+                  />
+                  {item.hasSubmenu && (openCategory ? <ExpandLess /> : <ExpandMore />)}
+                </ListItemButton>
+              </ListItem>
+              
+              {!isStaff && item.hasSubmenu && (
+                <Collapse in={openCategory} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    {categories.map((category, subIndex) => {
+                      const isSubActive = isSubmenuActive(category.MaMuc);
+
+                      return (
+                        <ListItemButton
+                          key={subIndex}
+                          sx={{
+                            pl: 4,
+                            bgcolor: isSubActive ? "rgba(0,0,0,0.1)" : "transparent",
+                            "&:hover": {
+                              bgcolor: "rgba(255,255,255,0.1)",
+                            },
+                          }}
+                          onClick={() => handleCategoryItemClick(category)}
+                        >
+                          <ListItemText 
+                            primary={category.TenMuc} 
+                            sx={{
+                              "& .MuiListItemText-primary": {
+                                fontSize: "13px",
+                                fontWeight: isSubActive ? 600 : 400,
+                                color: isSubActive ? "#007BFF" : "#303030",
+                              },
+                            }}
+                          />
+                        </ListItemButton>
+                      );
+                    })}
+                  </List>
+                </Collapse>
+              )}
+            </div>
+          );
+        })}
       </List>
     </Box>
   );

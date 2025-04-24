@@ -52,12 +52,17 @@ const Sales = () => {
               size={{ xs: 6, md: 3 }}
               key={product.id}
             >
-              <Box sx={{ "&:hover ": {
-                transform: "translateY(-10px) scale(1.02)",
-                transition: "transform 0.3s ease-in-out",
-                cursor: "pointer",
-              }}}>
-                <Box sx={{position: "relative"}}>
+              <Box
+                sx={{
+                  "&:hover ": {
+                    transform: "translateY(-10px) scale(1.02)",
+                    transition: "transform 0.3s ease-in-out",
+                    cursor: "pointer",
+                  },
+                }}
+                onClick={() => navigate(`/user/product/${product.idSanPham}`)} 
+              >
+                <Box sx={{ position: "relative" }}>
                   <img
                     src={`${product.HinhAnh[0]}`}
                     alt={product.TenSanPham}
