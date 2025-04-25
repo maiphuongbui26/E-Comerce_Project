@@ -196,17 +196,16 @@ const cartController = {
 
   // Clear cart
   clearCart: async (req, res) => {
+    const {idUser} = req.body
+    
     try {
       const cart = await Cart.findOne({ 
-        NguoiDung: req.user._id,
+        NguoiDung: idUser,
         TrangThai: 'active'
       });
-
       if (!cart) {
         return res.status(404).json({ message: 'Không tìm thấy giỏ hàng' });
       }
-
-    
       cart.DanhSachSanPham = [];
       cart.TongTienHang = 0;
       cart.GiamGia = 0;

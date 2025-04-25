@@ -93,13 +93,17 @@ export const removeFromCart = createAsyncThunk(
 
 export const clearCart = createAsyncThunk(
   "cart/clearCart",
-  async (_, { rejectWithValue }) => {
+  async (userId, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${BASE_URL}/cart/clear`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await axios.delete(`${BASE_URL}/cart/clear/${userId}`, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json" 
+        },
+        data: { idUser: userId }
       });
-      return true;
+      return response.data.cart;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

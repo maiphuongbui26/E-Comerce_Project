@@ -15,13 +15,15 @@ const OfficeDresses = () => {
 
   useEffect(() => {
     if (products && productTypes) {
+      console.log(productTypes);
       // Tìm loại sản phẩm "Đầm công sở" trong danh mục "Công sở"
       const dressType = productTypes.find(type => 
         type.TenLoaiSanPham.toLowerCase().includes('đầm công sở') &&
         type.DanhMucSanPham.TenDanhMuc === "Công sở"
       );
-
+    console.log(dressType);
       if (dressType) {
+        console.log("dressType", dressType);
         // Lọc sản phẩm theo loại sản phẩm
         const dressProducts = products.filter(product => 
           product.LoaiSanPham?.id === dressType.id

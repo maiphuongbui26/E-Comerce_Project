@@ -9,6 +9,7 @@ import supplierReducer from './redux/features/supplier/supplierSlice';
 import userReducer from './redux/features/user/userslice';
 import discountReducer from './redux/features/discount/discountSlice';
 import warehouseReducer from './redux/features/warehouse/warehouseSlice';
+import paymentReducer from './redux/features/payment/paymentSlice';
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     users: userReducer,
     discounts: discountReducer,
     warehouses: warehouseReducer,
+    payment: paymentReducer,
   },
 });
 

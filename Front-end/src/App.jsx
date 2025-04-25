@@ -49,6 +49,7 @@ import WarehouseDetail from "./page/admin/warehouse_management/WarehouseDetail";
 import OrderDetail from "./page/admin/order_management/OrderDetail";
 import SearchResults from "./page/users/product/search/SearchResults";
 import Collection from "./page/users/product/collection/Collection";
+import Checkout from "./page/users/checkout/Checkout";
 
 function App() {
   return (
@@ -71,6 +72,7 @@ function App() {
         <Route path="cart" element={<Cart />} />
         <Route path="account" element={<Profile />} />
         <Route path="order" element={<Order />} />
+        <Route path="checkout" element={<Checkout />} />
         <Route path="product/:id" element={<ProductDetail />} />
         <Route path="search" element={<SearchResults />} />
         <Route path="collection/:collectionName" element={<Collection />} />
@@ -136,9 +138,9 @@ function App() {
         </Route>
         <Route path="warehouses">
           <Route index element={<WarehouseManagement />} />
-          <Route path="warehouses/import" element={<WarehouseForm />} />
-          <Route path="warehouses/export" element={<WarehouseForm />} />
-          <Route path="warehouses/:id" element={<WarehouseDetail />} />
+          <Route path="import" element={<WarehouseForm />} />
+          <Route path="export" element={<WarehouseForm />} />
+          <Route path=":id" element={<WarehouseDetail />} />
         </Route>
       </Route>
 

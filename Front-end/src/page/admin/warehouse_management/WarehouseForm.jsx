@@ -182,7 +182,7 @@ const WarehouseForm = () => {
               <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
                 <Button
                   variant="outlined"
-                  onClick={() => navigate("/admin/warehouse")}
+                  onClick={() => navigate("/admin/warehouses")}
                 >
                   Hủy
                 </Button>

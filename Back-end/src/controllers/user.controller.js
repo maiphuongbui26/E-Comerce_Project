@@ -8,7 +8,6 @@ const userController = {
   login: async (req, res) => {
     try {
       const { ThuDienTu, MatKhau } = req.body;
-      console.log(ThuDienTu,MatKhau);
       const user = await User.findOne({ ThuDienTu });
       if (!user) {
         return res.status(401).json({ message: 'Email không tồn tại' });
@@ -41,7 +40,6 @@ const userController = {
     try {
       const formData = req.body;
       const hashedPassword = await bcrypt.hash(formData.MatKhau, 10);
-      console.log("req.body",req.body)
       const user = new User({
         id: generateUserId('U'),
         ...formData,
@@ -157,10 +155,8 @@ const userController = {
 
   // Get current logged-in user
   getCurrentUser: async (req, res) => {
-    console.log("reqreqreq",req.user); 
     try {
       const user = await User.findOne({id: req.user.id}).select('-MatKhau');
-    console.log("useruser",user); 
       if (!user) {
         return res.status(404).json({ message: 'Không tìm thấy người dùng' });
       }

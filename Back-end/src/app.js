@@ -15,7 +15,6 @@ const discountRoutes = require('./routes/discount.routes');
 const productRoutes = require('./routes/product.routes');
 const warehouseRoutes = require('./routes/warehouse.routes');
 
-
 const app = express();
 
 // Connect to MongoDB

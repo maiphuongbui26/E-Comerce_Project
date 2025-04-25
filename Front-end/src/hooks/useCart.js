@@ -61,7 +61,11 @@ export const useCart = () => {
 
   const handleClearCart = async () => {
     try {
-      await dispatch(clearCart()).unwrap();
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user?.id) {
+        throw new Error('User not found');
+      }
+      await dispatch(clearCart(user.id)).unwrap();
       return true;
     } catch (error) {
       console.error('Error clearing cart:', error);

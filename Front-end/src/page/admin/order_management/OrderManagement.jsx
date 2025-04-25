@@ -5,6 +5,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOrder } from '../../../hooks/useOrder';
+import DownloadIcon from '@mui/icons-material/Download';
+import * as XLSX from 'xlsx'; // Thêm thư viện xlsx để xuất file Excel
 
 const OrderManagement = () => {
   const navigate = useNavigate();
@@ -15,7 +17,9 @@ const OrderManagement = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
-
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [month, setMonth] = useState('');
   useEffect(() => {
     handleFetchOrders()
   }, []);
@@ -111,6 +115,56 @@ const OrderManagement = () => {
     setOrderToDelete(null);
   };
 
+  // Hàm xuất danh sách theo khoảng ngày
+  const handleExportByDateRange = () => {
+    if (!startDate || !endDate) {
+      alert('Vui lòng chọn ngày bắt đầu và ngày kết thúc');
+      return;
+    }
+
+    const filteredOrders = orders.filter(order => {
+      const orderDate = new Date(order.NgayDatHang);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      return orderDate >= start && orderDate <= end;
+    });
+
+    exportToExcel(filteredOrders, `DonHang_${startDate}_den_${endDate}`);
+  };
+
+  // Hàm xuất danh sách theo tháng
+  const handleExportByMonth = () => {
+    if (!month) {
+      alert('Vui lòng chọn tháng');
+      return;
+    }
+
+    const [year, monthNum] = month.split('-');
+    const filteredOrders = orders.filter(order => {
+      const orderDate = new Date(order.NgayDatHang);
+      return orderDate.getFullYear() === parseInt(year) && 
+             orderDate.getMonth() === parseInt(monthNum) - 1;
+    });
+
+    exportToExcel(filteredOrders, `DonHang_Thang_${monthNum}_${year}`);
+  };
+
+  // Hàm xuất ra file Excel
+  const exportToExcel = (data, fileName) => {
+    const worksheet = XLSX.utils.json_to_sheet(data.map(order => ({
+      'Mã đơn hàng': order.idDonHang,
+      'Địa chỉ giao hàng': order.DiaChiGiaoHang,
+      'Phương thức thanh toán': getPaymentMethodText(order.PhuongThucThanhToan),
+      'Ngày đặt': new Date(order.NgayDatHang).toLocaleDateString('vi-VN'),
+      'Tổng tiền': order.GioHang.TongTien.toLocaleString('vi-VN') + 'đ',
+      'Trạng thái': getStatusText(order.TrangThaiDonHang)
+    })));
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Orders');
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
+  };
+
   return (
     <>
       <Box sx={{ 
@@ -149,6 +203,79 @@ const OrderManagement = () => {
               <MenuItem value="delivered">Hoàn thành</MenuItem>
               <MenuItem value="cancelled">Đã hủy</MenuItem>
             </Select>
+          </Box>
+          
+          {/* Thêm phần xuất Excel */}
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <TextField
+                size="small"
+                type="date"
+                label="Từ ngày"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  lang: 'vi-VN',
+                }}
+                sx={{
+                  '& input::-webkit-calendar-picker-indicator': {
+                    cursor: 'pointer'
+                  }
+                }}
+              />
+              <TextField
+                size="small"
+                type="date"
+                label="Đến ngày"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  lang: 'vi-VN',
+                }}
+                sx={{
+                  '& input::-webkit-calendar-picker-indicator': {
+                    cursor: 'pointer'
+                  }
+                }}
+              />
+              <Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={handleExportByDateRange}
+                size="small"
+              >
+                Xuất theo ngày
+              </Button>
+            </Box>
+            
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <TextField
+                size="small"
+                type="month"
+                label="Chọn tháng"
+                value={month}
+                onChange={(e) => setMonth(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  lang: 'vi-VN',
+                }}
+                sx={{
+                  '& input::-webkit-calendar-picker-indicator': {
+                    cursor: 'pointer'
+                  }
+                }}
+              />
+              <Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={handleExportByMonth}
+                size="small"
+              >
+                Xuất theo tháng
+              </Button>
+            </Box>
           </Box>
         </Box>
 

@@ -12,7 +12,7 @@ router.post('/add', cartController.addProduct);
 router.put('/quantity', cartController.updateQuantity);
 router.delete('/remove/:idSanPham', cartController.removeProduct);
 router.put('/discount', cartController.applyDiscount);
-router.delete('/clear', cartController.clearCart);
+router.delete('/clear/:id', cartController.clearCart);
 router.delete('/removeAll/:idSanPham', cartController.removeAllProduct);
 
 module.exports = router;
