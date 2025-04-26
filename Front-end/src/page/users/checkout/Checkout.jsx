@@ -120,7 +120,7 @@ const Checkout = () => {
         },
         TrangThaiDonHang: "pending",
         PhuongThucThanhToan: "cash", 
-        DiaChiGiaoHang: user.DiaChi || "", 
+        DiaChiGiaoHang: formData?.address || "", 
         GhiChu: "" 
       };
       const result = await handleCreateOrder(orderData);
