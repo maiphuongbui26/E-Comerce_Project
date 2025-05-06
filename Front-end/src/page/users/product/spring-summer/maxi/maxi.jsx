@@ -16,11 +16,12 @@ const MaxiDresses = () => {
   useEffect(() => {
     if (products && productTypes) {
       // Tìm loại sản phẩm "Đầm maxi" trong danh mục "Xuân hè"
+      console.log("productTypes", productTypes)
       const maxiType = productTypes.find(type => 
         type.TenLoaiSanPham.toLowerCase().includes('đầm maxi') &&
-        type.DanhMucSanPham.TenDanhMuc === "Xuân hè"
+        type.DanhMucSanPham.TenDanhMuc === "Xuân hạ"
       );
-
+      console.log("maxiType", maxiType)
       if (maxiType) {
         // Lọc sản phẩm theo loại sản phẩm
         const maxiProducts = products.filter(product => 

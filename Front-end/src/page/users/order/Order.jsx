@@ -64,7 +64,7 @@ const Order = () => {
   const consolidateProducts = (products) => {
     console.log(products);
     return products.reduce((acc, product) => {
-      const existingProduct = acc.find(p => p.idSanPham === product.idSanPham);
+      const existingProduct = acc.find(p => p.idSanPham === product.idSanPham && p.KichThuoc.TenKichThuoc === product.KichThuoc.TenKichThuoc);
       if (existingProduct) {
         existingProduct.SoLuong += product.SoLuong;
         existingProduct.ThanhTien += product.ThanhTien;
@@ -200,6 +200,11 @@ const Order = () => {
                             sx={{ color: "#666", fontSize: "0.875rem" }}
                           >
                             Số lượng: {product.SoLuong}
+                          </Typography>
+                          <Typography
+                            sx={{ color: "#666", fontSize: "0.875rem" }}
+                          >
+                            Kích thước: {product?.KichThuoc?.TenKichThuoc}
                           </Typography>
                           <Typography
                             sx={{ color: "#dc0606", fontWeight: 500 }}

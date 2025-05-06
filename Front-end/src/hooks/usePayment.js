@@ -1,16 +1,41 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { createPayment } from '../redux/features/payment/paymentThunks';
-import { clearError } from '../redux/features/payment/paymentSlice';
+import { createPaypalPayment, capturePaypalPayment, getPaymentById } from '../redux/features/payment/paymentThunks';
+import { clearError, clearPaymentData } from '../redux/features/payment/paymentSlice';
 
 export const usePayment = () => {
   const dispatch = useDispatch();
-  const { paymentUrl, isLoading, error } = useSelector((state) => state.payment);
+  const { paymentData, approvalUrl, isLoading, error, currentPayment } = useSelector((state) => state.payment);
 
-  const handleCreatePayment = async (amount, orderInfo, returnUrl) => {
+  const handleCreatePaypalPayment = async (orderId) => {
     try {
-      await dispatch(createPayment({ amount, orderInfo, returnUrl })).unwrap();
+      const result = await dispatch(createPaypalPayment({ orderId })).unwrap();
+      if (result.approvalUrl) {
+        window.location.href = result.approvalUrl;
+      }
+      return result;
     } catch (error) {
-      console.error('Error creating payment:', error);
+      console.error('Lỗi khi tạo thanh toán PayPal:', error);
+      return null;
+    }
+  };
+
+  const handleCapturePaypalPayment = async (orderID) => {
+    try {
+      const result = await dispatch(capturePaypalPayment({ orderID })).unwrap();
+      return result;
+    } catch (error) {
+      console.error('Lỗi khi xác nhận thanh toán PayPal:', error);
+      return null;
+    }
+  };
+
+  const handleGetPaymentById = async (paymentId) => {
+    try {
+      const result = await dispatch(getPaymentById(paymentId)).unwrap();
+      return result;
+    } catch (error) {
+      console.error('Lỗi khi lấy thông tin thanh toán:', error);
+      return null;
     }
   };
 
@@ -18,11 +43,20 @@ export const usePayment = () => {
     dispatch(clearError());
   };
 
+  const handleClearPaymentData = () => {
+    dispatch(clearPaymentData());
+  };
+
   return {
-    paymentUrl,
+    paymentData,
+    approvalUrl,
     isLoading,
     error,
-    handleCreatePayment,
+    currentPayment,
+    handleCreatePaypalPayment,
+    handleCapturePaypalPayment,
+    handleGetPaymentById,
     handleClearError,
+    handleClearPaymentData
   };
 };

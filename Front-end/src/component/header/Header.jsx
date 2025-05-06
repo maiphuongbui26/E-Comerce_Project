@@ -19,7 +19,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from "@mui/icons-material/Close";
 import { Drawer, Popper, Paper, Fade, Avatar, Badge } from "@mui/material";
-import { useAuth } from '../../hooks/useAuth'; 
+import { useAuth } from '../../hooks/useAuth';
 import { useCart } from "../../hooks/useCart";
 import { useProduct } from "../../hooks/useProduct";
 
@@ -94,10 +94,10 @@ const createDynamicMenu = (categories, productTypes) => {
       path: `/user/category/${category.id}`,
       staticSubItems: []
     };
-    
+
     const dynamicSubItems = groupedProducts[category.id] || [];
-    const subItems = config.staticSubItems.length > 0 
-      ? config.staticSubItems 
+    const subItems = config.staticSubItems.length > 0
+      ? config.staticSubItems
       : dynamicSubItems;
 
     menuItems.push({
@@ -117,7 +117,7 @@ const settings = [
   },
   {
     label: "Đăng xuất",
-    path: "/auth/user/login", 
+    path: "/auth/user/login",
   }
 ];
 
@@ -125,7 +125,7 @@ const Header = () => {
   const { handleLogout, user, getUser } = useAuth();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [anchorElCart, setAnchorElCart] = useState(null); 
+  const [anchorElCart, setAnchorElCart] = useState(null);
   const [anchorElHover, setAnchorElHover] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const { handleFetchCart, cartItems, handleRemoveFromCart } = useCart();
@@ -134,8 +134,8 @@ const Header = () => {
   const [menuItems, setMenuItems] = useState([
     { label: "Trang chủ", path: "/user", hidden: true },
     { label: "GIẢM GIÁ", path: "/user/sale" },
-    { 
-      label: "Công sở", 
+    {
+      label: "Công sở",
       path: "/user/office-wear",
       subItems: [
         { label: "Áo sơ mi", path: "/user/office-wear/shirts" },
@@ -144,16 +144,16 @@ const Header = () => {
         { label: "Blazer", path: "/user/office-wear/blazers" }
       ]
     },
-    { 
-      label: "Dạo phố", 
+    {
+      label: "Dạo phố",
       path: "/user/casual-wear",
       subItems: [
         { label: "Áo thun", path: "/user/casual-wear/t-shirts" },
         { label: "Quần sooc", path: "/user/casual-wear/shorts" }
       ]
     },
-    { 
-      label: "Xuân Hạ", 
+    {
+      label: "Xuân Hạ",
       path: "/user/spring-summer",
       subItems: [
         { label: "Váy babydoll", path: "/user/spring-summer/babydoll" },
@@ -162,8 +162,8 @@ const Header = () => {
         { label: "Váy hoa nhí", path: "/user/spring-summer/floral" }
       ]
     },
-    { 
-      label: "Phụ kiện", 
+    {
+      label: "Phụ kiện",
       path: "/user/accessories",
       subItems: [
         { label: "Túi", path: "/user/accessories/bags" },
@@ -172,8 +172,8 @@ const Header = () => {
         { label: "Trang sức", path: "/user/accessories/jewelry" }
       ]
     },
-    { 
-      label: "Dự tiệc", 
+    {
+      label: "Dự tiệc",
       path: "/user/party-wear",
       subItems: [
         { label: "Đầm dự tiệc", path: "/user/party-wear/dresses" }
@@ -233,7 +233,10 @@ const Header = () => {
     setActiveMenu(null);
   };
   const consolidatedCartItems = cartItems.reduce((acc, item) => {
-    const existingItem = acc.find(i => i.idSanPham === item.idSanPham);
+    const existingItem = acc.find(i =>
+      i.idSanPham === item.idSanPham &&
+      i.KichThuoc.TenKichThuoc === item.KichThuoc.TenKichThuoc
+    );
     if (existingItem) {
       existingItem.quantity = (existingItem.quantity || 1) + 1;
     } else {
@@ -241,7 +244,7 @@ const Header = () => {
     }
     return acc;
   }, []);
-  
+
   useEffect(() => {
     handleFetchCart();
     getUser();
@@ -249,118 +252,118 @@ const Header = () => {
   }, []);
 
   const getTotalItems = (items) => {
-    return items.reduce((total, item) => total + (item.quantity || 1), 0);
+    return items.reduce((total, item) => total + item.SoLuong, 0);
   };
 
   return (
     <>
-      <AppBar 
-            position="fixed" 
-            sx={{ 
-              backgroundColor: "#fff", 
-              color: "#000",
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)' 
-            }}
-          >
-            <Container sx={{ maxWidth: "1240px", px: "12px" }}>
-              <Toolbar disableGutters>
-                <Box sx={{ display: { xs: "none", md: "block" }, mr: 1,":hover":{cursor:"pointer"}}}
-                onClick={() => {
-                  navigate("/user");
+      <AppBar
+        position="fixed"
+        sx={{
+          backgroundColor: "#fff",
+          color: "#000",
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}
+      >
+        <Container sx={{ maxWidth: "1240px", px: "12px" }}>
+          <Toolbar disableGutters>
+            <Box sx={{ display: { xs: "none", md: "block" }, mr: 1, ":hover": { cursor: "pointer" } }}
+              onClick={() => {
+                navigate("/user");
+              }}
+            >
+              <img
+                src="../../../public/image/logo_main.jpg"
+                width={77}
+                height={44}
+              />
+            </Box>
+            {/* Menu app */}
+            <Box sx={{ flexGrow: 1, display: { xs: "block", md: "none" } }}>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenNavMenu}
+                color="inherit"
+                sx={{
+                  p: 0,
+
                 }}
               >
-                <img
-                  src="../../../public/image/logo_main.jpg"
-                  width={77}
-                  height={44}
-                />
-              </Box>
-              {/* Menu app */}
-              <Box sx={{ flexGrow: 1, display: { xs: "block", md: "none" } }}>
-                <IconButton
-                  size="large"
-                  aria-label="account of current user"
-                  aria-controls="menu-appbar"
-                  aria-haspopup="true"
-                  onClick={handleOpenNavMenu}
-                  color="inherit"
+                <MenuIcon />
+              </IconButton>
+              <Drawer
+                anchor="left"
+                open={Boolean(anchorElNav)}
+                onClose={handleCloseNavMenu}
+              >
+                <Box
                   sx={{
-                    p: 0,
-                    
+                    width: "350px",
+                    display: "flex",
+                    flexDirection: "column",
+                    mt: 2,
                   }}
                 >
-                  <MenuIcon />
-                </IconButton>
-                <Drawer
-                  anchor="left"
-                  open={Boolean(anchorElNav)}
-                  onClose={handleCloseNavMenu}
-                >
-                  <Box
-                    sx={{
-                      width: "350px",
-                      display: "flex",
-                      flexDirection: "column",
-                      mt: 2,
-                    }}
+                  <IconButton
+                    onClick={handleCloseNavMenu}
+                    sx={{ alignSelf: "flex-end", mb: 1 }}
                   >
-                    <IconButton
-                      onClick={handleCloseNavMenu}
-                      sx={{ alignSelf: "flex-end", mb: 1 }}
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                    {menuItems
-                      .filter((item) => !item.hidden)
-                      .map((page, index) => (
-                        <MenuItem
-                          key={index}
-                          onClick={() => handleMenuClick(page.path)}
+                    <CloseIcon />
+                  </IconButton>
+                  {menuItems
+                    .filter((item) => !item.hidden)
+                    .map((page, index) => (
+                      <MenuItem
+                        key={index}
+                        onClick={() => handleMenuClick(page.path)}
+                      >
+                        <Typography
+                          sx={{
+                            color: "#000",
+                            whiteSpace: "nowrap",
+                            fontSize: "14px !important",
+                            fontWeight: 700,
+                            marginLeft: "16px",
+                          }}
                         >
-                          <Typography
-                            sx={{
-                              color: "#000",
-                              whiteSpace: "nowrap",
-                              fontSize: "14px !important",
-                              fontWeight: 700,
-                              marginLeft: "16px",
-                            }}
-                          >
-                            {page.label}
-                          </Typography>
-                        </MenuItem>
-                      ))}
-                  </Box>
-                </Drawer>
-              </Box>
-              {/* UI PC */}
-              <Typography
-                variant="h5"
-                noWrap
-                component="a"
-                onClick={() => {
-                  handleMenuClick("/");
-                }}
-                sx={{
-                  display: { xs: "block", md: "none" },
-                  flexGrow: 1,
-                  fontFamily: "monospace",
-                  fontWeight: 700,
-                  marginLeft: "52px",
-                  letterSpacing: ".3rem",
-                  textDecoration: "none",
-                  hover: {
-                    cursor: "pointer",
-                  },
-                }}
-              >
-                <img
-                  src="../../../public/image/20240805_KnfT1Dl0.png"
-                  width={61}
-                  height={38}
-                />
-              </Typography>
-              <Box
+                          {page.label}
+                        </Typography>
+                      </MenuItem>
+                    ))}
+                </Box>
+              </Drawer>
+            </Box>
+            {/* UI PC */}
+            <Typography
+              variant="h5"
+              noWrap
+              component="a"
+              onClick={() => {
+                handleMenuClick("/");
+              }}
+              sx={{
+                display: { xs: "block", md: "none" },
+                flexGrow: 1,
+                fontFamily: "monospace",
+                fontWeight: 700,
+                marginLeft: "52px",
+                letterSpacing: ".3rem",
+                textDecoration: "none",
+                hover: {
+                  cursor: "pointer",
+                },
+              }}
+            >
+              <img
+                src="../../../public/image/20240805_KnfT1Dl0.png"
+                width={61}
+                height={38}
+              />
+            </Typography>
+            <Box
               sx={{
                 flexGrow: 1,
                 display: { xs: "none", md: "flex" },
@@ -400,28 +403,28 @@ const Header = () => {
                         {page.label}
                       </Typography>
                       {page.subItems && (
-                        <Box sx={{ 
+                        <Box sx={{
                           display: 'flex',
                           alignItems: 'center',
                           position: 'relative',
                           width: 20,
                           height: 20
                         }}>
-                          <ExpandMoreIcon 
-                            sx={{ 
+                          <ExpandMoreIcon
+                            sx={{
                               position: 'absolute',
                               fontSize: 15,
                               opacity: activeMenu === page ? 0 : 1,
                               transition: 'opacity 0.3s ease',
-                            }} 
+                            }}
                           />
-                          <ExpandLessIcon 
-                            sx={{ 
+                          <ExpandLessIcon
+                            sx={{
                               position: 'absolute',
                               fontSize: 15,
                               opacity: activeMenu === page ? 1 : 0,
                               transition: 'opacity 0.3s ease',
-                            }} 
+                            }}
                           />
                         </Box>
                       )}
@@ -475,212 +478,218 @@ const Header = () => {
                   </Box>
                 ))}
             </Box>
-              {/* Setting */}
-              <Box sx={{ flexGrow: 0 }}>
-                {/* Favorite */}
-                <IconButton sx={{ color: "#000", p: 0 }} onClick={() => handleMenuClick('/user/favorite')}>
-                  <FavoriteBorderOutlinedIcon />
-                </IconButton>
-                {/* Cart */}
-                <IconButton 
-                  sx={{ color: "#000", p: 0 }} 
-                  onClick={handleCartOpen}
-                >
-                  <Badge 
-                    badgeContent={getTotalItems(consolidatedCartItems)} 
-                    color="error"
-                    sx={{
-                      '& .MuiBadge-badge': {
-                        right: 13,
-                        top: 5,
-                        padding: '0 4px',
-                        height: '16px',
-                        minWidth: '16px',
-                        backgroundColor: '#cc0f0f'
-                      }
-                    }}
-                  >
-                    <LocalMallOutlinedIcon sx={{ margin: "0 10px" }} />
-                  </Badge>
-                </IconButton>
-                {/* Personal */}
-                <IconButton
-                  onClick={handleOpenUserMenu}
-                  sx={{ display: { xs: "none", md: "inline-flex" }, color: "#000", p: 0 }}
-                >
-                  {user ? <Avatar sx={{ width: 34, height: 34 }}  alt="avatar" src="/static/images/avatar/1.jpg" /> : (<PersonOutlineOutlinedIcon  onClick={()=>navigate('/auth/user/login')}/>)}
-                </IconButton>
-                {/* Search */}
-                <IconButton
-                  sx={{ display: { xs: "inline-flex", md: "none" }, color: "#000", p: 0 }}
-                >
-                  <SearchIcon />
-                </IconButton>
-                {user ? (  <Menu
-                  sx={{ mt: "45px" }}
-                  id="menu-appbar"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
+            {/* Setting */}
+            <Box sx={{ flexGrow: 0 }}>
+              {/* Favorite */}
+              <IconButton sx={{ color: "#000", p: 0 }} onClick={() => handleMenuClick('/user/favorite')}>
+                <FavoriteBorderOutlinedIcon />
+              </IconButton>
+              {/* Cart */}
+              <IconButton
+                sx={{ color: "#000", p: 0 }}
+                onClick={handleCartOpen}
+              >
+                <Badge
+                  badgeContent={getTotalItems(consolidatedCartItems)}
+                  color="error"
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      right: 13,
+                      top: 5,
+                      padding: '0 4px',
+                      height: '16px',
+                      minWidth: '16px',
+                      backgroundColor: '#cc0f0f'
+                    }
                   }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
                 >
-                  {settings.map((setting, index) => (
-                    <MenuItem key={index} onClick={() => handleSettingClick(setting)}>
-                      <Typography
+                  <LocalMallOutlinedIcon sx={{ margin: "0 10px" }} />
+                </Badge>
+              </IconButton>
+              {/* Personal */}
+              <IconButton
+                onClick={handleOpenUserMenu}
+                sx={{ display: { xs: "none", md: "inline-flex" }, color: "#000", p: 0 }}
+              >
+                {user ? <Avatar sx={{ width: 34, height: 34 }} alt="avatar" src="/static/images/avatar/1.jpg" /> : (<PersonOutlineOutlinedIcon onClick={() => navigate('/auth/user/login')} />)}
+              </IconButton>
+              {/* Search */}
+              <IconButton
+                sx={{ display: { xs: "inline-flex", md: "none" }, color: "#000", p: 0 }}
+              >
+                <SearchIcon />
+              </IconButton>
+              {user ? (<Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting, index) => (
+                  <MenuItem key={index} onClick={() => handleSettingClick(setting)}>
+                    <Typography
+                      sx={{
+                        textAlign: "center",
+                        fontSize: "13px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {setting.label}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>) : <Box></Box>}
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+
+      {/* Cart Dropdown */}
+      <Popper
+        open={Boolean(anchorElCart)}
+        anchorEl={anchorElCart}
+        transition
+        placement="bottom-end"
+        sx={{ zIndex: 1301 }}
+      >
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <Paper
+              sx={{
+                width: { xs: '90vw', sm: 400 },
+                mt: 1,
+                borderRadius: 2,
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                maxHeight: '80vh',
+                overflow: 'auto'
+              }}
+            >
+              <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600 }}>
+                  Giỏ hàng ({consolidatedCartItems.length})
+                </Typography>
+                <IconButton size="small" onClick={handleCartClose}>
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+
+              {cartItems.length > 0 ? (
+                <>
+                  <Box sx={{ maxHeight: '400px', overflow: 'auto' }}>
+                    {consolidatedCartItems.map((item) => (
+                      <Box
+                        key={item.idSanPham}
                         sx={{
-                          textAlign: "center",
-                          fontSize: "13px",
-                          fontWeight: "600",
+                          p: 2,
+                          display: 'flex',
+                          borderBottom: '1px solid #f0f0f0',
+                          '&:hover': { bgcolor: '#f9f9f9' }
                         }}
                       >
-                        {setting.label}
-                      </Typography>
-                    </MenuItem>
-                  ))}
-                </Menu>):<Box></Box>}
-              </Box>
-            </Toolbar>
-          </Container>
-        </AppBar>
-
-          {/* Cart Dropdown */}
-            <Popper
-              open={Boolean(anchorElCart)}
-              anchorEl={anchorElCart}
-              transition
-              placement="bottom-end"
-              sx={{ zIndex: 1301 }}
-            >
-              {({ TransitionProps }) => (
-                <Fade {...TransitionProps} timeout={350}>
-                  <Paper
-                    sx={{
-                      width: { xs: '90vw', sm: 400 },
-                      mt: 1,
-                      borderRadius: 2,
-                      boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                      maxHeight: '80vh',
-                      overflow: 'auto'
-                    }}
-                  >
-                    <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600 }}>
-                        Giỏ hàng ({consolidatedCartItems.length})
-                      </Typography>
-                      <IconButton size="small" onClick={handleCartClose}>
-                        <CloseIcon />
-                      </IconButton>
-                    </Box>
-                    
-                    {cartItems.length > 0 ? (
-                      <>
-                        <Box sx={{ maxHeight: '400px', overflow: 'auto' }}>
-                          {consolidatedCartItems.map((item) => (
-                            <Box
-                              key={item.idSanPham}
-                              sx={{
-                                p: 2,
-                                display: 'flex',
-                                borderBottom: '1px solid #f0f0f0',
-                                '&:hover': { bgcolor: '#f9f9f9' }
-                              }}
-                            >
-                              <Box sx={{ width: 80, height: 80, flexShrink: 0 }}>
-                                <img
-                                  src={`http://localhost:8080${item.HinhAnh}`}
-                                  alt={item.TenSanPham}
-                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                />
-                              </Box>
-                              <Box sx={{ ml: 2, flex: 1 }}>
-                                <Typography sx={{ fontWeight: 500, fontSize: '0.9rem' }}>
-                                  {item.TenSanPham}
-                                </Typography>
-                                <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem', mt: 0.5 }}>
-                                  Số lượng: {item.quantity}
-                                </Typography>
-                                <Typography sx={{ color: '#cc0f0f', fontWeight: 600, mt: 0.5 }}>
-                                  {(item.GiaTien * item.quantity).toLocaleString('vi-VN')}đ
-                                </Typography>
-                              </Box>
-                              <IconButton 
-                                size="small" 
-                                onClick={() => handleRemoveFromCart(item.idSanPham)}
-                                sx={{ alignSelf: 'flex-start' }}
-                              >
-                                <CloseIcon fontSize="small" />
-                              </IconButton>
-                            </Box>
-                        ))}
-                      </Box>
-                      <Box sx={{ p: 2, borderTop: '1px solid #e0e0e0' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                          <Typography sx={{ fontWeight: 500 }}>Tổng tiền:</Typography>
-                          <Typography sx={{ color: '#cc0f0f', fontWeight: 600 }}>
-                            {consolidatedCartItems.reduce((total, item) => total + (item.GiaTien * item.quantity), 0).toLocaleString('vi-VN')}đ
+                        <Box sx={{ width: 80, height: 80, flexShrink: 0 }}>
+                          <img
+                            src={`http://localhost:8080${item.HinhAnh}`}
+                            alt={item.TenSanPham}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                        </Box>
+                        <Box sx={{ ml: 2, flex: 1 }}>
+                          <Typography sx={{ fontWeight: 500, fontSize: '0.9rem' }}>
+                            {item.TenSanPham}
+                          </Typography>
+                          <Typography sx={{ fontSize: '0.8rem', color: 'text.secondary', mb: 0.5 }}>
+                            Kích thước: {item.KichThuoc.TenKichThuoc}
+                          </Typography>
+                          <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem', mt: 0.5 }}>
+                            Số lượng: {item.quantity}
+                          </Typography>
+                          <Typography sx={{ color: '#cc0f0f', fontWeight: 600, mt: 0.5 }}>
+                            {(item.GiaTien * item.quantity).toLocaleString('vi-VN')}đ
                           </Typography>
                         </Box>
-                        <Button
-                          variant="contained"
-                          fullWidth
-                          onClick={() => {
-                            handleCartClose();
-                            handleMenuClick('/user/cart');
+                        <IconButton
+                          size="small"
+                          onClick={async () => {
+                            await handleRemoveFromCart(item.idSanPham);
+                            handleFetchCart(); // Thêm dòng này để cập nhật lại giỏ hàng
                           }}
-                          sx={{
-                            bgcolor: '#cc0f0f',
-                            color: 'white',
-                            '&:hover': { bgcolor: '#a30c0c' }
-                          }}
+                          sx={{ alignSelf: 'flex-start' }}
                         >
-                          XEM GIỎ HÀNG
-                        </Button>
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
                       </Box>
-                    </>
-                  ) : (
-                    <Box sx={{ 
-                      p: 4,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      minHeight: 300
-                    }}>
-                      <ShoppingCartOutlinedIcon sx={{ fontSize: 50, color: 'text.secondary', mb: 2 }} />
-                      <Typography variant="h6" color="text.secondary" mb={2}>
-                        Giỏ hàng trống
+                    ))}
+                  </Box>
+                  <Box sx={{ p: 2, borderTop: '1px solid #e0e0e0' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography sx={{ fontWeight: 500 }}>Tổng tiền:</Typography>
+                      <Typography sx={{ color: '#cc0f0f', fontWeight: 600 }}>
+                        {consolidatedCartItems.reduce((total, item) => total + (item.GiaTien * item.quantity), 0).toLocaleString('vi-VN')}đ
                       </Typography>
-                      <Button 
-                        variant="contained"
-                        onClick={() => {
-                          handleCartClose();
-                          handleMenuClick('/user/cart');
-                        }}
-                        sx={{
-                          bgcolor: '#cc0f0f',
-                          color: 'white',
-                          px: 4,
-                          py: 1,
-                          '&:hover': { bgcolor: '#a30c0c' }
-                        }}
-                      >
-                        ĐẾN GIỎ HÀNG
-                      </Button>
                     </Box>
-                  )}
-                </Paper>
-              </Fade>
-            )}
-          </Popper>
-        </>
-      );
-    };
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      onClick={() => {
+                        handleCartClose();
+                        handleMenuClick('/user/cart');
+                      }}
+                      sx={{
+                        bgcolor: '#cc0f0f',
+                        color: 'white',
+                        '&:hover': { bgcolor: '#a30c0c' }
+                      }}
+                    >
+                      XEM GIỎ HÀNG
+                    </Button>
+                  </Box>
+                </>
+              ) : (
+                <Box sx={{
+                  p: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  minHeight: 300
+                }}>
+                  <ShoppingCartOutlinedIcon sx={{ fontSize: 50, color: 'text.secondary', mb: 2 }} />
+                  <Typography variant="h6" color="text.secondary" mb={2}>
+                    Giỏ hàng trống
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      handleCartClose();
+                      handleMenuClick('/user/cart');
+                    }}
+                    sx={{
+                      bgcolor: '#cc0f0f',
+                      color: 'white',
+                      px: 4,
+                      py: 1,
+                      '&:hover': { bgcolor: '#a30c0c' }
+                    }}
+                  >
+                    ĐẾN GIỎ HÀNG
+                  </Button>
+                </Box>
+              )}
+            </Paper>
+          </Fade>
+        )}
+      </Popper>
+    </>
+  );
+};
 
-    export default Header;
+export default Header;

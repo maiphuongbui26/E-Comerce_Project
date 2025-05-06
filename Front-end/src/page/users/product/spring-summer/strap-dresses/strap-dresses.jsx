@@ -17,8 +17,8 @@ const StrapDresses = () => {
     if (products && productTypes) {
       // Tìm loại sản phẩm "Đầm hai dây" trong danh mục "Xuân hè"
       const strapType = productTypes.find(type => 
-        type.TenLoaiSanPham.toLowerCase().includes('đầm hai dây') &&
-        type.DanhMucSanPham.TenDanhMuc === "Xuân hè"
+        type.TenLoaiSanPham.toLowerCase().includes('váy 2 dây') &&
+        type.DanhMucSanPham.TenDanhMuc === "Xuân hạ"
       );
 
       if (strapType) {

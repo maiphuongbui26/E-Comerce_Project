@@ -57,11 +57,18 @@ export const updateOrderStatus = createAsyncThunk(
   'orders/updateStatus',
   async ({ orderId, TrangThaiDonHang }, { rejectWithValue }) => {
     try {
+      const token = localStorage.getItem('adminToken');
+      const user = JSON.parse(localStorage.getItem('user'));  
       const response = await axios.patch(
-        `${BASE_URL}/orders/${orderId}/status`, 
-        { TrangThaiDonHang },
-        getAuthHeader()
-      );
+        `${BASE_URL}/orders/${orderId}/status`, // Sửa lỗi template literal
+        { TrangThaiDonHang, user }, // Request body
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`, // Sửa lỗi template literal
+            'Content-Type': 'application/json'
+          }
+        }
+      );  // Thêm dấu chấm phẩy
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

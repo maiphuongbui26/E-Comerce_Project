@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import StarIcon from "@mui/icons-material/Star";
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate, useParams } from "react-router-dom";
@@ -13,11 +14,11 @@ import { useAuth } from "../../../hooks/useAuth";
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate()
-  const { handleFetchProductById, selectedProduct,sizes,fetchAllData } = useProduct();
+  const { handleFetchProductById, selectedProduct, sizes, fetchAllData, handleToggleFavorite } = useProduct();
   const { handleAddToCart, handleFetchCart } = useCart();
-  const { getUser,user } = useAuth();
+  const { getUser, user } = useAuth();
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState(null); 
+  const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showSizeChart, setShowSizeChart] = useState(false);
@@ -36,7 +37,7 @@ const ProductDetail = () => {
     handleFetchProductById(id);
     fetchAllData()
     getUser()
-  }, [id]); 
+  }, [id]);
 
   useEffect(() => {
     if (selectedProduct?.HinhAnh && selectedProduct.HinhAnh.length > 0) {
@@ -54,7 +55,7 @@ const ProductDetail = () => {
     }
     const cartItem = {
       user,
-      idSanPham: selectedProduct.idSanPham, 
+      idSanPham: selectedProduct.idSanPham,
       SoLuong: quantity,
       MauSac: selectedColor,
       KichThuoc: selectedSize,
@@ -68,6 +69,17 @@ const ProductDetail = () => {
     } catch (error) {
       console.error("Error adding to cart:", error);
       toast.error("Có lỗi xảy ra khi thêm vào giỏ hàng");
+    }
+  };
+  const handleToggleFavoriteClick = async () => {
+    if (!selectedProduct) return;
+    try {
+      const success = await handleToggleFavorite(selectedProduct.idSanPham);
+      if (success) {
+        toast.success("Đã cập nhật trạng thái yêu thích");
+      }
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi cập nhật trạng thái yêu thích");
     }
   };
   return (
@@ -148,7 +160,7 @@ const ProductDetail = () => {
               currency: "VND",
             })}
           </Typography>
-        
+
           <Box sx={{ mb: 3 }}>
             <Typography sx={{ mb: 1 }}>Màu sắc:</Typography>
             <Box sx={{ display: "flex", gap: 1 }}>
@@ -192,17 +204,17 @@ const ProductDetail = () => {
             <Box sx={{ display: "flex", gap: 1 }}>
               {sizes.map((size) => (
                 <Button
-                  key={size.id} 
-                  variant={selectedSize === size.id ? "contained" : "outlined"} 
-                  onClick={() => setSelectedSize(size.id)} 
+                  key={size.id}
+                  variant={selectedSize === size.id ? "contained" : "outlined"}
+                  onClick={() => setSelectedSize(size.id)}
                   sx={{
                     minWidth: "40px",
                     height: "40px",
-                    bgcolor: selectedSize === size.id ? "#333" : "transparent", 
-                    color: selectedSize === size.id ? "#fff" : "#333", 
+                    bgcolor: selectedSize === size.id ? "#333" : "transparent",
+                    color: selectedSize === size.id ? "#fff" : "#333",
                     border: "1px solid #ddd",
                     "&:hover": {
-                      bgcolor: selectedSize === size.id ? "#333" : "transparent", 
+                      bgcolor: selectedSize === size.id ? "#333" : "transparent",
                     },
                   }}
                 >
@@ -244,21 +256,19 @@ const ProductDetail = () => {
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button
               variant="outlined"
+              onClick={handleToggleFavoriteClick}
               sx={{
                 minWidth: "50px",
                 height: "48px",
                 border: "1px solid #ddd",
-                color: "#333",
+                color: selectedProduct?.YeuThich ? "#dc0606" : "#333",
                 padding: 0,
                 "&:hover": {
                   border: "1px solid #333",
                 },
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
               }}
             >
-              <FavoriteBorderIcon />
+              {selectedProduct?.YeuThich ? <FavoriteIcon /> : <FavoriteBorderIcon />}
             </Button>
             <Button
               variant="outlined"
@@ -286,7 +296,7 @@ const ProductDetail = () => {
                   bgcolor: "#000",
                 },
               }}
-              onClick={()=>{navigate('/user/cart')}}
+              onClick={() => { navigate('/user/cart') }}
             >
               MUA NGAY
             </Button>
@@ -310,25 +320,50 @@ const ProductDetail = () => {
             <Collapse in={showDetails}>
               <Box sx={{ p: 2, borderTop: "1px solid #ddd" }}>
                 <Typography variant="h6" sx={{ mb: 2 }}>
-                  QUẦN SOOC PHỐI LÉ GẤU – NĂNG ĐỘNG & TINH TẾ
+                  {selectedProduct?.TenSanPham}
                 </Typography>
                 <Typography variant="h6" sx={{ mb: 1 }}>
-                  1.Điểm nổi bật của sản phẩm
+                  Thông tin sản phẩm
                 </Typography>
                 <ul style={{ paddingLeft: "20px" }}>
                   <li>
-                    Thiết kế quần sooc hiện đại với chi tiết phối lé phần gấu,
-                    tạo điểm nhấn tinh tế.
+                    <Typography sx={{ mb: 1 }}>
+                      <strong>Mô tả:</strong> {selectedProduct?.MoTa || "Chưa có mô tả"}
+                    </Typography>
                   </li>
                   <li>
-                    Hai ly chết giúp quần giữ phom tốt, tôn dáng người mặc.
+                    <Typography sx={{ mb: 1 }}>
+                      <strong>Chất liệu:</strong> {selectedProduct?.ChatLieu || "Đang cập nhật"}
+                    </Typography>
                   </li>
-                  <li>Màu sắc: Be/Xanh Đá – thanh lịch, dễ phối đồ.</li>
                   <li>
-                    Chất liệu: Polyester Weft Stripe cao cấp – mềm mại, thoáng
-                    khí, giữ form tốt.
+                    <Typography sx={{ mb: 1 }}>
+                      <strong>Màu sắc có sẵn:</strong> {selectedProduct?.MauSac?.map(color => color.TenMau).join(', ')}
+                    </Typography>
                   </li>
+                  <li>
+                    <Typography sx={{ mb: 1 }}>
+                      <strong>Kích thước có sẵn:</strong> {sizes?.map(size => size.TenKichThuoc).join(', ')}
+                    </Typography>
+                  </li>
+                  {selectedProduct?.ThongTinBoSung && (
+                    <li>
+                      <Typography sx={{ mb: 1 }}>
+                        <strong>Thông tin thêm:</strong> {selectedProduct.ThongTinBoSung}
+                      </Typography>
+                    </li>
+                  )}
                 </ul>
+                {selectedProduct?.HuongDanBaoQuan && (
+                  <>
+                    <Typography variant="h6" sx={{ mb: 1, mt: 2 }}>
+                      Hướng dẫn bảo quản
+                    </Typography>
+                    <Typography sx={{ pl: 2.5 }}>
+                      {selectedProduct.HuongDanBaoQuan}
+                    </Typography>
+                  </>
+                )}
               </Box>
             </Collapse>
 

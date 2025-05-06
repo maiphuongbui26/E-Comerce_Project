@@ -17,8 +17,8 @@ const BabydollDresses = () => {
     if (products && productTypes) {
       // Tìm loại sản phẩm "Đầm babydoll" trong danh mục "Xuân hè"
       const babydollType = productTypes.find(type => 
-        type.TenLoaiSanPham.toLowerCase().includes('đầm babydoll') &&
-        type.DanhMucSanPham.TenDanhMuc === "Xuân hè"
+        type.TenLoaiSanPham.toLowerCase().includes('váy babydoll') &&
+        type.DanhMucSanPham.TenDanhMuc === "Xuân hạ"
       );
 
       if (babydollType) {

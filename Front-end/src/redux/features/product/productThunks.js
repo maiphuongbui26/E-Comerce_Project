@@ -253,8 +253,14 @@ export const deleteProductImage = createAsyncThunk(
 export const toggleFavorite = createAsyncThunk(
   'products/toggleFavorite',
   async (id, { rejectWithValue }) => {
+    const token = localStorage.getItem('token');
     try {
-      const response = await axios.patch(`${BASE_URL}/products/${id}/favorite`);
+      const response = await axios.patch(`${BASE_URL}/products/${id}/favorite`, {}, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);

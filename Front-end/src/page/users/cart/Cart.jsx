@@ -47,7 +47,10 @@ const Cart = () => {
   const { user } = useAuth();
   console.log("cartItems", cartItems);
   const consolidatedCartItems = cartItems.reduce((acc, item) => {
-    const existingItem = acc.find((i) => i.idSanPham === item.idSanPham);
+    const existingItem = acc.find(i => 
+      i.idSanPham === item.idSanPham && 
+      i.KichThuoc.TenKichThuoc === item.KichThuoc.TenKichThuoc
+    );
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
@@ -55,9 +58,11 @@ const Cart = () => {
     }
     return acc;
   }, []);
-  const handleQuantityChange = async (idSanPham, change) => {
+
+  const handleQuantityChange = async (idSanPham, kichThuoc, change) => {
     const item = consolidatedCartItems.find(
-      (item) => item.idSanPham === idSanPham
+      (item) => item.idSanPham === idSanPham && 
+                item.KichThuoc.TenKichThuoc === kichThuoc
     );
     if (!item) return;
 
@@ -133,7 +138,7 @@ const Cart = () => {
                 </TableHead>
                 <TableBody>
                   {consolidatedCartItems.map((cartItem) => (
-                    <TableRow key={cartItem.idSanPham}>
+                    <TableRow key={`${cartItem.idSanPham}-${cartItem.KichThuoc.TenKichThuoc}`}>
                       <TableCell>
                         <img
                           src={`http://localhost:8080${cartItem?.HinhAnh}`}
@@ -147,6 +152,9 @@ const Cart = () => {
                         <Typography variant="body1" sx={{ fontWeight: 500 }}>
                           {cartItem?.TenSanPham}
                         </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Kích thước: {cartItem.KichThuoc.TenKichThuoc}
+                        </Typography>
                       </TableCell>
                       <TableCell align="center">
                         <Box
@@ -159,7 +167,11 @@ const Cart = () => {
                           <IconButton
                             size="small"
                             onClick={() =>
-                              handleQuantityChange(cartItem.idSanPham, -1)
+                              handleQuantityChange(
+                                cartItem.idSanPham,
+                                cartItem.KichThuoc.TenKichThuoc,
+                                -1
+                              )
                             }
                           >
                             <RemoveIcon />
@@ -170,7 +182,11 @@ const Cart = () => {
                           <IconButton
                             size="small"
                             onClick={() =>
-                              handleQuantityChange(cartItem.idSanPham, 1)
+                              handleQuantityChange(
+                                cartItem.idSanPham,
+                                cartItem.KichThuoc.TenKichThuoc,
+                                1
+                              )
                             }
                           >
                             <AddIcon />

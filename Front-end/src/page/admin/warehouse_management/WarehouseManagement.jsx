@@ -110,7 +110,6 @@ const WarehouseManagement = () => {
                 <TableRow key={item.id}>
                   <TableCell>{item.id}</TableCell>
                   <TableCell>{item.SanPham?.TenSanPham}</TableCell>
-              
                   <TableCell>
                     {formatDate(item.NgayNhapKho)}
                   </TableCell>
@@ -123,7 +122,7 @@ const WarehouseManagement = () => {
                   <TableCell align="center">
                     <IconButton
                       size="small"
-                      onClick={() => navigate(`/admin/warehouse/${item.id}`)}
+                      onClick={() => navigate(`/admin/warehouses/${item.id}`)}
                     >
                       <VisibilityIcon />
                     </IconButton>

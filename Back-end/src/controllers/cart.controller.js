@@ -1,5 +1,6 @@
 const Cart = require('../models/cart.model');
 const Product = require('../models/product.model');
+const Size = require('../models/size.model');
 const generateCartId = require('../utils/generateId');
 
 const cartController = {
@@ -44,6 +45,7 @@ const cartController = {
   addProduct: async (req, res) => {
     try {
       const { idSanPham, SoLuong, MauSac, KichThuoc,user } = req.body;
+      console.log("KichThuoc",KichThuoc)
       let cart = await Cart.findOne({ 
         NguoiDung: user.id,
         TrangThai: 'active'
@@ -57,13 +59,13 @@ const cartController = {
         });
       }
       const product = await Product.findOne({ idSanPham:  idSanPham});
+      const size = await Size.findOne({ id:  KichThuoc});
       if (!product) {
         return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
       }
       const existingProductIndex = cart.DanhSachSanPham.findIndex(
         item => item.idSanPham === idSanPham && 
-               item.MauSac === MauSac && 
-               item.KichThuoc === KichThuoc
+               item.MauSac === MauSac 
       );
       if (existingProductIndex > -1) {
         cart.DanhSachSanPham[existingProductIndex].SoLuong += SoLuong;
@@ -77,7 +79,7 @@ const cartController = {
           HinhAnh: product.HinhAnh[0],
           SoLuong,
           MauSacDaChon: product.MauSac[0].TenMau,
-          KichThuoc,
+          KichThuoc: size,
           GiaTien: product.GiaSanPham
         });
       }

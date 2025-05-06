@@ -204,7 +204,7 @@ const Home = () => {
               spacing={{ xs: 1, md: 3 }}
               justifyContent="center"
             >
-              {products?.map((product, index) => (
+              {products?.slice(0,5)?.map((product, index) => (
                 <Grid2 size={{ xs: 6, md: 2 }} key={product.id}>
                   <Box
                     sx={{

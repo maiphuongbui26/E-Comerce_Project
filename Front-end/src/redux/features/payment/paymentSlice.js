@@ -1,10 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createPayment } from './paymentThunks';
+import { createPaypalPayment, capturePaypalPayment, getPaymentById } from './paymentThunks';
 
 const initialState = {
-  paymentUrl: null,
+  paymentData: null,
+  approvalUrl: null,
   isLoading: false,
   error: null,
+  currentPayment: null
 };
 
 const paymentSlice = createSlice({
@@ -14,23 +16,57 @@ const paymentSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    clearPaymentData: (state) => {
+      state.paymentData = null;
+      state.approvalUrl = null;
+    }
   },
   extraReducers: (builder) => {
     builder
-      .addCase(createPayment.pending, (state) => {
+      // CreatePaypalPayment cases
+      .addCase(createPaypalPayment.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(createPayment.fulfilled, (state, action) => {
+      .addCase(createPaypalPayment.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.paymentUrl = action.payload.paymentUrl;
+        state.paymentData = action.payload;
+        state.approvalUrl = action.payload.approvalUrl;
       })
-      .addCase(createPayment.rejected, (state, action) => {
+      .addCase(createPaypalPayment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      
+      // CapturePaypalPayment cases
+      .addCase(capturePaypalPayment.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(capturePaypalPayment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.paymentData = action.payload;
+      })
+      .addCase(capturePaypalPayment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      
+      // GetPaymentById cases
+      .addCase(getPaymentById.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getPaymentById.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.currentPayment = action.payload;
+      })
+      .addCase(getPaymentById.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { clearError } = paymentSlice.actions;
+export const { clearError, clearPaymentData } = paymentSlice.actions;
 export default paymentSlice.reducer;

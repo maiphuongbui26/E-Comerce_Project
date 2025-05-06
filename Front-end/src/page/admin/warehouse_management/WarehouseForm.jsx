@@ -48,7 +48,6 @@ const WarehouseForm = () => {
           SanPham: formData.productId,
           SoLuong: formData.quantity,
           NgayNhapKho: formData.importDate,
-          HanBanLoHang: formData.expiryDate,
           GhiChu: formData.note
         });
       } else if (isExport) {
@@ -56,12 +55,12 @@ const WarehouseForm = () => {
           SanPham: formData.productId,
           SoLuong: formData.quantity,
           NgayXuatKho: formData.exportDate,
+          HanBanLoHang: formData.expiryDate,
           GhiChu: formData.note
         });
       }
-
       if (success) {
-        navigate("/admin/warehouse");
+        navigate("/admin/warehouses");
       }
     } catch (error) {
       console.error("Error processing warehouse operation:", error);

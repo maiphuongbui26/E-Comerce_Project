@@ -16,14 +16,16 @@ const upload = multer({
 router.get('/', productController.getAll);
 router.get('/:id', productController.getById);
 
+// Routes requiring only authentication
+router.use(verifyToken);
+router.patch('/:id/favorite', productController.toggleFavorite);
+
 // Protected routes (admin only)
-router.use(verifyToken, verifyAdmin);
-router.get('/', productController.getAll);
+router.use(verifyAdmin);
 router.post('/create', productController.create);
 router.put('/:id', productController.update);
 router.delete('/:id', productController.delete);
 router.patch('/:id/stock', productController.updateStock);
-router.patch('/:id/favorite', productController.toggleFavorite);
 router.delete('/:id/images/:filename', productController.deleteImage);
 
 module.exports = router;

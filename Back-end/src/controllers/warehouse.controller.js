@@ -13,7 +13,6 @@ const warehouseController = {
         id: generateWarehouseId('WH'),
         SanPham: product.toObject(), // Store full product object
         NgayNhapKho: NgayNhapKho || new Date(),
-        HanBanLoHang,
         SoLuong
       });
       if (!product) {
@@ -41,7 +40,8 @@ const warehouseController = {
   // Export stock
   exportStock: async (req, res) => {
     try {
-      const { SanPham, SoLuong, NgayXuatKho } = req.body;
+        
+        const { SanPham, SoLuong, NgayXuatKho,HanBanLoHang } = req.body;
 
       const product = await Product.findOne({ idSanPham: SanPham });
       if (!product) {
@@ -57,7 +57,8 @@ const warehouseController = {
         id: generateWarehouseId('WH'),
         SanPham: product.toObject(), 
         NgayXuatKho: NgayXuatKho || new Date(),
-        SoLuong: -SoLuong
+        SoLuong: -SoLuong,
+        HanBanLoHang
       });
 
       // Decrease product quantity

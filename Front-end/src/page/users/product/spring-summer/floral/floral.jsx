@@ -17,8 +17,8 @@ const FloralDresses = () => {
     if (products && productTypes) {
       // Tìm loại sản phẩm "Đầm hoa" trong danh mục "Xuân hè"
       const floralType = productTypes.find(type => 
-        type.TenLoaiSanPham.toLowerCase().includes('đầm hoa') &&
-        type.DanhMucSanPham.TenDanhMuc === "Xuân hè"
+        type.TenLoaiSanPham.toLowerCase().includes('váy hoa nhí') &&
+        type.DanhMucSanPham.TenDanhMuc === "Xuân hạ"
       );
 
       if (floralType) {
