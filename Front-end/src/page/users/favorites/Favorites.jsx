@@ -51,7 +51,7 @@ const Favorites = () => {
               >
                 <CardMedia
                   component="img"
-                  image={`http://localhost:8080${product.HinhAnh[0]}`}
+                  image={`${product?.HinhAnh[0]}`}
                   alt={product.TenSanPham}
                   sx={{ 
                     height: 200,

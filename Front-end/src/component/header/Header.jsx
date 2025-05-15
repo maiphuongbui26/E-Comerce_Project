@@ -481,7 +481,7 @@ const Header = () => {
             {/* Setting */}
             <Box sx={{ flexGrow: 0 }}>
               {/* Favorite */}
-              <IconButton sx={{ color: "#000", p: 0 }} onClick={() => handleMenuClick('/user/favorite')}>
+              <IconButton sx={{ color: "#000", p: 0 }} onClick={() => handleMenuClick('/user/favorites')}>
                 <FavoriteBorderOutlinedIcon />
               </IconButton>
               {/* Cart */}

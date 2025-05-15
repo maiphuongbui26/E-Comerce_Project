@@ -31,10 +31,36 @@ const LoginAdmin = () => {
   const {handleAdminLogin, admin, error, isAuthenticated, isLoading} = useAuthAdmin();
   const [authError, setAuthError] = useState(null);
 
+  useEffect(() => {
+    // Kiểm tra nếu đã có thông tin admin trong localStorage
+    const adminInfo = localStorage.getItem('adminInfo');
+    if (adminInfo) {
+      const parsedAdmin = JSON.parse(adminInfo);
+      if (parsedAdmin.VaiTro === 'khachhang') {
+        setAuthError('Tài khoản không có quyền truy cập vào trang quản trị');
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminInfo');
+        return;
+      }
+      if (parsedAdmin.VaiTro === 'admin' || parsedAdmin.VaiTro === 'nhanvien') {
+        navigate('/admin/dashboard');
+      }
+    }
+  }, [navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-       await handleAdminLogin(formData);
+      const success = await handleAdminLogin(formData);
+      if (success) {
+        const adminInfo = localStorage.getItem('adminInfo');
+        if (adminInfo) {
+          const parsedAdmin = JSON.parse(adminInfo);
+          if (parsedAdmin.VaiTro === 'admin' || parsedAdmin.VaiTro === 'nhanvien') {
+            navigate('/admin/dashboard');
+          }
+        }
+      }
     } catch (error) {
       console.error('Login failed:', error);
     }

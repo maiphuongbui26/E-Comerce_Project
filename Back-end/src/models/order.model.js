@@ -55,7 +55,7 @@ const orderSchema = new mongoose.Schema({
   },
   PhuongThucThanhToan: {
     type: String,
-    enum: ["cash", "credit_card", "bank_transfer", "e_wallet",'paypal'],
+    enum: ["cash", "credit_card", "bank_transfer", "cod",'paypal'],
   },
   TrangThaiDonHang: {
     type: String,
@@ -76,12 +76,12 @@ const orderSchema = new mongoose.Schema({
 orderSchema.pre("save", async function (next) {
   if (this.isNew) {
     const cart = await mongoose.model("Cart").findOne({ Id: this.GioHang.Id });
-    const user = await mongoose.model("User").findById(this.NguoiDung.id);
+    const user = await mongoose.model("User").findOne({ id: this.NguoiDung.id });
 
     if (cart && user) {
       // Copy user information
       this.NguoiDung = {
-        id: user._id,
+        id: user.id,
         HoTen: user.HoTen,
         Email: user.Email,
         SoDienThoai: user.SoDienThoai,
@@ -98,7 +98,7 @@ orderSchema.pre("save", async function (next) {
       };
 
       // Calculate final total
-      this.TongTien = cart.TongTien + this.PhiShip;
+      this.TongTien = cart.TongTien + (this.PhiShip || 0);
 
       // Update cart status
       cart.TrangThai = "ordered";

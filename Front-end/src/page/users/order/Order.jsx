@@ -166,9 +166,15 @@ const Order = () => {
                         {getPaymentMethodText(order.PhuongThucThanhToan)}
                       </Typography>
                     </Grid>
+                    <Grid item xs={12}>
+                      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+                        <LocationOnIcon sx={{ color: "#666", mt: 0.3 }} />
+                        <Typography sx={{ color: "#666" }}>
+                          Địa chỉ giao hàng: {order.DiaChiGiaoHang}
+                        </Typography>
+                      </Box>
+                    </Grid>
                   </Grid>
-
-                  
                   {/* Products */}
                   <Box sx={{ mb: 3 }}>
                     {consolidateProducts(order.GioHang.DanhSachSanPham).map((product) => (

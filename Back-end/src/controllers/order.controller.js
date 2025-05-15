@@ -7,10 +7,16 @@ const orderController = {
   // Create new order
   create: async (req, res) => {
     try {
-       console.log(req.body)
+      const { user, ...orderData } = req.body;
       const order = new Order({
         idDonHang: generateOrderId('DH'),
-        ...req.body
+        NguoiDung: {
+          id: user.id,
+          HoTen: user.HoVaTen,
+          Email: user.ThuDienTu,
+          SoDienThoai: user.SoDienThoai
+        },
+        ...orderData
       });
       await order.save();
       res.status(201).json({
@@ -71,7 +77,7 @@ const orderController = {
   // Get user's orders
   getUserOrders: async (req, res) => {
     try {
-      const orders = await Order.find({ 'NguoiDung.id': req.user._id })
+      const orders = await Order.find({ 'NguoiDung.id': req.user.id })
         .sort({ createdAt: -1 });
 
       res.json(orders);

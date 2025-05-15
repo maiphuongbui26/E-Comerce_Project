@@ -44,6 +44,33 @@ const ProductDetail = () => {
       setMainImage(selectedProduct.HinhAnh[0]);
     }
   }, [selectedProduct]);
+  const handleMuaNgay = async() => {
+    if (!selectedSize) {
+      toast.warning("Vui lòng chọn kích thước");
+      return;
+    }
+    if (!selectedColor) {
+      toast.warning("Vui lòng chọn màu sắc");
+      return;
+    }
+    const cartItem = {
+      user,
+      idSanPham: selectedProduct.idSanPham,
+      SoLuong: quantity,
+      MauSac: selectedColor,
+      KichThuoc: selectedSize,
+    };
+    try {
+      const success = await handleAddToCart(cartItem);
+      if (success) {
+        await handleFetchCart();
+        navigate("/user/cart")
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Có lỗi xảy ra khi mua hàng");
+    }
+  }
   const handleAddProductToCart = async () => {
     if (!selectedSize) {
       toast.warning("Vui lòng chọn kích thước");
@@ -296,7 +323,7 @@ const ProductDetail = () => {
                   bgcolor: "#000",
                 },
               }}
-              onClick={() => { navigate('/user/cart') }}
+              onClick={handleMuaNgay}
             >
               MUA NGAY
             </Button>

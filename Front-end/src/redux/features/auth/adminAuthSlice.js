@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginAdmin, logoutAdmin,getCurrentAdmin  } from './adminAuthThunks';
+import { loginAdmin, logoutAdmin, getCurrentAdmin } from './adminAuthThunks';
 
 const initialState = {
-  admin: null,
+  admin: JSON.parse(localStorage.getItem('adminInfo')) || null,
   isLoading: false,
   error: null,
-  isAuthenticated: false
+  isAuthenticated: !!localStorage.getItem('adminToken')
 };
 
 const adminAuthSlice = createSlice({

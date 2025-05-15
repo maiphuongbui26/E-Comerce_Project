@@ -8,8 +8,9 @@ export const loginAdmin = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${BASE_URL}/users/login`, credentials);
-      // Store the token in localStorage
+      // Lưu token và thông tin admin vào localStorage
       localStorage.setItem('adminToken', response.data.token);
+      localStorage.setItem('adminInfo', JSON.stringify(response.data.user));
       // Set default authorization header
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       return response.data;
@@ -19,14 +20,17 @@ export const loginAdmin = createAsyncThunk(
     }
   }
 );
+
 export const logoutAdmin = createAsyncThunk(
   'adminAuth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      // Remove token from localStorage
       const response = await axios.post(`${BASE_URL}/users/logout`);
+      // Xóa thông tin admin khỏi localStorage
       localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminInfo');
       // Remove authorization header
+      delete axios.defaults.headers.common['Authorization'];
       return response;
     } catch (error) {
       return rejectWithValue(error.message);

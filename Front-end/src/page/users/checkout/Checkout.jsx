@@ -106,6 +106,7 @@ const [paypalOrderDetails, setPaypalOrderDetails] = useState(null);
 
     try {
       const orderData = {
+        user: user,
         GioHang: {
           DanhSachSanPham: consolidatedCartItems.map((item) => ({
             idSanPham: item.idSanPham,
@@ -130,7 +131,6 @@ const [paypalOrderDetails, setPaypalOrderDetails] = useState(null);
         DiaChiGiaoHang: formData.address,
         GhiChu: formData.note,
       };
-
       
       
       // Modify the PayPal section in handlePlaceOrder

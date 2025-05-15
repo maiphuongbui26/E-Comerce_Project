@@ -50,6 +50,7 @@ import OrderDetail from "./page/admin/order_management/OrderDetail";
 import SearchResults from "./page/users/product/search/SearchResults";
 import Collection from "./page/users/product/collection/Collection";
 import Checkout from "./page/users/checkout/Checkout";
+import Favorites from "./page/users/favorites/Favorites";
 
 function App() {
   return (
@@ -76,6 +77,7 @@ function App() {
         <Route path="product/:id" element={<ProductDetail />} />
         <Route path="search" element={<SearchResults />} />
         <Route path="collection/:collectionName" element={<Collection />} />
+        <Route path="favorites" element={<Favorites />} />
         <Route path="casual-wear">
           <Route path="t-shirts" element={<TShirts />} />
           <Route path="shorts" element={<Shorts />} />
