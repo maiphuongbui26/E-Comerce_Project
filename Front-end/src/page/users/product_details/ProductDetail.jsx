@@ -1,4 +1,4 @@
-import { Box, Button, Typography, Grid, Collapse } from "@mui/material";
+import { Box, Button, Typography, Grid, Collapse, Rating, Grid2, Card, CardMedia, CardContent } from "@mui/material";
 import { useEffect, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -6,15 +6,17 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import StarIcon from "@mui/icons-material/Star";
 import { ToastContainer, toast } from 'react-toastify';
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useProduct } from "../../../hooks/useProduct";
 import { useCart } from "../../../hooks/useCart";
 import { useAuth } from "../../../hooks/useAuth";
+import ProductTemplate from "../../../components/templates/ProductTemplate";
+import ProductItem from "../../../component/main_component/productItem";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate()
-  const { handleFetchProductById, selectedProduct, sizes, fetchAllData, handleToggleFavorite } = useProduct();
+  const { handleFetchProductById, selectedProduct, sizes, fetchAllData, handleToggleFavorite,products,handleFetchProducts } = useProduct();
   const { handleAddToCart, handleFetchCart } = useCart();
   const { getUser, user } = useAuth();
   const [quantity, setQuantity] = useState(1);
@@ -22,21 +24,25 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showSizeChart, setShowSizeChart] = useState(false);
-  const [mainImage, setMainImage] = useState("");
-  console.log(sizes)
-  const handleIncrement = () => {
-    setQuantity((prev) => prev + 1);
-  };
-
-  const handleDecrement = () => {
-    if (quantity > 1) {
-      setQuantity((prev) => prev - 1);
+  const [randomProducts, setRandomProducts] = useState([]);
+  const [reviews, setReviews] = useState({
+    averageRating: 0,
+    totalReviews: 0,
+    ratingCounts: {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0
     }
-  };
+  });
+  console.log("products", products);
+  const [mainImage, setMainImage] = useState("");
   useEffect(() => {
     handleFetchProductById(id);
     fetchAllData()
     getUser()
+    handleFetchProducts()
   }, [id]);
 
   useEffect(() => {
@@ -44,7 +50,14 @@ const ProductDetail = () => {
       setMainImage(selectedProduct.HinhAnh[0]);
     }
   }, [selectedProduct]);
-  const handleMuaNgay = async() => {
+  useEffect(() => {
+    if (products && products.length > 0) {
+      const filteredProducts = products.filter(p => p.idSanPham !== id);
+      const shuffled = [...filteredProducts].sort(() => 0.5 - Math.random());
+      setRandomProducts(shuffled.slice(0, 6));
+    }
+  }, [products, id]);
+  const handleMuaNgay = async () => {
     if (!selectedSize) {
       toast.warning("Vui lòng chọn kích thước");
       return;
@@ -98,7 +111,14 @@ const ProductDetail = () => {
       toast.error("Có lỗi xảy ra khi thêm vào giỏ hàng");
     }
   };
+  const isFavorited = selectedProduct?.YeuThich?.some(fav => fav.userId === user?.id);
+
   const handleToggleFavoriteClick = async () => {
+    if (!user) {
+      toast.warning("Vui lòng đăng nhập để thêm vào danh sách yêu thích");
+      return;
+    }
+
     if (!selectedProduct) return;
     try {
       const success = await handleToggleFavorite(selectedProduct.idSanPham);
@@ -109,6 +129,10 @@ const ProductDetail = () => {
       toast.error("Có lỗi xảy ra khi cập nhật trạng thái yêu thích");
     }
   };
+
+  // Trong phần render, sử dụng isFavorited để hiển thị icon phù hợp
+  { isFavorited ? <FavoriteIcon /> : <FavoriteBorderIcon /> }
+
   return (
     <Box sx={{ maxWidth: "1240px", margin: "0 auto", padding: "20px" }}>
       <Typography sx={{ mb: 2, color: "#666" }}>
@@ -288,14 +312,14 @@ const ProductDetail = () => {
                 minWidth: "50px",
                 height: "48px",
                 border: "1px solid #ddd",
-                color: selectedProduct?.YeuThich ? "#dc0606" : "#333",
+                color: isFavorited ? "#dc0606" : "#333",
                 padding: 0,
                 "&:hover": {
                   border: "1px solid #333",
                 },
               }}
             >
-              {selectedProduct?.YeuThich ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+              {isFavorited ? <FavoriteIcon /> : <FavoriteBorderIcon />}
             </Button>
             <Button
               variant="outlined"
@@ -431,6 +455,103 @@ const ProductDetail = () => {
           </Box>
         </Grid>
       </Grid>
+      <Box sx={{ mt: 5, mb: 5 }}>
+        <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+          Đánh giá sản phẩm
+        </Typography>
+        <Box sx={{ bgcolor: '#f5f5f5', p: 3, borderRadius: 1 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={3}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="h3" sx={{ mb: 1 }}>
+                  {reviews.averageRating.toFixed(1)}<Typography component="span" variant="h5">/5</Typography>
+                </Typography>
+                <Rating value={reviews.averageRating} readOnly precision={0.1} />
+                <Typography sx={{ color: '#666', mt: 1 }}>
+                  {reviews.totalReviews} đánh giá
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={9}>
+              {[5, 4, 3, 2, 1].map((star) => (
+                <Box key={star} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Typography sx={{ minWidth: 50 }}>{star} sao</Typography>
+                  <Box sx={{ flex: 1, mx: 1, bgcolor: '#ddd', height: 8, borderRadius: 1 }}>
+                    <Box
+                      sx={{
+                        width: `${(reviews.ratingCounts[star] / reviews.totalReviews) * 100 || 0}%`,
+                        bgcolor: '#ffd700',
+                        height: '100%',
+                        borderRadius: 1
+                      }}
+                    />
+                  </Box>
+                  <Typography sx={{ minWidth: 50, textAlign: 'right' }}>
+                    ({reviews.ratingCounts[star]})
+                  </Typography>
+                </Box>
+              ))}
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+      {/* Phần Có thể bạn sẽ thích */}
+        <Box sx={{ mt: 5 }}>
+        <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+          CÓ THỂ BẠN SẼ THÍCH
+        </Typography>
+        <Grid container spacing={3}>
+          {randomProducts.map((product) => (
+            <Grid item xs={12} sm={6} md={4} lg={2} key={product.idSanPham}>
+              <Card 
+                sx={{ 
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  '&:hover': {
+                    boxShadow: 3
+                  }
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  image={`${product.HinhAnh[0]}`}
+                  alt={product.TenSanPham}
+                  sx={{ 
+                    height: 280,
+                    objectFit: "cover",
+                    cursor: "pointer"
+                  }}
+                  onClick={() => navigate(`/user/product/${product.idSanPham}`)}
+                />
+                <CardContent>
+                  <Typography 
+                    gutterBottom 
+                    variant="body1"
+                    sx={{ 
+                      fontSize: '0.9rem',
+                      cursor: "pointer",
+                      '&:hover': { color: '#dc0606' },
+                      height: 40,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
+                    }}
+                    onClick={() => navigate(`/product/${product.idSanPham}`)}
+                  >
+                    {product.TenSanPham}
+                  </Typography>
+                  <Typography variant="body1" color="#dc0606" fontWeight={500}>
+                    {product.GiaSanPham.toLocaleString('vi-VN')}đ
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
       <ToastContainer />
     </Box>
   );

@@ -11,7 +11,8 @@ import {
   TableRow,
   Paper,
   IconButton,
-  MenuItem 
+  MenuItem, 
+  Pagination
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -41,6 +42,8 @@ const CategoryDetail = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [referenceData, setReferenceData] = useState({});
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   // Constants
   const formFields = category ? categoryFormConfigs[category.TenMuc] : [];
   const visibleFields = formFields.filter(field => !field.hidden);
@@ -220,7 +223,21 @@ const CategoryDetail = () => {
       }
     };
   }, [previewUrl]);
+      // Tính toán phân trang
+  const totalPages = Math.ceil((items?.length || 0) / rowsPerPage);
+  const startIndex = (page - 1) * rowsPerPage;
+  const paginatedItems = items?.slice(startIndex, startIndex + rowsPerPage);
 
+  // Xử lý thay đổi trang
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Xử lý thay đổi số hàng mỗi trang
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(Number(event.target.value));
+    setPage(1);
+  };
   return (
     <>
       <Box sx={{ p: 2, bgcolor: '#fff', borderRadius: '4px 4px 0 0', borderBottom: '1px solid #e0e0e0', mb: 2 }}>
@@ -390,7 +407,7 @@ const CategoryDetail = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                items?.map((item, itemIndex) => (
+                paginatedItems?.map((item, itemIndex) => (
                   <TableRow key={itemIndex}>
                     {visibleFields.map((field, fieldIndex) => (
                       <TableCell key={`${itemIndex}-${fieldIndex}`}>
@@ -440,7 +457,60 @@ const CategoryDetail = () => {
             </TableBody>
           </Table>
         </TableContainer>
-
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            Số hàng mỗi trang:
+          </Typography>
+          <select
+            value={rowsPerPage}
+            onChange={handleRowsPerPageChange}
+            style={{ 
+              padding: '4px',
+              borderRadius: '4px',
+              border: '1px solid #ddd'
+            }}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+          </select>
+          <Typography variant="body2" color="text.secondary">
+            Tổng số: {items?.length || 0} mục
+          </Typography>
+        </Box>
+        <Pagination 
+          count={totalPages}
+          page={page}
+          onChange={handlePageChange}
+          size="small"
+          shape="rounded"
+          showFirstButton 
+          showLastButton
+          sx={{
+            '& .MuiPaginationItem-root': {
+              color: '#666',
+              bgcolor: '#fff',
+              border: '1px solid #ddd',
+              margin: '0 2px',
+              '&.Mui-selected': {
+                bgcolor: '#1976d2',
+                color: '#fff',
+                '&:hover': {
+                  bgcolor: '#1565c0'
+                }
+              },
+              '&:hover': {
+                bgcolor: '#f5f5f5'
+              }
+            },
+            '& .MuiPaginationItem-page': {
+              minWidth: '32px',
+              height: '32px'
+            }
+          }}
+        />
+      </Box>
         {error && !error.includes('bắt buộc') && (
           <Typography color="error" sx={{ mt: 2 }}>
             {error}

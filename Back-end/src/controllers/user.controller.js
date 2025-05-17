@@ -108,7 +108,6 @@ const userController = {
       if (MatKhau) {
         updateData.MatKhau = await bcrypt.hash(MatKhau, 10);
       }
-
       const user = await User.findOneAndUpdate(
         { id: req.params.id }, // Tìm theo trường 'id' thay vì '_id'
         updateData,
@@ -165,6 +164,68 @@ const userController = {
       res.status(500).json({ message: error.message });
     }
   },
+
+  // Update password
+  updatePassword: async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      const user = await User.findOne({ id: req.user.id });
+      
+      if (!user) {
+        return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+      }
+
+      const isValidPassword = await bcrypt.compare(currentPassword, user.MatKhau);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: 'Mật khẩu hiện tại không chính xác' });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.MatKhau = hashedPassword;
+      await user.save();
+
+      // Trả về response một lần và kết thúc
+      return res.status(200).json({ 
+        success: true,
+        message: 'Cập nhật mật khẩu thành công'
+      });
+    } catch (error) {
+      // Trả về lỗi một lần và kết thúc
+      return res.status(400).json({ 
+        success: false,
+        message: error.message 
+      });
+    }
+  },
+
+  // Update profile
+  updateProfile: async (req, res) => {
+    try {
+      const { HoVaTen, SoDienThoai, DiaChi } = req.body;
+      const user = await User.findOne({ id: req.user.id });
+      
+      if (!user) {
+        return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+      }
+  
+      user.HoVaTen = HoVaTen;
+      user.SoDienThoai = SoDienThoai;
+      user.DiaChi = DiaChi;
+      
+      await user.save();
+  
+      return res.status(200).json({ 
+        success: true,
+        message: 'Cập nhật thông tin thành công',
+        user: { ...user._doc, MatKhau: undefined }
+      });
+    } catch (error) {
+      return res.status(400).json({ 
+        success: false,
+        message: error.message 
+      });
+    }
+  }
 };
 
 module.exports = userController;

@@ -1,5 +1,16 @@
 const mongoose = require('mongoose');
 
+const favoriteSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
+}, { _id: false }); // Thêm option { _id: false } để tránh tạo _id cho subdocument
+
 const productSchema = new mongoose.Schema({
   idSanPham: {
     type: String,
@@ -64,9 +75,18 @@ const productSchema = new mongoose.Schema({
     default: 'available'
   },
   YeuThich: {
-    type: Boolean,
-    default: false
-  }
+    type: [favoriteSchema],
+    default: [],
+    validate: {
+      validator: function(v) {
+        return Array.isArray(v) && v.every(item => 
+          typeof item === 'object' && 
+          typeof item.userId === 'string'
+        );
+      },
+      message: 'YeuThich phải là một mảng các object có userId'
+    }
+  },
 }, {
   timestamps: true
 });

@@ -2,9 +2,8 @@ const jwt = require('jsonwebtoken');
 
 const authMiddleware = {
   verifyToken: (req, res, next) => {
-    console.log(req.cookies);
     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
-    console.log(token);
+    
     if (!token) {
       return res.status(401).json({ message: 'Không tìm thấy token xác thực' });
     }
@@ -19,11 +18,14 @@ const authMiddleware = {
   },
 
   verifyAdmin: (req, res, next) => {
-    console.log(req);
-    if (req?.user?.VaiTro === 'admin' || req?.body?.user?.VaiTro === 'admin') {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Không tìm thấy thông tin người dùng' });
+    }
+    
+    if (req.user.VaiTro === 'admin' || req.user.VaiTro === 'nhanvien') {
       next();
     } else {
-      res.status(403).json({ message: 'Yêu cầu quyền admin' });
+      return res.status(403).json({ message: 'Yêu cầu quyền admin' });
     }
   }
 };

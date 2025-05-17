@@ -55,3 +55,45 @@ export const getCurrentAdmin = createAsyncThunk(
     }
   }
 );
+
+export const updateAdminPassword = createAsyncThunk(
+  'adminAuth/updatePassword',
+  async (passwordData, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await axios.post(`${BASE_URL}/users/update-password`, passwordData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Cập nhật mật khẩu thất bại');
+    }
+  }
+);
+
+export const updateAdminProfile = createAsyncThunk(
+  'adminAuth/updateProfile',
+  async (profileData, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await axios.put(`${BASE_URL}/users/update-profile`, profileData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // Cập nhật thông tin trong localStorage
+      const currentAdmin = JSON.parse(localStorage.getItem('adminInfo'));
+      const updatedAdmin = { ...currentAdmin, ...profileData };
+      localStorage.setItem('adminInfo', JSON.stringify(updatedAdmin));
+      
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Cập nhật thông tin thất bại');
+    }
+  }
+);

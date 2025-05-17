@@ -20,7 +20,6 @@ const CategoryManagement = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Thay đổi useEffect để gọi fetchCategories khi component được mount và khi searchTerm thay đ
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -29,7 +28,6 @@ const CategoryManagement = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      // Include endpoint from API field in categoryFormConfigs
       const categoriesList = Object.keys(categoryFormConfigs).map(key => {
         const apiField = categoryFormConfigs[key].find(field => field.id === 'API');
         return {
@@ -49,17 +47,30 @@ const CategoryManagement = () => {
     }
   };
 
-  // Thêm kiểm tra trước khi filter
-  const filteredData = Array.isArray(categories) 
-    ? categories.filter(item =>
-        item.TenMuc.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.MoTa.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
+  // Tối ưu hóa hàm lọc dữ liệu
+  const filteredData = useMemo(() => {
+    if (!Array.isArray(categories)) return [];
+    return categories.filter(item =>
+      item.TenMuc.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.MoTa.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [categories, searchTerm]);
 
+  // Tính toán phân trang
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const startIndex = (page - 1) * rowsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+
+  // Xử lý thay đổi trang
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Xử lý thay đổi số hàng mỗi trang
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(Number(event.target.value));
+    setPage(1);
+  };
 
   // Replace modal handling with navigation
   const handleViewCategory = (category) => {
@@ -135,26 +146,43 @@ const CategoryManagement = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="body2" color="text.secondary">
-              Rows per page:
+              Số hàng mỗi trang:
             </Typography>
             <select
               value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setPage(1);
+              onChange={handleRowsPerPageChange}
+              style={{ 
+                padding: '4px',
+                borderRadius: '4px',
+                border: '1px solid #ddd'
               }}
-              style={{ padding: '4px' }}
             >
               <option value={5}>5</option>
               <option value={10}>10</option>
               <option value={25}>25</option>
             </select>
+            <Typography variant="body2" color="text.secondary">
+              Tổng số: {filteredData.length} danh mục
+            </Typography>
           </Box>
           <Pagination 
             count={totalPages}
             page={page}
-            onChange={(e, newPage) => setPage(newPage)}
+            onChange={handlePageChange}
             size="small"
+            shape="rounded"
+            sx={{
+              '& .MuiPaginationItem-root': {
+                color: '#666',
+                '&.Mui-selected': {
+                  bgcolor: '#1976d2',
+                  color: '#fff',
+                  '&:hover': {
+                    bgcolor: '#1565c0'
+                  }
+                }
+              }
+            }}
           />
         </Box>
 

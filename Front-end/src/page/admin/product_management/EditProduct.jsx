@@ -57,7 +57,7 @@ const EditProduct = () => {
     TrangThai: "available",
     DanhGia: "",
     HinhAnh: [],
-    YeuThich: false,
+    YeuThich: [],
   });
   console.log(formData);
 
@@ -106,7 +106,7 @@ const EditProduct = () => {
             DiaChi: "",
             MoTa: "",
           },
-          YeuThich: productData.YeuThich || false,
+          YeuThich: productData.YeuThich || [],
         });
 
         if (productData.HinhAnh && productData.HinhAnh.length > 0) {
@@ -228,9 +228,10 @@ const EditProduct = () => {
                 }
                 required
                 fullWidth
+                sx={{ '& .MuiInputLabel-root': { bgcolor: 'white', px: 1 } }}
               />
 
-              <FormControl fullWidth>
+              <FormControl fullWidth sx={{ '& .MuiInputLabel-root': { bgcolor: 'white', px: 1 } }}>
                 <InputLabel>Danh mục sản phẩm</InputLabel>
                 <Select
                   value={formData.DanhMucSanPham?.id || ""}
@@ -253,7 +254,7 @@ const EditProduct = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth>
+              <FormControl fullWidth  sx={{ '& .MuiInputLabel-root': { bgcolor: 'white', px: 1 } }}>
                 <InputLabel>Loại sản phẩm</InputLabel>
                 <Select
                   value={formData.LoaiSanPham?.id || ""}
@@ -276,7 +277,7 @@ const EditProduct = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth>
+              <FormControl fullWidth  sx={{ '& .MuiInputLabel-root': { bgcolor: 'white', px: 1 } }}>
                 <InputLabel>Đơn giá</InputLabel>
                 <Select
                   value={formData.DonGia?.id || ""}
@@ -295,7 +296,7 @@ const EditProduct = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth>
+              <FormControl fullWidth  sx={{ '& .MuiInputLabel-root': { bgcolor: 'white', px: 1 } }}>
                 <InputLabel>Style</InputLabel>
                 <Select
                   value={formData.Style?.id || ""}
@@ -314,7 +315,7 @@ const EditProduct = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth>
+              <FormControl fullWidth  sx={{ '& .MuiInputLabel-root': { bgcolor: 'white', px: 1 } }}>
                 <InputLabel>Nhà cung cấp</InputLabel>
                 <Select
                   value={formData.NhaCungCap?.idNhaCungCap || ""}
@@ -345,6 +346,7 @@ const EditProduct = () => {
                 }
                 required
                 fullWidth
+                sx={{ '& .MuiInputLabel-root': { bgcolor: 'white', px: 1 } }}
               />
 
               <TextField
@@ -357,8 +359,10 @@ const EditProduct = () => {
                 }
                 required
                 fullWidth
+                sx={{ '& .MuiInputLabel-root': { bgcolor: 'white', px: 1 } }}
               />
-              <FormControl fullWidth>
+
+              <FormControl fullWidth sx={{ '& .MuiInputLabel-root': { bgcolor: 'white', px: 1 } }}>
                 <InputLabel>Trạng thái</InputLabel>
                 <Select
                   value={formData.TrangThai}
@@ -491,7 +495,7 @@ const EditProduct = () => {
                 setFormData({ ...formData, MoTa: e.target.value })
               }
               fullWidth
-              sx={{ mt: 2 }}
+              sx={{ '& .MuiInputLabel-root': { bgcolor: 'white', px: 1 } }}
             />
 
             <Box sx={{ mt: 3 }}>
@@ -558,9 +562,7 @@ const EditProduct = () => {
                 )}
               </Box>
             </Box>
-
             <Divider sx={{ my: 3 }} />
-
             <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
               <Button
                 variant="outlined"

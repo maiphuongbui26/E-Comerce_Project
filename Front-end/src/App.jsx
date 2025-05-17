@@ -51,6 +51,8 @@ import SearchResults from "./page/users/product/search/SearchResults";
 import Collection from "./page/users/product/collection/Collection";
 import Checkout from "./page/users/checkout/Checkout";
 import Favorites from "./page/users/favorites/Favorites";
+import ProfileAdmin from './page/admin/auth_admin/Profile';
+import Settings from './page/admin/auth_admin/Settings';
 
 function App() {
   return (
@@ -144,6 +146,9 @@ function App() {
           <Route path="export" element={<WarehouseForm />} />
           <Route path=":id" element={<WarehouseDetail />} />
         </Route>
+        // Trong phần routes
+        <Route path="/admin/profile" element={<ProfileAdmin />} />
+        <Route path="/admin/settings" element={<Settings />} />
       </Route>
 
       {/* Root Redirect */}

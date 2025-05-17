@@ -4,17 +4,21 @@ import { useProduct } from "../../../hooks/useProduct";
 import { useNavigate } from "react-router-dom";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { toast } from 'react-toastify';
+import { useAuth } from "../../../hooks/useAuth";
 
 const Favorites = () => {
   const navigate = useNavigate();
   const { products, handleFetchProducts, handleToggleFavorite } = useProduct();
+  const { user } = useAuth();
 
   useEffect(() => {
     handleFetchProducts();
   }, []);
 
-  // Lọc ra các sản phẩm được yêu thích
-  const favoriteProducts = products.filter(product => product.YeuThich);
+  // Lọc ra các sản phẩm được yêu thích bởi người dùng hiện tại
+  const favoriteProducts = products.filter(product => 
+    product.YeuThich.some(fav => fav.userId === user?.id)
+  );
 
   const handleRemoveFromFavorites = async (productId) => {
     try {
@@ -58,7 +62,7 @@ const Favorites = () => {
                     objectFit: "cover",
                     cursor: "pointer"
                   }}
-                  onClick={() => navigate(`/product/${product.idSanPham}`)}
+                  onClick={() => navigate(`/user/product/${product.idSanPham}`)}
                 />
                 <IconButton
                   sx={{

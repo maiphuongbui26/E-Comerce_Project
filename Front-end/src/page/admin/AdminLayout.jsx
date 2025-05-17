@@ -190,13 +190,13 @@ const AdminLayout = () => {
                 </Typography>
               </Box>
 
-              <MenuItem sx={{ bgcolor: "#f3f0ff", mt: 1 }}>
+              <MenuItem sx={{ bgcolor: "#f3f0ff", mt: 1 }} onClick={()=>{navigate('/admin/settings')}}>
                 <ListItemIcon>
                   <SettingsIcon fontSize="small" />
                 </ListItemIcon>
                 <ListItemText>Cài đặt tài khoản</ListItemText>
               </MenuItem>
-              <MenuItem>
+              <MenuItem onClick={()=>{navigate('/admin/profile')}}>
                 <ListItemIcon>
                   <PersonIcon fontSize="small" />
                 </ListItemIcon>

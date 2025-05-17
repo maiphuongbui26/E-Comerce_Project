@@ -161,19 +161,36 @@ const productController = {
       res.status(400).json({ message: error.message });
     }
   },
-
-  toggleFavorite: async (req, res) => {
+   toggleFavorite: async (req, res) => {
     try {
+      // console.log("req.user",req.user);
+      const userId = req.user.id;
       const product = await Product.findOne({ idSanPham: req.params.id });
       
       if (!product) {
         return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
       }
 
-      product.YeuThich = !product.YeuThich;
+      const favoriteIndex = product.YeuThich.findIndex(fav => fav.userId === userId);
+
+      if (favoriteIndex === -1) {
+        // Thêm vào danh sách yêu thích với đối tượng đầy đủ
+        product.YeuThich.push({
+          userId: userId,
+          timestamp: new Date()
+        });
+      } else {
+        // Xóa khỏi danh sách yêu thích
+        product.YeuThich.splice(favoriteIndex, 1);
+      }
+
       await product.save();
 
-      res.json({ message: 'Cập nhật trạng thái yêu thích thành công', product });
+      res.json({ 
+        message: 'Cập nhật trạng thái yêu thích thành công', 
+        product,
+        isFavorited: favoriteIndex === -1 
+      });
     } catch (error) {
       res.status(400).json({ message: error.message });
     }

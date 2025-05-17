@@ -49,17 +49,21 @@ const getPaymentMethodText = (method) => {
 
 const Order = () => {
   const { handleFetchOrders, handleCancelOrder } = useOrder();
-  const { getUser,user } = useAuth();
+  const { getUser, user } = useAuth();
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
+  
   useEffect(() => {
     const fetchOrders = async () => {
       const result = await handleFetchOrders();
-      setOrders(Array.isArray(result) ? result : result.orders || []);
+      const userOrders = Array.isArray(result) 
+        ? result.filter(order => order.NguoiDung?.id === user?.id)
+        : result.orders?.filter(order => order.NguoiDung?.id === user?.id) || [];
+      setOrders(userOrders);
     };
     fetchOrders();
-    getUser()
-  }, []);
+    getUser();
+  }, [user]);
 
   const consolidateProducts = (products) => {
     console.log(products);
@@ -107,7 +111,7 @@ const Order = () => {
           ) : (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
               {orders?.map((order) => (
-                <Paper key={order.idDonHang} sx={{ p: 3, borderRadius: 2 }}>
+                <Paper key={order.idDonHang} sx={{ p: 3, borderRadius: 2}} >
                   {/* Order Header */}
                   <Box
                     sx={{
@@ -180,12 +184,14 @@ const Order = () => {
                     {consolidateProducts(order.GioHang.DanhSachSanPham).map((product) => (
                       <Box
                         key={product.idSanPham}
+                        onClick={() => navigate(`/user/product/${product.idSanPham}`)}
                         sx={{
                           display: "flex",
                           gap: 2,
                           p: 2,
                           borderBottom: "1px solid #eee",
                           "&:last-child": { borderBottom: "none" },
+                          cursor: 'pointer'
                         }}
                       >
                         <img

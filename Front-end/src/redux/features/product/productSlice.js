@@ -144,6 +144,7 @@ const productSlice = createSlice({
       })
 
       // Toggle Favorite
+      // Trong extraReducers
       .addCase(toggleFavorite.fulfilled, (state, action) => {
         const index = state.products.findIndex(p => p.idSanPham === action.payload.product.idSanPham);
         if (index !== -1) {

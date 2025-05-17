@@ -4,7 +4,6 @@ const Product = require('../models/product.model');
 const generateOrderId = require('../utils/generateId');
 
 const orderController = {
-  // Create new order
   create: async (req, res) => {
     try {
       const { user, ...orderData } = req.body;
@@ -12,9 +11,10 @@ const orderController = {
         idDonHang: generateOrderId('DH'),
         NguoiDung: {
           id: user.id,
-          HoTen: user.HoVaTen,
-          Email: user.ThuDienTu,
-          SoDienThoai: user.SoDienThoai
+          HoVaTen: user.HoVaTen,
+          ThuDienTu: user.ThuDienTu,
+          SoDienThoai: user.SoDienThoai,
+          DiaChi: user.DiaChi
         },
         ...orderData
       });

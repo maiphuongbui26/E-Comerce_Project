@@ -106,7 +106,13 @@ const [paypalOrderDetails, setPaypalOrderDetails] = useState(null);
 
     try {
       const orderData = {
-        user: user,
+        user: {
+          id: user.id,
+          HoVaTen: formData.name,
+          ThuDienTu: formData.email,
+          SoDienThoai: formData.phone,
+          DiaChi: formData.address
+        },
         GioHang: {
           DanhSachSanPham: consolidatedCartItems.map((item) => ({
             idSanPham: item.idSanPham,

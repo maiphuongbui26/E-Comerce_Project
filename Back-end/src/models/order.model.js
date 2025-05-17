@@ -8,10 +8,23 @@ const orderSchema = new mongoose.Schema({
     trim: true,
   },
   NguoiDung: {
-    id: String,
-    HoTen: String,
-    Email: String,
-    SoDienThoai: String,
+    id: {
+      type: String,
+      required: true
+    },
+    HoVaTen: {
+      type: String,
+      required: true
+    },
+    ThuDienTu: {
+      type: String,
+      required: true
+    },
+    SoDienThoai: {
+      type: String,
+      required: true
+    },
+    DiaChi: String
   },
   GioHang: {
     DanhSachSanPham: [{
@@ -75,34 +88,15 @@ const orderSchema = new mongoose.Schema({
 
 orderSchema.pre("save", async function (next) {
   if (this.isNew) {
-    const cart = await mongoose.model("Cart").findOne({ Id: this.GioHang.Id });
     const user = await mongoose.model("User").findOne({ id: this.NguoiDung.id });
-
-    if (cart && user) {
-      // Copy user information
+    if (user) {
       this.NguoiDung = {
         id: user.id,
-        HoTen: user.HoTen,
-        Email: user.Email,
+        HoVaTen: user.HoVaTen,
+        ThuDienTu: user.ThuDienTu,
         SoDienThoai: user.SoDienThoai,
+        DiaChi: user.DiaChi
       };
-
-      // Copy cart information
-      this.GioHang = {
-        Id: cart.Id,
-        DanhSachSanPham: cart.DanhSachSanPham,
-        TongTienHang: cart.TongTienHang,
-        GiamGia: cart.GiamGia,
-        TamTinh: cart.TamTinh,
-        TongTien: cart.TongTien,
-      };
-
-      // Calculate final total
-      this.TongTien = cart.TongTien + (this.PhiShip || 0);
-
-      // Update cart status
-      cart.TrangThai = "ordered";
-      await cart.save();
     }
   }
   next();

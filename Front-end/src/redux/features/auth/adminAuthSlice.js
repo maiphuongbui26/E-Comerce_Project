@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { loginAdmin, logoutAdmin, getCurrentAdmin } from './adminAuthThunks';
+import { loginAdmin, logoutAdmin, getCurrentAdmin, updateAdminPassword } from './adminAuthThunks';
 
 const initialState = {
   admin: JSON.parse(localStorage.getItem('adminInfo')) || null,
@@ -49,6 +49,19 @@ const adminAuthSlice = createSlice({
         state.admin = null;
         state.token = null;
         // state.role = null;
+      })
+      // Update password cases
+      .addCase(updateAdminPassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateAdminPassword.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(updateAdminPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 });

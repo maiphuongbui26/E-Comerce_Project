@@ -296,7 +296,7 @@ const OrderManagement = () => {
               {filteredOrders.map((order) => (
                 <TableRow key={order._id}>
                   <TableCell>{order.idDonHang}</TableCell>
-                  <TableCell>{order.DiaChiGiaoHang}</TableCell>
+                  <TableCell>{order?.DiaChiGiaoHang}</TableCell>
                   <TableCell>{getPaymentMethodText(order.PhuongThucThanhToan)}</TableCell>
                   <TableCell>
                     {new Date(order.NgayDatHang).toLocaleDateString('vi-VN')}

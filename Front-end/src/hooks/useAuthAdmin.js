@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { loginAdmin, logoutAdmin,getCurrentAdmin } from '../redux/features/auth/adminAuthThunks';
+import { loginAdmin, logoutAdmin, getCurrentAdmin, updateAdminPassword, updateAdminProfile } from '../redux/features/auth/adminAuthThunks';
 
 export const useAuthAdmin = () => {
   const dispatch = useDispatch();
@@ -32,5 +32,35 @@ export const useAuthAdmin = () => {
     }
   };
 
-  return { admin, isLoading, error, isAuthenticated,getAdmin, handleAdminLogin, handleAdminLogout };
+  const handleUpdatePassword = async (passwords) => {
+    try {
+      await dispatch(updateAdminPassword(passwords)).unwrap();
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+  const handleUpdateProfile = async (profileData) => {
+    try {
+      await dispatch(updateAdminProfile(profileData)).unwrap();
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+  return { 
+    admin, 
+    isLoading, 
+    error, 
+    isAuthenticated, 
+    getAdmin, 
+    handleAdminLogin, 
+    handleAdminLogout,
+    handleUpdatePassword,
+    handleUpdateProfile 
+  };
 };

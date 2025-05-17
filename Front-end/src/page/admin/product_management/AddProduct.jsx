@@ -54,7 +54,7 @@ const AddProduct = () => {
     TrangThai: "available",
     DanhGia: "",
     HinhAnh: [],
-    YeuThich: false,
+    YeuThich: [],
   });
 
   const [filteredProductTypes, setFilteredProductTypes] = useState([]);
