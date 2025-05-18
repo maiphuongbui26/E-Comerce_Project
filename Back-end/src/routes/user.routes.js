@@ -13,8 +13,8 @@ router.post("/update-password", verifyToken, userController.updatePassword);
 router.put("/update-profile", verifyToken, userController.updateProfile);
 
 // Social login routes
-router.post("/auth/google", userController.googleLogin);
-router.post("/auth/facebook", userController.facebookLogin);
+router.post("/auth/google", userController.loginWithGoogle);
+router.post("/auth/facebook", userController.loginWithFacebook);
 
 // Protected routes
 router.get("/", verifyToken, verifyAdmin, userController.getAll);
