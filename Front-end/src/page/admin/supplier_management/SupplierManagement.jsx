@@ -1,7 +1,7 @@
 import { 
   Box, Typography, TextField, IconButton, Table, TableBody, 
   TableCell, TableContainer, TableHead, TableRow, Paper, 
-  Button, Pagination // Add Pagination import
+  Button, Pagination, Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
@@ -13,11 +13,13 @@ import { useSupplier } from '../../../hooks/useSupplier';
 
 const SupplierManagement = () => {
   const navigate = useNavigate();
-  // Add pagination states
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(5);
   const { suppliers, isLoading, error, handleFetchSuppliers, handleDeleteSupplier } = useSupplier();
   const [searchTerm, setSearchTerm] = useState('');
+  // Thêm state cho Dialog
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   // Fetch suppliers when component mounts
   useEffect(() => {
@@ -25,13 +27,27 @@ const SupplierManagement = () => {
   }, []);
 
   // Handle delete supplier
-  const onDeleteSupplier = async (id) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa nhà cung cấp này?')) {
-      const success = await handleDeleteSupplier(id);
+  // Thay thế hàm onDeleteSupplier cũ
+  const handleDeleteClick = (id) => {
+    setSelectedId(id);
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const success = await handleDeleteSupplier(selectedId);
       if (success) {
-        handleFetchSuppliers(); // Refresh the list
+        handleFetchSuppliers();
       }
+      setOpenDialog(false);
+    } catch (error) {
+      console.error("Lỗi khi xóa:", error);
     }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedId(null);
   };
 
   // Filter suppliers based on search term and status
@@ -130,7 +146,7 @@ const SupplierManagement = () => {
                       </IconButton>
                       <IconButton 
                         size="small"
-                        onClick={() => onDeleteSupplier(supplier.idNhaCungCap)}
+                        onClick={() => handleDeleteClick(supplier.idNhaCungCap)}
                       >
                         <DeleteIcon fontSize="small" sx={{ color: '#f44336' }} />
                       </IconButton>
@@ -156,8 +172,24 @@ const SupplierManagement = () => {
           </Box>
         )}
       </Box>
+      {/* Di chuyển Dialog vào trong component */}
+<Dialog open={openDialog} onClose={handleCloseDialog}>
+  <DialogTitle>Xác nhận xóa</DialogTitle>
+  <DialogContent>
+    Bạn có chắc chắn muốn xóa nhà cung cấp này không?
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleCloseDialog} color="primary">
+      Hủy
+    </Button>
+    <Button onClick={handleConfirmDelete} color="error" variant="contained">
+      Xóa
+    </Button>
+  </DialogActions>
+</Dialog>
     </>
   );
 };
 
 export default SupplierManagement;
+

@@ -37,7 +37,33 @@ const Sales = () => {
       <Box sx={{maxWidth: "1240px", margin: "30px auto"}}>
         <SearchForm/>
         {/* Start Breadcrumbs */}
-        <Box>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1,
+          color: '#666',
+          mb: 2
+        }}>
+          <Typography 
+            component="span" 
+            sx={{ 
+              cursor: 'pointer',
+              '&:hover': { color: '#333' }
+            }}
+            onClick={() => navigate('/user')}
+          >
+            Trang chủ
+          </Typography>
+          <Typography component="span">/</Typography>
+          <Typography 
+            component="span" 
+            sx={{ 
+              color: '#333',
+              fontWeight: 500
+            }}
+          >
+            Giảm giá
+          </Typography>
         </Box>
         {/* End Breadcrumbs */}
         {/* Start Product Sale */}

@@ -25,7 +25,6 @@ const paymentController = {
       }
 
       // Convert VND to USD (roughly 1 USD = 24,000 VND)
-      const amountInUSD = (order.GioHang.TongTien / 24000).toFixed(2);
       const collect = {
         body: {
             intent: "CAPTURE",
@@ -69,7 +68,7 @@ const paymentController = {
           idDonHang: orderId,
           NguoiDung: {
             id: order.NguoiDung.id,
-            HoTen: order.NguoiDung.HoTen,
+            HoTen: order.NguoiDung.HoVaTen,
             Email: order.NguoiDung.Email,
             SoDienThoai: order.NguoiDung.SoDienThoai
           },

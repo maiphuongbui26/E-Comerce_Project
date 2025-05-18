@@ -1,4 +1,4 @@
-import { Box, Typography, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination } from '@mui/material';
+import { Box, Typography, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -13,6 +13,8 @@ const PromotionManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { discounts, isLoading, error, handleFetchDiscounts, handleDeleteDiscount } = useDiscount();
   const rowsPerPage = 10;
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     handleFetchDiscounts();
@@ -37,6 +39,28 @@ const PromotionManagement = () => {
         handleFetchDiscounts();
       }
     }
+  };
+
+  const handleDeleteClick = (id) => {
+    setSelectedId(id);
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const success = await handleDeleteDiscount(selectedId);
+      if (success) {
+        handleFetchDiscounts();
+      }
+      setOpenDialog(false);
+    } catch (error) {
+      console.error("Lỗi khi xóa:", error);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedId(null);
   };
 
   return (
@@ -111,7 +135,7 @@ const PromotionManagement = () => {
                       </IconButton>
                       <IconButton 
                         size="small"
-                        onClick={() => handleDelete(discount.id)}
+                        onClick={() => handleDeleteClick(discount.id)}
                       >
                         <DeleteIcon fontSize="small" sx={{ color: '#f44336' }} />
                       </IconButton>
@@ -136,6 +160,20 @@ const PromotionManagement = () => {
           </Box>
         )}
       </Box>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>
+          Bạn có chắc chắn muốn xóa mã giảm giá này không?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

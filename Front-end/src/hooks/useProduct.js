@@ -50,7 +50,7 @@ export const useProduct = () => {
         axios.get('http://localhost:8080/api/categories', getAuthHeader()),
         axios.get('http://localhost:8080/api/sizes', getAuthHeader())
       ]);
-console.log("sizesRes",sizesRes)
+      console.log("sizesRes",sizesRes)
       setProductTypes(typesRes.data['product-types']);
       setPrices(pricesRes.data.prices);
       setStyles(stylesRes.data.styles);

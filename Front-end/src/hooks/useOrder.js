@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { createOrder, fetchOrders, fetchOrderById, updateOrderStatus, cancelOrder, deleteOrder } from '../redux/features/order/orderThunks';
-import { selectAllOrders, selectOrderLoading, selectOrderError } from '../redux/features/order/orderSlice';
 
 export const useOrder = () => {
   const dispatch = useDispatch();
@@ -8,6 +7,7 @@ export const useOrder = () => {
     (state) => state.orders
   );
   const handleCreateOrder = async (orderData) => {
+    console.log('handleCreateOrder',orderData)
     try {
       const result = await dispatch(createOrder(orderData)).unwrap();
       return result;

@@ -21,9 +21,9 @@ const ProductTemplate = ({
   const itemsPerPage = 24;
 
   const priceRanges = [
-    { value: 'under150', label: 'Dưới 150.000đ' },
-    { value: '150to300', label: 'Từ 150.000đ - 300.000đ' },
-    { value: 'above300', label: 'Trên 300.000đ' }
+    { value: 'under500', label: 'Dưới 500.000 VND' },
+    { value: '500to1000000', label: 'Từ 500.000 VND- 1.000.000 VND' },
+    { value: 'above1000000', label: 'Trên 1.000.000 VND' }
   ];
 
   const handlePriceRangeToggle = (range) => {
@@ -51,9 +51,9 @@ const ProductTemplate = ({
       const price = product.GiaSanPham;
       return isInCategory && selectedPriceRanges.some(range => {
         switch (range) {
-          case 'under150': return price < 150000;
-          case '150to300': return price >= 150000 && price <= 300000;
-          case 'above300': return price > 300000;
+          case 'under500': return price < 500000;
+          case '500to1000000': return price >= 500000 && price <= 1000000;
+          case 'above1000000': return price > 1000000;
           default: return true;
         }
       });
@@ -287,7 +287,7 @@ const ProductTemplate = ({
                     price={product.GiaSanPham} 
                     discount={product.GiamGia} 
                     rating={product.DanhGia} 
-                    soldCount={product.SoLuongDaBan} 
+                    soldCount={product.DaBan} 
                   />
                 </Link>
               </Grid2>

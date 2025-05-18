@@ -40,6 +40,7 @@ export const fetchOrderById = createAsyncThunk(
 export const createOrder = createAsyncThunk(
   'orders/createOrder',
   async (orderData, { rejectWithValue }) => {
+    console.log("createOrder",orderData);
     try {
       const user = JSON.parse(localStorage.getItem('user'));
       const response = await axios.post(`${BASE_URL}/orders/create`, 

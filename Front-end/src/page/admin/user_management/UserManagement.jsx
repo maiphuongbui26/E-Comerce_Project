@@ -1,4 +1,4 @@
-import { Box, Typography, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination } from '@mui/material';
+import { Box, Typography, TextField, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Pagination, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -13,6 +13,8 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { users, isLoading, error, handleFetchUsers, handleDeleteUser } = useUser();
   const rowsPerPage = 10;
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     handleFetchUsers();
@@ -32,13 +34,26 @@ const UserManagement = () => {
   const startIndex = (page - 1) * rowsPerPage;
   const paginatedUsers = filteredUsers?.slice(startIndex, startIndex + rowsPerPage);
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
-      const success = await handleDeleteUser(id);
+  const handleDeleteClick = (id) => {
+    setSelectedId(id);
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const success = await handleDeleteUser(selectedId);
       if (success) {
         handleFetchUsers();
       }
+      setOpenDialog(false);
+    } catch (error) {
+      console.error("Lỗi khi xóa:", error);
     }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedId(null);
   };
 
   return (
@@ -128,7 +143,7 @@ const UserManagement = () => {
                       </IconButton>
                       <IconButton 
                         size="small"
-                        onClick={() => handleDelete(user.id)}
+                        onClick={() => handleDeleteClick(user.id)}
                       >
                         <DeleteIcon fontSize="small" sx={{ color: '#f44336' }} />
                       </IconButton>
@@ -153,6 +168,21 @@ const UserManagement = () => {
           </Box>
         )}
       </Box>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>
+          Bạn có chắc chắn muốn xóa người dùng này không?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

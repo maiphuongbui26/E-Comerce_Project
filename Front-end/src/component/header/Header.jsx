@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -130,6 +130,7 @@ const Header = () => {
   const [activeMenu, setActiveMenu] = useState(null);
   const { handleFetchCart, cartItems, handleRemoveFromCart } = useCart();
   const navigate = useNavigate();
+
   const { fetchAllData, categories, productTypes } = useProduct();
   const [menuItems, setMenuItems] = useState([
     { label: "Trang chủ", path: "/user", hidden: true },

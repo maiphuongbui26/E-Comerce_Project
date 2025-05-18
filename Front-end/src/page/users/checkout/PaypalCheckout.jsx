@@ -10,7 +10,7 @@ const PaypalCheckout = ({ orderDetails, onSuccess, onError, onCancel, open, onCl
   const navigate = useNavigate();
 
   const initialOptions = {
-    clientId: "AaqEcqDTymof8un7l4vlHtNFvuG_HNPdQ6QT2IBt2yfjVJcOJRgPrnwlDWyGSNxpI0leztP4KS9r3jhi",
+    clientId: "AbunZVL55AvQedjUNRgvELH4BNonzjfWpmyknpMe5PCpypG9lt1QY3vnqyjMuLkl7PGw4x_1XuL2Xjr7",
     currency: "USD",
     intent: "capture",
   };

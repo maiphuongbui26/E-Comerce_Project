@@ -24,26 +24,48 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useWarehouse } from "../../../hooks/useWarehouse";
 import Checkbox from "@mui/material/Checkbox";
+import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 
 const WarehouseManagement = () => {
+  
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { warehouses, handleFetchWarehouses, handleDeleteWarehouse } =
     useWarehouse();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
     handleFetchWarehouses({ page, limit: rowsPerPage, search: searchTerm });
   }, [page, searchTerm]);
-  const formatDate = (date) => {
-    if (!date) return "-";
+
+  const handleDeleteClick = (id) => {
+    setSelectedId(id);
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      return new Date(date).toLocaleDateString("vi-VN");
-    } catch {
-      return "-";
+      await handleDeleteWarehouse(selectedId);
+      // Re-fetch data sau khi xóa
+      handleFetchWarehouses({ page, limit: rowsPerPage, search: searchTerm });
+      setOpenDialog(false);
+    } catch (error) {
+      console.error("Lỗi khi xóa:", error);
     }
   };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedId(null);
+  };
+// Add formatDate function
+const formatDate = (dateString) => {
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleDateString("vi-VN");
+};
   return (
     <>
       <Box
@@ -129,7 +151,7 @@ const WarehouseManagement = () => {
                     <IconButton
                       size="small"
                       color="error"
-                      onClick={() => handleDeleteWarehouse(item.id)}
+                      onClick={() => handleDeleteClick(item.id)}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -148,8 +170,24 @@ const WarehouseManagement = () => {
           />
         </Box>
       </Box>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+    <DialogTitle>Xác nhận xóa</DialogTitle>
+    <DialogContent>
+      Bạn có chắc chắn muốn xóa phiếu kho này không?
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={handleCloseDialog} color="primary">
+        Hủy
+      </Button>
+      <Button onClick={handleConfirmDelete} color="error" variant="contained">
+        Xóa
+      </Button>
+    </DialogActions>
+  </Dialog>
     </>
   );
+
+ 
 };
 
 export default WarehouseManagement;

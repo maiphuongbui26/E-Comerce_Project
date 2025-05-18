@@ -14,6 +14,10 @@ import {
   Select,
   MenuItem,
   Pagination,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
@@ -30,6 +34,8 @@ const ProductManagement = () => {
   const [rowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
   
   const { products, isLoading, error, handleFetchProducts, handleDeleteProduct } = useProduct();
 
@@ -46,13 +52,26 @@ const ProductManagement = () => {
     return colors[status] || "#757575";
   };
 
-  const handleDelete = async(productId) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-      const success = await handleDeleteProduct(productId);
+  const handleDeleteClick = (productId) => {
+    setSelectedId(productId);
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const success = await handleDeleteProduct(selectedId);
       if (success) {
         handleFetchProducts();
       }
+      setOpenDialog(false);
+    } catch (error) {
+      console.error("Lỗi khi xóa:", error);
     }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedId(null);
   };
 
   const filteredProducts = products?.filter(product => {
@@ -190,7 +209,7 @@ const ProductManagement = () => {
                     </IconButton>
                     <IconButton
                       size="small"
-                      onClick={() => handleDelete(product.idSanPham)}
+                      onClick={() => handleDeleteClick(product.idSanPham)}
                     >
                       <DeleteIcon fontSize="small" sx={{ color: "#f44336" }} />
                     </IconButton>
@@ -200,6 +219,7 @@ const ProductManagement = () => {
             </TableBody>
           </Table>
         </TableContainer>
+        
         {!isLoading && filteredProducts?.length > 0 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
             <Pagination
@@ -213,6 +233,21 @@ const ProductManagement = () => {
           </Box>
         )}
       </Box>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>
+          Bạn có chắc chắn muốn xóa sản phẩm này không?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
