@@ -225,7 +225,84 @@ const userController = {
         message: error.message 
       });
     }
+  },
+   // Thêm các phương thức xử lý đăng nhập social
+   loginWithGoogle: async (req, res) => {
+    try {
+      const { email, name, googleId } = req.body;
+      
+      // Kiểm tra xem user đã tồn tại chưa
+      let user = await User.findOne({ ThuDienTu: email });
+      
+      if (!user) {
+        // Tạo user mới nếu chưa tồn tại
+        user = new User({
+          id: generateUserId('U'),
+          HoVaTen: name,
+          ThuDienTu: email,
+          GoogleId: googleId,
+          VaiTro: 'khachhang',
+          TrangThai: 'active'
+        });
+        await user.save();
+      }
+
+      const token = jwt.sign(
+        { id: user.id, VaiTro: user.VaiTro },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000
+      });
+
+      res.json({ token, user: { ...user._doc, MatKhau: undefined } });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+  loginWithFacebook: async (req, res) => {
+    try {
+      const { email, name, facebookId } = req.body;
+      
+      let user = await User.findOne({ ThuDienTu: email });
+      
+      if (!user) {
+        user = new User({
+          id: generateUserId('U'),
+          HoVaTen: name,
+          ThuDienTu: email,
+          FacebookId: facebookId,
+          VaiTro: 'khachhang',
+          TrangThai: 'active'
+        });
+        await user.save();
+      }
+
+      const token = jwt.sign(
+        { id: user.id, VaiTro: user.VaiTro },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000
+      });
+
+      res.json({ token, user: { ...user._doc, MatKhau: undefined } });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
   }
 };
 
 module.exports = userController;
+
+ 

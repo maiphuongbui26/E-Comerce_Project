@@ -1,26 +1,8 @@
-import { Box, TextField, Button, Typography, Paper, Alert } from '@mui/material';
+import { Box, TextField, Button, Typography, Grid, Backdrop, Alert, CircularProgress } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { useAuthAdmin } from '../../../hooks/useAuthAdmin';
-
-// Styled components
-const StyledTextField = styled(TextField)({
-  '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      borderColor: 'rgba(0, 0, 0, 0.23)',
-    },
-    '&:hover fieldset': {
-      borderColor: 'rgba(0, 0, 0, 0.5)',
-    },
-  },
-  '& .MuiInputLabel-root': {
-    color: 'rgba(0, 0, 0, 0.7)',
-  },
-  '& .MuiInputBase-input': {
-    color: '#000',
-  },
-});
 
 const LoginAdmin = () => {
   const navigate = useNavigate();
@@ -78,107 +60,96 @@ const LoginAdmin = () => {
   }, [isAuthenticated, admin]);
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', bgcolor: '#fff' }}>
-      {/* Left side - Logo */}
-      <Box
+    <>
+      <Backdrop
         sx={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 4
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)'
         }}
+        open={isLoading}
       >
-        <Box
-          component="img"
-          src="/logo.png"
-          alt="Bailey and Co."
-          sx={{
-            width: '300px',
-            height: 'auto'
-          }}
-        />
-      </Box>
+        <CircularProgress color="inherit" size={60} />
+      </Backdrop>
 
-      {/* Right side - Login form */}
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          p: 6,
-          borderLeft: '1px solid rgba(0, 0, 0, 0.12)'
-        }}
-      >
-        <Box sx={{ maxWidth: 400, width: '100%', mx: 'auto' }}>
-          <Typography variant="h3" sx={{ mb: 4, color: 'rgba(0, 0, 0, 0.7)' }}>
-            Welcome
-          </Typography>
-          
-          {/* Add error alert */}
-          {(authError || error) && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {authError || error}
-            </Alert>
-          )}
+      <Grid container sx={{ 
+        minHeight: '100vh', 
+        bgcolor: '#f5f5f5',
+        backgroundImage: 'url("../../../../public/image/login_background.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}>
+        <Grid item xs={6} />
 
-          <form onSubmit={handleSubmit}>
-            <StyledTextField
-              fullWidth
-              label="Email"
-              variant="outlined"
-              margin="normal"
-              name="ThuDienTu"
-              value={formData.ThuDienTu}
-              onChange={(e) => setFormData({ ...formData, ThuDienTu: e.target.value })}
-            />
-            <StyledTextField
-              fullWidth
-              label="Password"
-              type="password"
-              variant="outlined"
-              margin="normal"
-              name="MatKhau"
-              value={formData.MatKhau}
-              onChange={(e) => setFormData({ ...formData, MatKhau: e.target.value })}
-            />
-
-            <Button
-            onClick={handleSubmit}
-              fullWidth
-              type="submit"
-              variant="contained"
-              sx={{
-                mt: 3,
-                mb: 2,
-                py: 1.5,
-                bgcolor: '#303030',
-                '&:hover': {
-                  bgcolor: '#404040'
-                }
-              }}
-            >
-              Đăng nhập
-            </Button>
-
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                textAlign: 'center',
-                color: 'rgba(0, 0, 0, 0.7)',
-                cursor: 'pointer',
-                '&:hover': {
-                  color: '#303030'
-                }
-              }}
-            >
-              Quên mật khẩu?
+        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Box sx={{
+            width: '100%',
+            maxWidth: 400,
+            bgcolor: 'rgba(255, 255, 255, 0.8)',
+            borderRadius: 2,
+            p: 4,
+            boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+            mx: 'auto'
+          }}>
+            <Typography sx={{fontSize: "20px", fontWeight: 600, mb: 3, color: '#333'}}>
+              Đăng nhập Admin
             </Typography>
-          </form>
-        </Box>
-      </Box>
-    </Box>
+
+            {(authError || error) && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {authError || error}
+              </Alert>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <Typography variant="body1" sx={{ color: '#555' }}>
+                Email:
+              </Typography>
+              <TextField
+                fullWidth
+                placeholder="Email"
+                name="ThuDienTu"
+                value={formData.ThuDienTu}
+                onChange={(e) => setFormData({ ...formData, ThuDienTu: e.target.value })}
+                margin="normal"
+                sx={{ mb: 1, bgcolor: 'rgba(255, 255, 255, 0.9)' }}
+              />
+
+              <Typography variant="body1" sx={{ color: '#555' }}>
+                Mật Khẩu:
+              </Typography>
+              <TextField
+                fullWidth
+                placeholder="Password"
+                type="password"
+                name="MatKhau"
+                value={formData.MatKhau}
+                onChange={(e) => setFormData({ ...formData, MatKhau: e.target.value })}
+                margin="normal"
+                sx={{ mb: 3, bgcolor: 'rgba(255, 255, 255, 0.9)' }}
+              />
+
+              <Button
+                onClick={handleSubmit}
+                fullWidth
+                type="submit"
+                variant="contained"
+                sx={{
+                  bgcolor: '#333',
+                  color: 'white',
+                  py: 1.5,
+                  '&:hover': {
+                    bgcolor: '#555'
+                  }
+                }}
+              >
+                ĐĂNG NHẬP
+              </Button>
+            </form>
+          </Box>
+        </Grid>
+      </Grid>
+    </>
   );
 };
 

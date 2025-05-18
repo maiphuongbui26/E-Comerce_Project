@@ -14,7 +14,7 @@ router.get('/user-orders', orderController.getUserOrders);
 router.post('/:id/cancel', orderController.cancelOrder);
 
 // Admin routes (require both authentication and admin role)
-router.use(verifyAdmin);
+router.use(verifyAdmin,verifyToken);
 router.patch('/:id/status', orderController.updateStatus);
 // Đảm bảo route delete được định nghĩa với callback function
 router.delete('/:id', orderController.deleteOrder);

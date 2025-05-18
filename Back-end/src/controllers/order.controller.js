@@ -111,22 +111,36 @@ const orderController = {
 
       // Nếu đơn hàng chuyển sang trạng thái đã giao
       if (TrangThaiDonHang === 'delivered' && order.TrangThaiDonHang !== 'delivered') {
-        // Cập nhật số lượng đã bán cho từng sản phẩm trong đơn hàng
+        // Cập nhật số lượng tồn kho và số lượng đã bán cho từng sản phẩm trong đơn hàng
         const updatePromises = order.GioHang.DanhSachSanPham.map(async (item) => {
-          await Product.findOneAndUpdate(
-            { idSanPham: item.idSanPham },
-            { $inc: { DaBan: item.SoLuong } }
-          );
+          const product = await Product.findOne({ idSanPham: item.idSanPham });
+          if (product) {
+            // Cập nhật số lượng tồn kho và số lượng đã bán
+            await Product.findOneAndUpdate(
+              { idSanPham: item.idSanPham },
+              { 
+                $inc: { 
+                  DaBan: item.SoLuong,
+                  SoLuong: -item.SoLuong // Giảm số lượng tồn kho
+                }
+              }
+            );
+          }
         });
         await Promise.all(updatePromises);
       }
       // Nếu đơn hàng từ trạng thái đã giao chuyển sang hủy
       else if (TrangThaiDonHang === 'cancelled' && order.TrangThaiDonHang === 'delivered') {
-        // Giảm số lượng đã bán của sản phẩm
+        // Hoàn lại số lượng tồn kho và giảm số lượng đã bán
         const updatePromises = order.GioHang.DanhSachSanPham.map(async (item) => {
           await Product.findOneAndUpdate(
             { idSanPham: item.idSanPham },
-            { $inc: { DaBan: -item.SoLuong } }
+            { 
+              $inc: { 
+                DaBan: -item.SoLuong,
+                SoLuong: item.SoLuong // Hoàn lại số lượng tồn kho
+              }
+            }
           );
         });
         await Promise.all(updatePromises);

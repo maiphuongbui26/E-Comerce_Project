@@ -18,11 +18,12 @@ const authMiddleware = {
   },
 
   verifyAdmin: (req, res, next) => {
-    if (!req.user) {
+    const user = req?.user || req?.body?.user;
+    if (!user) {
       return res.status(401).json({ message: 'Không tìm thấy thông tin người dùng' });
     }
     
-    if (req.user.VaiTro === 'admin' || req.user.VaiTro === 'nhanvien') {
+    if (user.VaiTro === 'admin' || user.VaiTro === 'nhanvien') {
       next();
     } else {
       return res.status(403).json({ message: 'Yêu cầu quyền admin' });

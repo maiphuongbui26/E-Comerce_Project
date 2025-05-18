@@ -61,14 +61,14 @@ export const updateOrderStatus = createAsyncThunk(
       const user = JSON.parse(localStorage.getItem('adminInfo'));  
       const response = await axios.patch(
         `${BASE_URL}/orders/${orderId}/status`, // Sửa lỗi template literal
-        { TrangThaiDonHang, user }, // Request body
+        { TrangThaiDonHang, user: user }, // Request body
         {
           headers: {
             'Authorization': `Bearer ${token}`, // Sửa lỗi template literal
             'Content-Type': 'application/json'
           }
         }
-      );  // Thêm dấu chấm phẩy
+      );  
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

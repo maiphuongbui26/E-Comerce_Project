@@ -139,8 +139,30 @@ const Login = () => {
                   }
                 }}
               >
-                  ĐĂNG NHẬP
+                ĐĂNG NHẬP
               </Button>
+
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                mb: 2 
+              }}>
+                <Typography variant="body2" sx={{ color: '#666' }}>
+                  Chưa có tài khoản? 
+                </Typography>
+                <Link
+                  to="/auth/user/register"
+                  style={{ 
+                    color: '#0066cc',
+                    textDecoration: 'none',
+                    marginLeft: '8px',
+                    fontWeight: 500
+                  }}
+                >
+                  Đăng ký ngay
+                </Link>
+              </Box>
 
               <Button
                 fullWidth

@@ -128,11 +128,33 @@ const Register = () => {
             >
               TẠO TÀI KHOẢN
             </Button>
-          </form>
 
-          <Typography variant="body2" sx={{ color: '#666', textAlign: 'center' }}>
-            Đăng ký Nhận phiếu <span style={{ color: 'red' }}>giảm giá 10%</span> off và Hơn thế nữa
-          </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center',
+              mb: 2 
+            }}>
+              <Typography variant="body2" sx={{ color: '#666' }}>
+                Đã có tài khoản? 
+              </Typography>
+              <Link
+                to="/auth/user/login"
+                style={{ 
+                  color: '#0066cc',
+                  textDecoration: 'none',
+                  marginLeft: '8px',
+                  fontWeight: 500
+                }}
+              >
+                Đăng nhập
+              </Link>
+            </Box>
+
+            <Typography variant="body2" sx={{ color: '#666', textAlign: 'center' }}>
+              Đăng ký Nhận phiếu <span style={{ color: 'red' }}>giảm giá 10%</span> off và Hơn thế nữa
+            </Typography>
+          </form>
         </Box>
       </Grid>
     </Grid>
