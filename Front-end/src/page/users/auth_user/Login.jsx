@@ -42,6 +42,75 @@ const Login = () => {
     }
   }, [isAuthenticated, location.state, navigate]);
 
+  const handleGoogleLogin = async () => {
+    try {
+      // Khởi tạo Google OAuth Client
+      const googleAuth = await window.gapi.auth2.getAuthInstance();
+      const googleUser = await googleAuth.signIn();
+      
+      const profile = googleUser.getBasicProfile();
+      const userData = {
+        email: profile.getEmail(),
+        name: profile.getName(),
+        googleId: profile.getId()
+      };
+  
+      // Gọi API đăng nhập Google
+      const response = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        // Xử lý đăng nhập thành công
+        handleLogin(data);
+      }
+    } catch (error) {
+      console.error('Google login failed:', error);
+    }
+  };
+  
+  const handleFacebookLogin = async () => {
+    try {
+      // Khởi tạo Facebook SDK
+      const fbResponse = await new Promise((resolve) => {
+        window.FB.login((response) => resolve(response), {
+          scope: 'email,public_profile'
+        });
+      });
+  
+      if (fbResponse.status === 'connected') {
+        const userData = await new Promise((resolve) => {
+          window.FB.api('/me', { fields: 'name,email' }, (response) => resolve(response));
+        });
+  
+        // Gọi API đăng nhập Facebook
+        const response = await fetch('/api/auth/facebook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: userData.email,
+            name: userData.name,
+            facebookId: fbResponse.authResponse.userID
+          })
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          // Xử lý đăng nhập thành công
+          handleLogin(data);
+        }
+      }
+    } catch (error) {
+      console.error('Facebook login failed:', error);
+    }
+  };
   return (
     <>
       <Backdrop
@@ -163,11 +232,11 @@ const Login = () => {
                   Đăng ký ngay
                 </Link>
               </Box>
-
               <Button
                 fullWidth
                 variant="outlined"
                 startIcon={<GoogleIcon />}
+                onClick={handleGoogleLogin}
                 sx={{ mb: 1, color: '#333', borderColor: '#ccc' }}
               >
                 Đăng nhập gmail
@@ -176,6 +245,7 @@ const Login = () => {
                 fullWidth
                 variant="outlined"
                 startIcon={<FacebookIcon />}
+                onClick={handleFacebookLogin}
                 sx={{ color: '#333', borderColor: '#ccc' }}
               >
                 Đăng nhập facebook
