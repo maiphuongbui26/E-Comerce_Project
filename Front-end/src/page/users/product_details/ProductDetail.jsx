@@ -4,14 +4,11 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import StarIcon from "@mui/icons-material/Star";
 import { ToastContainer, toast } from 'react-toastify';
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useProduct } from "../../../hooks/useProduct";
 import { useCart } from "../../../hooks/useCart";
 import { useAuth } from "../../../hooks/useAuth";
-import ProductTemplate from "../../../components/templates/ProductTemplate";
-import ProductItem from "../../../component/main_component/productItem";
 
 const ProductDetail = () => {
   const { id } = useParams();
