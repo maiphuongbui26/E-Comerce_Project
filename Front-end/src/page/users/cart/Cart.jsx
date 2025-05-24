@@ -421,6 +421,7 @@ const Cart = () => {
                 },
                 fontSize: { xs: '0.875rem', sm: '1rem' }
               }}
+              onClick={() => navigate("/")}
             >
               MUA THÊM SẢN PHẨM
             </Button>
