@@ -53,15 +53,19 @@ import Checkout from "./page/users/checkout/Checkout";
 import Favorites from "./page/users/favorites/Favorites";
 import ProfileAdmin from './page/admin/auth_admin/Profile';
 import Settings from './page/admin/auth_admin/Settings';
+import ForgotPassword from './page/users/auth_user/ForgotPassword';
+import ResetPassword from './page/users/auth_user/ResetPassword';
 
 function App() {
   return (
     <Routes>
       {/* Auth Routes */}
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/auth">
         <Route path="user">
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
         </Route>
         <Route path="admin">
           <Route path="login" element={<LoginAdmin />} />

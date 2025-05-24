@@ -11,10 +11,8 @@ router.post('/logout', userController.logout);
 router.get("/me", verifyToken, userController.getCurrentUser);
 router.post("/update-password", verifyToken, userController.updatePassword);
 router.put("/update-profile", verifyToken, userController.updateProfile);
-
-// Social login routes
-router.post("/auth/google", userController.loginWithGoogle);
-router.post("/auth/facebook", userController.loginWithFacebook);
+router.post('/forgot-password', userController.forgotPassword);
+router.post('/reset-password', userController.resetPassword);
 
 // Protected routes
 router.get("/", verifyToken, verifyAdmin, userController.getAll);

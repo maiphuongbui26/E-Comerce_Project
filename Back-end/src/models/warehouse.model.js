@@ -26,6 +26,10 @@ const warehouseSchema = new mongoose.Schema({
   },
   GhiChu: {
     type: String
+  },
+  DaXuLyTonKho: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

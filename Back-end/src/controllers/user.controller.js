@@ -1,6 +1,7 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const generateUserId = require('../utils/generateId');
 
 const userController = {
@@ -226,79 +227,89 @@ const userController = {
       });
     }
   },
-   // Thêm các phương thức xử lý đăng nhập social
-   loginWithGoogle: async (req, res) => {
+  forgotPassword: async (req, res) => {
     try {
-      const { email, name, googleId } = req.body;
-      
-      // Kiểm tra xem user đã tồn tại chưa
-      let user = await User.findOne({ ThuDienTu: email });
+      const { ThuDienTu } = req.body;
+      const user = await User.findOne({ ThuDienTu });
       
       if (!user) {
-        // Tạo user mới nếu chưa tồn tại
-        user = new User({
-          id: generateUserId('U'),
-          HoVaTen: name,
-          ThuDienTu: email,
-          GoogleId: googleId,
-          VaiTro: 'khachhang',
-          TrangThai: 'active'
-        });
-        await user.save();
+        return res.status(404).json({ message: 'Email không tồn tại trong hệ thống' });
       }
 
-      const token = jwt.sign(
-        { id: user.id, VaiTro: user.VaiTro },
+      // Generate reset token
+      const resetToken = jwt.sign(
+        { id: user.id },
         process.env.JWT_SECRET,
-        { expiresIn: '24h' }
+        { expiresIn: '1h' }
       );
 
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000
+      // Save reset token to user
+      user.ResetPasswordToken = resetToken;
+      user.ResetPasswordExpires = Date.now() + 3600000; // 1 hour
+      await user.save();
+
+      // Create email transporter
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
       });
 
-      res.json({ token, user: { ...user._doc, MatKhau: undefined } });
+      // Email content
+      const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: user.ThuDienTu,
+        subject: 'Đặt lại mật khẩu',
+        html: `
+          <h1>Yêu cầu đặt lại mật khẩu</h1>
+          <p>Bạn đã yêu cầu đặt lại mật khẩu. Vui lòng click vào link bên dưới để đặt lại mật khẩu:</p>
+          <a href="${resetUrl}">Đặt lại mật khẩu</a>
+          <p>Link này sẽ hết hạn sau 1 giờ.</p>
+          <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+        `
+      };
+
+      // Send email
+      await transporter.sendMail(mailOptions);
+
+      res.json({ message: 'Email đặt lại mật khẩu đã được gửi' });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   },
-  loginWithFacebook: async (req, res) => {
+
+  // Reset password with token
+  resetPassword: async (req, res) => {
     try {
-      const { email, name, facebookId } = req.body;
+      const { token, newPassword } = req.body;
       
-      let user = await User.findOne({ ThuDienTu: email });
-      
-      if (!user) {
-        user = new User({
-          id: generateUserId('U'),
-          HoVaTen: name,
-          ThuDienTu: email,
-          FacebookId: facebookId,
-          VaiTro: 'khachhang',
-          TrangThai: 'active'
-        });
-        await user.save();
-      }
-
-      const token = jwt.sign(
-        { id: user.id, VaiTro: user.VaiTro },
-        process.env.JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000
+      // Verify token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findOne({ 
+        id: decoded.id,
+        ResetPasswordToken: token,
+        ResetPasswordExpires: { $gt: Date.now() }
       });
 
-      res.json({ token, user: { ...user._doc, MatKhau: undefined } });
+      if (!user) {
+        return res.status(400).json({ 
+          message: 'Token không hợp lệ hoặc đã hết hạn' 
+        });
+      }
+
+      // Update password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.MatKhau = hashedPassword;
+      user.ResetPasswordToken = undefined;
+      user.ResetPasswordExpires = undefined;
+      await user.save();
+
+      res.json({ message: 'Mật khẩu đã được đặt lại thành công' });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(400).json({ message: error.message });
     }
   }
 };

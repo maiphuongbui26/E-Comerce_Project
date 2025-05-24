@@ -47,7 +47,7 @@ export const addToCart = createAsyncThunk(
 
 export const updateCartItem = createAsyncThunk(
   "cart/updateCartItem",
-  async ({ itemId, quantity }, { rejectWithValue }) => {
+  async ({ itemId, quantity, KichThuoc }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
       const user = JSON.parse(localStorage.getItem("user"));
@@ -56,6 +56,7 @@ export const updateCartItem = createAsyncThunk(
         { 
           idSanPham: itemId,
           SoLuong: quantity,
+          KichThuoc: KichThuoc,
           idUser: user?.id
         },
         {

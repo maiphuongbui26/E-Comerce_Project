@@ -87,6 +87,14 @@ const productSchema = new mongoose.Schema({
       message: 'YeuThich phải là một mảng các object có userId'
     }
   },
+  TonKho: {
+    SoLuong: {
+      type: Number,
+      default: 0
+    },
+    NgayTonKho: Date,
+    GiamGia: Number,
+  },
 }, {
   timestamps: true
 });
@@ -97,5 +105,22 @@ productSchema.index({ 'LoaiSanPham.id': 1 });
 productSchema.index({ 'DanhMuc.id': 1 });
 productSchema.index({ DaBan: -1 });
 
+// Thêm method để xử lý chuyển sang tồn kho
+productSchema.methods.chuyenSangTonKho = async function(soLuong, hanBanLoHang) {
+  console.log("soLuong", soLuong)
+  console.log("hanBanLoHang", hanBanLoHang)
+  const giaSauGiam = this.GiaSanPham * 0.3; // Giảm 70%
+  console.log("giaSauGiam", giaSauGiam)
+  this.TonKho = {
+    SoLuong: soLuong,
+    NgayTonKho: new Date(),
+    GiamGia: giaSauGiam
+  };
+  
+  this.SoLuong -= soLuong;
+
+  return this.save();
+};
 const Product = mongoose.model('Product', productSchema);
 module.exports = Product;
+

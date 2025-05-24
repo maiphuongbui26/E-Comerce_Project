@@ -6,32 +6,55 @@ const warehouseController = {
   // Import stock
   importStock: async (req, res) => {
     try {
-      const { SanPham, SoLuong, NgayNhapKho, HanBanLoHang } = req.body;
+      const { SanPham, SoLuong, NgayNhapKho } = req.body;
       const product = await Product.findOne({ idSanPham: SanPham });
-      // In importStock function
-      const warehouse = new Warehouse({
-        id: generateWarehouseId('WH'),
-        SanPham: product.toObject(), // Store full product object
-        NgayNhapKho: NgayNhapKho || new Date(),
-        SoLuong
-      });
+      
       if (!product) {
         return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
       }
-      // Increase product quantity
-      product.SoLuong = (product.SoLuong || 0) + SoLuong;
-      await product.save();
-      await warehouse.save();
 
-      res.status(201).json({ 
-        message: 'Nhập kho thành công', 
-        warehouse,
-        product: {
-          idSanPham: product.idSanPham,
-          TenSanPham: product.TenSanPham,
-          SoLuong: product.SoLuong
-        }
+      // Kiểm tra xem đã có phiếu nhập kho cho sản phẩm này chưa
+      const existingWarehouse = await Warehouse.findOne({
+        'SanPham.idSanPham': SanPham,
+        NgayNhapKho: { $exists: true },
+        NgayXuatKho: { $exists: false }
       });
+
+      if (existingWarehouse) {
+        // Nếu đã có, tăng số lượng trong kho hiện tại
+        existingWarehouse.SoLuong += SoLuong;
+        await existingWarehouse.save();
+        
+        res.status(201).json({ 
+          message: 'Nhập kho thành công', 
+          warehouse: existingWarehouse,
+          product: {
+            idSanPham: product.idSanPham,
+            TenSanPham: product.TenSanPham,
+            SoLuong: product.SoLuong
+          }
+        });
+      } else {
+        // Nếu chưa có, tạo phiếu nhập kho mới
+        const warehouse = new Warehouse({
+          id: generateWarehouseId('WH'),
+          SanPham: product.toObject(),
+          NgayNhapKho: NgayNhapKho || new Date(),
+          SoLuong
+        });
+
+        await warehouse.save();
+        
+        res.status(201).json({ 
+          message: 'Tạo phiếu nhập kho mới thành công', 
+          warehouse,
+          product: {
+            idSanPham: product.idSanPham,
+            TenSanPham: product.TenSanPham,
+            SoLuong: product.SoLuong
+          }
+        });
+      }
     } catch (error) {
       res.status(400).json({ message: error.message });
     }
@@ -40,29 +63,48 @@ const warehouseController = {
   // Export stock
   exportStock: async (req, res) => {
     try {
-        
-        const { SanPham, SoLuong, NgayXuatKho,HanBanLoHang } = req.body;
+      const { SanPham, SoLuong, NgayXuatKho, HanBanLoHang } = req.body;
 
+      // Tìm sản phẩm
       const product = await Product.findOne({ idSanPham: SanPham });
       if (!product) {
         return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
       }
 
-      if (product.SoLuong < SoLuong) {
-        return res.status(400).json({ message: 'Số lượng xuất kho vượt quá số lượng tồn kho' });
+      // Tìm phiếu nhập kho có số lượng còn đủ
+      const warehouseStock = await Warehouse.findOne({
+        'SanPham.idSanPham': SanPham,
+        NgayNhapKho: { $exists: true },
+        NgayXuatKho: { $exists: false },
+        SoLuong: { $gte: SoLuong }
+      });
+
+      if (!warehouseStock) {
+        return res.status(400).json({ message: 'Số lượng trong kho không đủ để xuất' });
       }
 
-      // In exportStock function
+      // Tạo phiếu xuất kho
       const warehouse = new Warehouse({
         id: generateWarehouseId('WH'),
-        SanPham: product.toObject(), 
+        SanPham: product.toObject(),
         NgayXuatKho: NgayXuatKho || new Date(),
-        SoLuong: -SoLuong,
+        SoLuong: -SoLuong,  // Số âm để đánh dấu xuất kho
         HanBanLoHang
       });
 
-      // Decrease product quantity
-      product.SoLuong -= SoLuong;
+      // Giảm số lượng trong kho
+      warehouseStock.SoLuong -= SoLuong;
+      await warehouseStock.save();
+
+      // Tăng số lượng sản phẩm (bao gồm cả hàng tồn kho nếu có)
+      const tonKhoSoLuong = product.TonKho?.SoLuong || 0;
+      product.SoLuong = (product.SoLuong || 0) + SoLuong + tonKhoSoLuong;
+      
+      // Reset TonKho về 0 sau khi đã cộng vào SoLuong
+      if (product.TonKho) {
+        product.TonKho.SoLuong = 0;
+      }
+      
       await product.save();
       await warehouse.save();
 
@@ -72,7 +114,12 @@ const warehouseController = {
         product: {
           idSanPham: product.idSanPham,
           TenSanPham: product.TenSanPham,
-          SoLuong: product.SoLuong
+          SoLuong: product.SoLuong,
+          TonKho: product.TonKho
+        },
+        warehouseStock: {
+          id: warehouseStock.id,
+          SoLuongConLai: warehouseStock.SoLuong
         }
       });
     } catch (error) {
