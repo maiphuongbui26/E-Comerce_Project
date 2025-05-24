@@ -198,12 +198,12 @@ const Home = () => {
           >
             {categories.map((item) => (
               <Box
-                key={item}
+                key={item.id} // Sửa thành item.id
                 sx={{
                   whiteSpace: 'nowrap',
-                  color: item === 'GIẢM GIÁ' ? '#cc0f0f' : '#303030',
+                  color: item.TenDanhMuc === 'GIẢM GIÁ' ? '#cc0f0f' : '#303030',
                   fontSize: '13px',
-                  fontWeight: item === 'GIẢM GIÁ' ? 600 : 400,
+                  fontWeight: item.TenDanhMuc === 'GIẢM GIÁ' ? 600 : 400,
                   cursor: 'pointer',
                   '&:hover': {
                     color: '#cc0f0f'
