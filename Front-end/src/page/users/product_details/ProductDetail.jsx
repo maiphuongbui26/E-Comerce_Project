@@ -36,8 +36,7 @@ const ProductDetail = () => {
       5: 0
     }
   });
-    const isOutOfStock = selectedProduct?.SoLuong === 0 
-
+    const isOutOfStock = selectedProduct?.SoLuong === 0 && selectedProduct?.TonKho?.SoLuong === 0;
   console.log("products", products);
   const [mainImage, setMainImage] = useState("");
   useEffect(() => {
@@ -391,7 +390,7 @@ const ProductDetail = () => {
                   <Button
                     variant="outlined"
                     onClick={handleAddProductToCart}
-                    disabled={isOutOfStock && selectedProduct?.TonKho.SoLuong === 0}
+                    disabled={isOutOfStock}
                     sx={{
                       flex: { xs: "auto", sm: 1 },
                       height: 48,
@@ -409,11 +408,11 @@ const ProductDetail = () => {
                       }
                     }}
                   >
-                    {isOutOfStock && selectedProduct?.TonKho.SoLuong === 0 ? "HẾT HÀNG" : "THÊM VÀO GIỎ HÀNG"}
+                    {isOutOfStock ? "HẾT HÀNG" : "THÊM VÀO GIỎ HÀNG"}
                   </Button>
                   <Button
                     variant="contained"
-                    disabled={isOutOfStock && selectedProduct?.TonKho.SoLuong === 0}
+                    disabled={isOutOfStock}
                     sx={{
                       flex: { xs: "auto", sm: 1 },
                       height: 48,
@@ -429,7 +428,7 @@ const ProductDetail = () => {
                     }}
                     onClick={handleMuaNgay}
                   >
-                    {isOutOfStock && selectedProduct?.TonKho.SoLuong === 0  ? "HẾT HÀNG" : "MUA NGAY"}
+                    {isOutOfStock ? "HẾT HÀNG" : "MUA NGAY"}
                   </Button>
                 </Box>
           <Box>
